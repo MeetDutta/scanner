@@ -1,0 +1,8 @@
+{
+  "template_id": "TMPL-CHEM-001",
+  "template_version": "1.0.0",
+  "domain": "chemical",
+  "document_title": "Chemical Process Reactor Operating Specification",
+  "description": "Standard fixed specification for chemical batch reactor process concentration limits, thermal thresholds, and emergency systems.",
+  "classification": "Chemical Process Safety Specification"
+}

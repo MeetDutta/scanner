@@ -1,0 +1,41 @@
+{
+  "domain": "mechanical",
+  "components": [
+    "pump shaft",
+    "centrifugal pump",
+    "drive shaft",
+    "bearing journal",
+    "journal",
+    "flange collar",
+    "coupling hub",
+    "pump casing",
+    "impeller",
+    "seals",
+    "bearing"
+  ],
+  "materials": [
+    "304 SS",
+    "316L SS",
+    "AISI 4140",
+    "carbon steel",
+    "cast iron",
+    "bronze"
+  ],
+  "units": {
+    "temperature": ["°C", "C", "deg C", "degrees C"],
+    "pressure": ["bar", "Bar", "BAR", "MPa", "kPa", "psi"],
+    "dimension": ["mm", "μm", "um", "cm", "m", "inch"],
+    "roughness": ["μm", "um", "Ra"]
+  },
+  "keywords": [
+    "precision",
+    "machining",
+    "tolerancing",
+    "clearance",
+    "concentricity",
+    "runout",
+    "leakage",
+    "continuous operation",
+    "seating zones"
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "domain": "chemical",
+  "components": [
+    "batch reactor",
+    "reactor vessel",
+    "vessel jacket",
+    "emergency quench system",
+    "quench valve",
+    "agitator",
+    "heat exchanger",
+    "condenser",
+    "reflux column"
+  ],
+  "materials": [
+    "hastelloy c-276",
+    "inconel",
+    "glass lined steel",
+    "ptfe",
+    "316l stainless steel"
+  ],
+  "units": {
+    "concentration": ["%", "wt%", "vol%", "ppm", "molar", "M"],
+    "temperature": ["°C", "C", "K", "deg C"],
+    "pressure": ["bar", "barg", "MPa", "kPa", "psi"],
+    "time": ["s", "sec", "min", "hours"]
+  },
+  "keywords": [
+    "steady-state",
+    "synthesis",
+    "runaway",
+    "exothermic",
+    "quench",
+    "primed",
+    "concentration",
+    "process safety"
+  ]
+}

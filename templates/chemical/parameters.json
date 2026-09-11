@@ -1,0 +1,38 @@
+[
+  {
+    "parameter_id": "feed_concentration",
+    "parameter": "concentration",
+    "display_name": "Aqueous Reactant Concentration",
+    "aliases": ["aqueous reactant feed required concentration", "feed concentration", "reactant concentration", "solution concentration"],
+    "value_type": "numeric",
+    "unit": "%",
+    "required": true,
+    "max_value": 10.0,
+    "severity_on_deviation": "Critical",
+    "rule_reference": "Process Safety Engineering Threshold PS-01"
+  },
+  {
+    "parameter_id": "operating_temperature",
+    "parameter": "temperature",
+    "display_name": "Maximum Core Operating Temperature",
+    "aliases": ["maximum operating temperature", "jacket temperature", "reactor core temperature", "vessel temperature"],
+    "value_type": "numeric",
+    "unit": "°C",
+    "required": true,
+    "max_value": 120.0,
+    "severity_on_deviation": "Critical",
+    "rule_reference": "OSHA 1910.119 Process Safety Management / ASME Section VIII"
+  },
+  {
+    "parameter_id": "quench_time",
+    "parameter": "response_time",
+    "display_name": "Emergency Quench Response Time",
+    "aliases": ["emergency quench response time", "quench activation time", "valve opening time"],
+    "value_type": "numeric",
+    "unit": "s",
+    "required": false,
+    "max_value": 30.0,
+    "severity_on_deviation": "High",
+    "rule_reference": "NFPA 69 Explosion Prevention Systems"
+  }
+]

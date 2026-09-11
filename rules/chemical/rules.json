@@ -1,0 +1,41 @@
+[
+  {
+    "rule_id": "CHEM-R01",
+    "domain": "chemical",
+    "parameter": "concentration",
+    "condition": "aqueous_feed_steady_state",
+    "operator": "less_than_or_equal",
+    "expected_value": 10.0,
+    "allowed_range": [0.0, 10.0],
+    "unit": "%",
+    "severity": "Critical",
+    "description": "Aqueous reactant feed concentration must not exceed 10.0% safety threshold.",
+    "reference": "Process Safety Engineering Threshold PS-01"
+  },
+  {
+    "rule_id": "CHEM-R02",
+    "domain": "chemical",
+    "parameter": "temperature",
+    "condition": "reactor_core_thermal_runaway",
+    "operator": "less_than_or_equal",
+    "expected_value": 120.0,
+    "allowed_range": [-20.0, 120.0],
+    "unit": "°C",
+    "severity": "Critical",
+    "description": "Maximum core reactor vessel operating temperature must not exceed 120.0 °C.",
+    "reference": "OSHA 1910.119 Process Safety Management / ASME Section VIII"
+  },
+  {
+    "rule_id": "CHEM-R03",
+    "domain": "chemical",
+    "parameter": "response_time",
+    "condition": "quench_system_activation",
+    "operator": "less_than_or_equal",
+    "expected_value": 30.0,
+    "allowed_range": [0.0, 30.0],
+    "unit": "s",
+    "severity": "High",
+    "description": "Emergency quench system response activation time must not exceed 30.0 s.",
+    "reference": "NFPA 69 Explosion Prevention Systems"
+  }
+]

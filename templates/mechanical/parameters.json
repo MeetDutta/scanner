@@ -1,0 +1,50 @@
+[
+  {
+    "parameter_id": "operating_temperature",
+    "parameter": "operating_temperature",
+    "display_name": "Operating Temperature",
+    "aliases": ["operating temperature", "working temperature", "continuous rated temperature", "rated temp"],
+    "value_type": "numeric",
+    "unit": "°C",
+    "required": true,
+    "max_value": 80.0,
+    "severity_on_deviation": "High",
+    "rule_reference": "ISO 2768 / ASME B31.3 Standard Operating Bounds"
+  },
+  {
+    "parameter_id": "operating_pressure",
+    "parameter": "operating_pressure",
+    "display_name": "Operating Pressure",
+    "aliases": ["operating pressure", "working pressure", "system pressure", "design pressure"],
+    "value_type": "numeric",
+    "unit": "bar",
+    "required": true,
+    "max_value": 16.0,
+    "severity_on_deviation": "High",
+    "rule_reference": "ASME B31.3 Process Piping Rating"
+  },
+  {
+    "parameter_id": "bearing_journal_tolerance",
+    "parameter": "tolerance",
+    "display_name": "Bearing Journal Tolerance",
+    "aliases": ["bearing journal diameter tolerance", "journal tolerance", "machining tolerance", "shaft tolerance", "bearing seating tolerance"],
+    "value_type": "numeric",
+    "unit": "mm",
+    "required": true,
+    "max_value": 0.05,
+    "severity_on_deviation": "Critical",
+    "rule_reference": "ASME Y14.5-2018 §2.4 (Precision Mechanical Tolerancing)"
+  },
+  {
+    "parameter_id": "surface_roughness",
+    "parameter": "surface_roughness",
+    "display_name": "Surface Roughness",
+    "aliases": ["surface roughness", "surface finish", "ra roughness", "machined surface roughness"],
+    "value_type": "numeric",
+    "unit": "μm",
+    "required": false,
+    "max_value": 1.6,
+    "severity_on_deviation": "Medium",
+    "rule_reference": "ISO 1302 Surface Texture Specification"
+  }
+]

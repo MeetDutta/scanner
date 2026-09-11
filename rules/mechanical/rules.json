@@ -1,0 +1,54 @@
+[
+  {
+    "rule_id": "MECH-R01",
+    "domain": "mechanical",
+    "parameter": "tolerance",
+    "condition": "bearing_journal_precision",
+    "operator": "less_than_or_equal",
+    "expected_value": 0.05,
+    "allowed_range": [0.0, 0.05],
+    "unit": "mm",
+    "severity": "Critical",
+    "description": "Critical bearing journal diameter tolerance must not exceed ±0.05 mm.",
+    "reference": "ASME Y14.5-2018 §2.4 (Precision Mechanical Tolerancing)"
+  },
+  {
+    "rule_id": "MECH-R02",
+    "domain": "mechanical",
+    "parameter": "operating_pressure",
+    "condition": "piping_design_pressure",
+    "operator": "less_than_or_equal",
+    "expected_value": 16.0,
+    "allowed_range": [0.0, 16.0],
+    "unit": "bar",
+    "severity": "High",
+    "description": "Pneumatic/Hydraulic piping operating pressure must not exceed 16.0 bar rating.",
+    "reference": "ASME B31.3 Process Piping Rating"
+  },
+  {
+    "rule_id": "MECH-R03",
+    "domain": "mechanical",
+    "parameter": "surface_roughness",
+    "condition": "bearing_journal_finish",
+    "operator": "less_than_or_equal",
+    "expected_value": 1.6,
+    "allowed_range": [0.0, 1.6],
+    "unit": "μm",
+    "severity": "Medium",
+    "description": "Bearing journal surface finish roughness Ra must be at or below 1.6 μm.",
+    "reference": "ISO 1302 Surface Texture Specification"
+  },
+  {
+    "rule_id": "MECH-R04",
+    "domain": "mechanical",
+    "parameter": "operating_temperature",
+    "condition": "continuous_rated_load",
+    "operator": "less_than_or_equal",
+    "expected_value": 80.0,
+    "allowed_range": [-20.0, 80.0],
+    "unit": "°C",
+    "severity": "High",
+    "description": "Centrifugal pump shaft continuous operating temperature must not exceed 80.0 °C.",
+    "reference": "ISO 5199 Technical Specifications for Centrifugal Pumps"
+  }
+]

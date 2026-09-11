@@ -1,0 +1,50 @@
+[
+  {
+    "parameter_id": "rated_voltage",
+    "parameter": "voltage",
+    "display_name": "Rated Voltage",
+    "aliases": ["rated voltage", "operating voltage", "supply voltage", "system voltage", "line voltage"],
+    "value_type": "numeric",
+    "unit": "V",
+    "required": true,
+    "allowed_values": [415.0],
+    "severity_on_deviation": "Critical",
+    "rule_reference": "IEC 60364-4-41 §4.2 (Standard LV Distribution Voltage)"
+  },
+  {
+    "parameter_id": "operating_frequency",
+    "parameter": "frequency",
+    "display_name": "Operating Frequency",
+    "aliases": ["operating frequency", "system line operating frequency", "line frequency", "supply frequency"],
+    "value_type": "numeric",
+    "unit": "Hz",
+    "required": true,
+    "allowed_values": [50.0],
+    "severity_on_deviation": "High",
+    "rule_reference": "IEC 60034-1 Grid Frequency Tolerance"
+  },
+  {
+    "parameter_id": "incoming_current",
+    "parameter": "current",
+    "display_name": "Continuous Incoming Current",
+    "aliases": ["continuous incoming current", "busbar current", "rated current", "incoming load current"],
+    "value_type": "numeric",
+    "unit": "A",
+    "required": true,
+    "max_value": 630.0,
+    "severity_on_deviation": "Critical",
+    "rule_reference": "IEC 61439-1 Busbar Ampacity Limit"
+  },
+  {
+    "parameter_id": "insulation_resistance",
+    "parameter": "insulation_resistance",
+    "display_name": "Insulation Resistance",
+    "aliases": ["insulation resistance", "megger test resistance", "phase to ground insulation"],
+    "value_type": "numeric",
+    "unit": "MΩ",
+    "required": false,
+    "min_value": 1.0,
+    "severity_on_deviation": "High",
+    "rule_reference": "IEC 60364-6 Verification & Testing"
+  }
+]

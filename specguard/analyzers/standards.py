@@ -60,8 +60,15 @@ class StandardsAnalyzer(BaseAnalyzer):
         parameters: List[EngineeringParameter] = (context or {}).get("parameters", [])
         active_domain = (context or {}).get("domain", "mechanical").lower()
 
-        # Load installed local standards rules for active domain
-        rules = StandardsKnowledgeBase.load_rules_for_domain(active_domain)
+        # Load rules from template and local installed standards
+        rules = []
+        if context and context.get("template") and getattr(context["template"], "rules", None):
+            rules.extend(context["template"].rules)
+        installed_rules = StandardsKnowledgeBase.load_rules_for_domain(active_domain)
+        for ir in installed_rules:
+            if not any(r.get("rule_id") == ir.get("rule_id") for r in rules):
+                rules.append(ir)
+
         if not rules:
             logger.info("No local standard rules installed for domain '%s'", active_domain)
             return findings
@@ -82,6 +89,12 @@ class StandardsAnalyzer(BaseAnalyzer):
                 severity = rule.get("severity", "High")
                 ref = rule.get("reference", rule.get("_standard_name", "Local Standard"))
                 desc = rule.get("description", "Standard requirement deviation")
+
+                # Section 20: Flag low-confidence ML extractions for review
+                if getattr(param, "confidence", 1.0) < 0.6:
+                    severity = SeverityLevel.INFORMATIONAL.value
+                    desc = f"[Verification Needed: Low ML Confidence ({param.confidence:.2f})] {desc}"
+
 
                 deviation_detected = False
                 expected_str = ""

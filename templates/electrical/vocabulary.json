@@ -1,0 +1,41 @@
+{
+  "domain": "electrical",
+  "components": [
+    "induction motor",
+    "motor control center",
+    "mcc",
+    "feeder",
+    "busbar",
+    "circuit breaker",
+    "trip unit",
+    "switchgear",
+    "transformer",
+    "contactor",
+    "overload relay"
+  ],
+  "materials": [
+    "copper",
+    "aluminum",
+    "xlpe",
+    "pvc",
+    "class f insulation"
+  ],
+  "units": {
+    "voltage": ["V", "kV", "mV", "volts", "volt"],
+    "current": ["A", "kA", "mA", "amps", "amp", "ampere"],
+    "frequency": ["Hz", "kHz", "hertz"],
+    "power": ["kW", "MW", "kVA", "MVA", "HP"],
+    "resistance": ["Ω", "kΩ", "MΩ", "ohms"]
+  },
+  "keywords": [
+    "three-phase",
+    "single-phase",
+    "sinusoidal",
+    "continuous",
+    "peak loading",
+    "rated voltage",
+    "ampacity",
+    "insulation",
+    "short circuit"
+  ]
+}

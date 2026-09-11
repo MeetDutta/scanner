@@ -22,6 +22,8 @@ from specguard.analyzers.semantic import SemanticAnalyzer
 from specguard.analyzers.logical import LogicalAnalyzer
 from specguard.analyzers.standards import StandardsAnalyzer
 from specguard.analyzers.severity import SeverityEngine
+from specguard.analyzers.template_analyzer import TemplateAnalyzer
+from specguard.templates.manager import TemplateManager
 from specguard.storage.database import DatabaseManager
 from specguard.storage.repositories import DocumentRepository, SessionRepository
 from specguard.security.audit import AuditLogger
@@ -42,6 +44,7 @@ class AnalysisPipeline:
 
 
         # Initialize analyzers
+        self.template_analyzer = TemplateAnalyzer()
         self.formatting_analyzer = FormattingAnalyzer()
         self.structure_analyzer = StructureAnalyzer()
         self.toc_analyzer = TOCAnalyzer()
@@ -57,6 +60,7 @@ class AnalysisPipeline:
         self,
         file_path: str,
         domain: str = "mechanical",
+
         selected_standards: Optional[List[str]] = None,
         enabled_modules: Optional[List[str]] = None,
         progress_callback: Optional[Callable[[str, int], None]] = None
@@ -79,11 +83,15 @@ class AnalysisPipeline:
         doc = DocumentParser.parse_file(file_path)
         self.doc_repo.save_document(doc)
 
+        # Load fixed domain template directly based on user-selected mode
+        template = TemplateManager.get_template(domain)
+
         all_findings: List[Finding] = []
         context: Dict[str, Any] = {
             "domain": domain.lower(),
             "selected_standards": selected_standards or [],
-            "session_id": session_id
+            "session_id": session_id,
+            "template": template
         }
 
         # 2. Document Layout & Formatting Analysis
@@ -131,8 +139,18 @@ class AnalysisPipeline:
         try:
             eng_findings = self.engineering_analyzer.analyze(doc, context)
             all_findings.extend(eng_findings)
+            context["parameters"] = getattr(self.engineering_analyzer, "extract_parameters", lambda d: [])(doc)
         except Exception as e:
             logger.error("EngineeringAnalyzer failed: %s", e)
+
+        # 7.1 Template Validation (Sections, Numbering, Mandatory Parameters)
+        report("Validating fixed engineering template...", 80)
+        try:
+            tmpl_findings = self.template_analyzer.analyze(doc, context)
+            all_findings.extend(tmpl_findings)
+        except Exception as e:
+            logger.error("TemplateAnalyzer failed: %s", e)
+
 
         # 8. Semantic Propositions & Logical Consistency
         report("Detecting semantic propositions & cross-document contradictions...", 85)

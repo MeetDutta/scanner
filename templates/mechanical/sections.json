@@ -1,0 +1,56 @@
+[
+  {
+    "section_id": "SEC-1",
+    "number": "1",
+    "title": "Scope",
+    "required": true,
+    "order": 1,
+    "description": "General description and applicability of the precision shaft specification."
+  },
+  {
+    "section_id": "SEC-2",
+    "number": "2",
+    "title": "System Requirements",
+    "required": true,
+    "order": 2,
+    "description": "Operating conditions including rated temperature and working pressure bounds.",
+    "expected_parameters": ["operating_temperature", "operating_pressure"]
+  },
+  {
+    "section_id": "SEC-3",
+    "number": "3",
+    "title": "Manufacturing Tolerances",
+    "required": true,
+    "order": 3,
+    "description": "Precision dimensional limits and surface texture specifications.",
+    "subsections": [
+      {
+        "number": "3.1",
+        "title": "Shaft Machining Limits",
+        "required": true,
+        "expected_parameters": ["bearing_journal_tolerance", "surface_roughness"]
+      },
+      {
+        "number": "3.2",
+        "title": "Bearing & Collar Clearances",
+        "required": true,
+        "expected_parameters": ["bearing_clearance"]
+      },
+      {
+        "number": "3.3",
+        "title": "Environmental Operating Limits",
+        "required": true,
+        "expected_parameters": ["maximum_temperature"]
+      }
+    ]
+  },
+  {
+    "section_id": "SEC-4",
+    "number": "Table 1",
+    "title": "Critical Component Dimensions",
+    "required": false,
+    "order": 4,
+    "description": "Dimensional and tolerance table for critical components (Shaft Journal, Flange Collar, Coupling Hub).",
+    "expected_columns": ["Component", "Nominal Dimension", "Machining Tolerance"]
+  }
+]

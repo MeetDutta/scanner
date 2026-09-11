@@ -1,0 +1,43 @@
+[
+  {
+    "rule_id": "ELEC-R01",
+    "domain": "electrical",
+    "parameter": "voltage",
+    "condition": "three_phase_feeder_nominal",
+    "operator": "allowed_values",
+    "expected_value": 415.0,
+    "allowed_range": [400.0, 430.0],
+    "allowed_values": [415.0],
+    "unit": "V",
+    "severity": "Critical",
+    "description": "Three-phase motor feeder nominal operating voltage must be 415 V.",
+    "reference": "IEC 60364-4-41 §4.2 (Standard LV Distribution Voltage)"
+  },
+  {
+    "rule_id": "ELEC-R02",
+    "domain": "electrical",
+    "parameter": "frequency",
+    "condition": "grid_frequency",
+    "operator": "allowed_values",
+    "expected_value": 50.0,
+    "allowed_range": [49.5, 50.5],
+    "allowed_values": [50.0],
+    "unit": "Hz",
+    "severity": "High",
+    "description": "System line frequency must be 50.0 Hz.",
+    "reference": "IEC 60034-1 Grid Frequency Tolerance"
+  },
+  {
+    "rule_id": "ELEC-R03",
+    "domain": "electrical",
+    "parameter": "current",
+    "condition": "busbar_ampacity_limit",
+    "operator": "less_than_or_equal",
+    "expected_value": 630.0,
+    "allowed_range": [0.0, 630.0],
+    "unit": "A",
+    "severity": "Critical",
+    "description": "Main busbar continuous incoming current must not exceed standard frame limit of 630 A.",
+    "reference": "IEC 61439-1 Busbar Ampacity Limit"
+  }
+]

@@ -1,0 +1,36 @@
+[
+  {
+    "section_id": "SEC-1",
+    "number": "1",
+    "title": "Scope",
+    "required": true,
+    "order": 1,
+    "description": "Operational concentration limits and thermal thresholds for chemical synthesis."
+  },
+  {
+    "section_id": "SEC-2",
+    "number": "2",
+    "title": "Requirements",
+    "required": true,
+    "order": 2,
+    "description": "Reactant feed concentration and core vessel operating temperature limits.",
+    "expected_parameters": ["feed_concentration", "operating_temperature"]
+  },
+  {
+    "section_id": "SEC-3",
+    "number": "3",
+    "title": "Safety Interlocks",
+    "required": false,
+    "order": 3,
+    "description": "Emergency quench system valves and runaway reaction controls.",
+    "expected_parameters": ["quench_time"]
+  },
+  {
+    "section_id": "SEC-4",
+    "number": "4",
+    "title": "Material Compatibility",
+    "required": false,
+    "order": 4,
+    "description": "Corrosion resistance and vessel lining specifications."
+  }
+]

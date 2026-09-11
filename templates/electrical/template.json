@@ -1,0 +1,8 @@
+{
+  "template_id": "TMPL-ELEC-001",
+  "template_version": "1.0.0",
+  "domain": "electrical",
+  "document_title": "ELECTRICAL MOTOR CONTROL CENTER SPECIFICATION",
+  "description": "Standard fixed specification for industrial electrical motor control center, busbar distribution, and protection feeder ratings.",
+  "classification": "Electrical Engineering Specification"
+}
