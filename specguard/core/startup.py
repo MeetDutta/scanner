@@ -30,16 +30,16 @@ REQUIRED_PACKAGES = [
     ("openpyxl", "OpenPyXL Spreadsheet Parser"),
     ("numpy", "NumPy Numerical Computing"),
     ("pandas", "Pandas Tabular Processing"),
-    ("yaml", "PyYAML Standards Parser"),
-    ("torch", "PyTorch Deep Learning Engine"),
-    ("sklearn", "Scikit-Learn Evaluation Tools"),
-    ("scipy", "SciPy Scientific Algorithms"),
-    ("psutil", "Hardware Telemetry"),
-    ("onnx", "ONNX Model Serialization"),
+    ("yaml", "PyYAML Standards & Template Parser"),
 ]
 
 OPTIONAL_PACKAGES = [
-    ("onnxruntime", "ONNX Runtime Offline Inference Engine"),
+    ("torch", "PyTorch Deep Learning Engine (Optional ML)"),
+    ("onnx", "ONNX Model Serialization (Optional ML)"),
+    ("onnxruntime", "ONNX Runtime Offline Inference Engine (Optional ML)"),
+    ("sklearn", "Scikit-Learn Evaluation Tools (Research)"),
+    ("scipy", "SciPy Scientific Algorithms (Research)"),
+    ("psutil", "Hardware Telemetry (Research)"),
 ]
 
 

@@ -80,6 +80,12 @@ def test_minimal_gui_3_stage_workflow():
     assert window.view_preview.detail_panel.detected_val.text() != ""
     assert window.view_preview.detail_panel.expected_val.text() != ""
 
+    # 7.1 Verify Export Button & Actions
+    assert window.view_preview.export_btn.isVisible()
+    export_menu = window.view_preview.export_btn.menu()
+    assert export_menu is not None
+    assert len(export_menu.actions()) == 3
+
     # 8. Test Navigation: Back to Mode
     window.view_preview.back_btn.click()
     assert window.stack.currentIndex() == 1

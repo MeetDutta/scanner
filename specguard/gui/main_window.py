@@ -243,7 +243,7 @@ class MainWindow(QMainWindow):
         self.current_session_id = session_id
 
         self.btn_step_preview.setEnabled(True)
-        self.view_preview.display_results(doc, findings, self.current_domain)
+        self.view_preview.display_results(doc, findings, self.current_domain, session_id)
         self._switch_stage(3)
 
     def _on_analysis_failed(self, error_msg: str):

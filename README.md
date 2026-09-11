@@ -100,20 +100,25 @@ Pre-generated synthetic engineering test documents containing realistic deviatio
 ├── pyproject.toml              # Dependencies & packaging metadata
 ├── create_demo_samples.py      # Synthetic document generator
 ├── demo_samples/               # Pre-generated sample documents
-├── standards/                  # Local machine-readable standards
-│   ├── mechanical/             # ASME Y14.5 / ISO 2768 demo rules
-│   ├── electrical/             # IEC 60364 / IEEE 141 demo rules
-│   └── chemical/               # OSHA PSM / Process Safety demo rules
+├── templates/                  # Fixed domain document templates
+│   ├── mechanical/             # Mechanical sections, parameters, vocabulary
+│   ├── electrical/             # Electrical sections, parameters, vocabulary
+│   └── chemical/               # Chemical sections, parameters, vocabulary
+├── rules/                      # Local deterministic standards rules
+│   ├── mechanical/             # ASME Y14.5 / ISO 2768 rules
+│   ├── electrical/             # IEC 60364 / IEEE 141 rules
+│   └── chemical/               # Process Safety / OSHA rules
 ├── specguard/
-│   ├── core/                   # Parser, CV layout, scanned pipeline, orchestrator
-│   ├── analyzers/              # 10 modular analysis engines
-│   ├── storage/                # SQLite database and repositories
-│   ├── security/               # Local authentication, audit logger, SHA-256 integrity
-│   ├── export/                 # PDF annotator, DOCX annotator, HTML/JSON reports
-│   ├── models/                 # Model registry and service interfaces
-│   ├── evaluation/             # Precision, recall, F1, critical recall metrics
-│   └── gui/                    # PySide6 desktop views, widgets, and CAD theme
-└── tests/                      # Full automated test suite (18 test cases)
+│   ├── core/                   # DocumentParser, CV layout, Pipeline, Models
+│   ├── templates/              # TemplateManager
+│   ├── analyzers/              # 10 modular analysis engines + TemplateAnalyzer
+│   ├── export/                 # PDF annotator, ReportGenerator (HTML/JSON)
+│   ├── gui/                    # 3-stage Government Portal GUI (Upload, Mode, Preview)
+│   ├── models/                 # Optional ML inference models (NER, Logical)
+│   ├── training/               # Isolated research-grade training & evaluation tools
+│   ├── storage/                # SQLite local session persistence
+│   └── repository/             # Immutable comparison archives
+└── tests/                      # Full automated test suite (60 test cases)
 ```
 
 ---

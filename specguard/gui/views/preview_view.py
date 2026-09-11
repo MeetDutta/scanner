@@ -14,12 +14,15 @@ from typing import List, Optional
 
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame, QPushButton,
-    QScrollArea, QListWidget, QListWidgetItem, QSplitter
+    QScrollArea, QListWidget, QListWidgetItem, QSplitter, QMenu,
+    QFileDialog, QMessageBox
 )
 from PySide6.QtCore import Qt, Signal
 
 from specguard.core.models import DocumentModel, Finding
 from specguard.gui.views.viewer_widget import DocumentViewerWidget
+from specguard.export.pdf_annotator import PDFAnnotator
+from specguard.export.report_generator import ReportGenerator
 
 
 class GovFindingDetailPanel(QFrame):
@@ -204,6 +207,12 @@ class PreviewView(QWidget):
         self.new_btn.clicked.connect(self.new_comparison_requested.emit)
         top_bar.addWidget(self.new_btn)
 
+        self.export_btn = QPushButton("EXPORT RESULT ▾")
+        self.export_btn.setProperty("class", "gov_btn_secondary")
+        self.export_btn.setCursor(Qt.PointingHandCursor)
+        self._setup_export_menu()
+        top_bar.addWidget(self.export_btn)
+
         top_bar.addStretch()
 
         # Findings Navigation
@@ -319,9 +328,99 @@ class PreviewView(QWidget):
         self.splitter.setSizes([160, 800, 360])
         main_layout.addWidget(self.splitter, 1)
 
-    def display_results(self, doc: DocumentModel, findings: List[Finding], domain: str = "Mechanical"):
+    def _setup_export_menu(self):
+        menu = QMenu(self)
+        menu.setStyleSheet("""
+            QMenu {
+                background-color: #ffffff;
+                color: #0f172a;
+                border: 1px solid #cbd5e1;
+                font-weight: 600;
+                font-size: 12px;
+                padding: 4px;
+            }
+            QMenu::item {
+                padding: 8px 20px;
+            }
+            QMenu::item:selected {
+                background-color: #002b49;
+                color: #ffffff;
+            }
+        """)
+        act_pdf = menu.addAction("Export Certified PDF (with visual highlights)...")
+        act_html = menu.addAction("Export Executive Compliance Report (HTML)...")
+        act_json = menu.addAction("Export Findings Data (JSON)...")
+
+        act_pdf.triggered.connect(self._export_pdf)
+        act_html.triggered.connect(self._export_html)
+        act_json.triggered.connect(self._export_json)
+
+        self.export_btn.setMenu(menu)
+
+    def _export_pdf(self):
+        if not self.doc or not self.doc.file_path:
+            QMessageBox.warning(self, "Export Warning", "No verified document is currently loaded.")
+            return
+
+        default_name = f"{Path(self.doc.file_path).stem}_SpecGuard_Annotated.pdf"
+        out_path, _ = QFileDialog.getSaveFileName(self, "Export Annotated PDF", default_name, "PDF Files (*.pdf)")
+        if not out_path:
+            return
+
+        try:
+            if Path(self.doc.file_path).suffix.lower() == ".pdf":
+                PDFAnnotator.create_annotated_pdf(self.doc.file_path, out_path, self.findings)
+            else:
+                # If non-PDF (e.g. DOCX or TXT), generate comprehensive HTML or alert
+                ReportGenerator.generate_html_report(self.doc, self.findings, getattr(self, "session_id", "SES-EXPORT"), out_path.replace(".pdf", ".html"))
+                QMessageBox.information(
+                    self,
+                    "Export Successful",
+                    f"Original file is non-PDF ({self.doc.file_type}). Generated complete Compliance Audit Report at:\n{out_path.replace('.pdf', '.html')}"
+                )
+                return
+
+            QMessageBox.information(self, "Export Successful", f"Certified Annotated PDF successfully exported to:\n{out_path}")
+        except Exception as e:
+            QMessageBox.critical(self, "Export Error", f"Failed exporting PDF report: {e}")
+
+    def _export_html(self):
+        if not self.doc:
+            QMessageBox.warning(self, "Export Warning", "No verified document is currently loaded.")
+            return
+
+        default_name = f"{Path(self.doc.file_path).stem}_SpecGuard_Audit.html"
+        out_path, _ = QFileDialog.getSaveFileName(self, "Export Compliance Report", default_name, "HTML Files (*.html)")
+        if not out_path:
+            return
+
+        try:
+            ReportGenerator.generate_html_report(self.doc, self.findings, getattr(self, "session_id", "SES-EXPORT"), out_path)
+            QMessageBox.information(self, "Export Successful", f"Compliance Audit Report successfully exported to:\n{out_path}")
+        except Exception as e:
+            QMessageBox.critical(self, "Export Error", f"Failed exporting HTML report: {e}")
+
+    def _export_json(self):
+        if not self.doc:
+            QMessageBox.warning(self, "Export Warning", "No verified document is currently loaded.")
+            return
+
+        default_name = f"{Path(self.doc.file_path).stem}_SpecGuard_Findings.json"
+        out_path, _ = QFileDialog.getSaveFileName(self, "Export Findings JSON", default_name, "JSON Files (*.json)")
+        if not out_path:
+            return
+
+        try:
+            ReportGenerator.generate_json_report(self.doc, self.findings, getattr(self, "session_id", "SES-EXPORT"), out_path)
+            QMessageBox.information(self, "Export Successful", f"Findings JSON successfully exported to:\n{out_path}")
+        except Exception as e:
+            QMessageBox.critical(self, "Export Error", f"Failed exporting JSON: {e}")
+
+    def display_results(self, doc: DocumentModel, findings: List[Finding], domain: str = "Mechanical", session_id: str = ""):
         self.doc = doc
         self.findings = findings
+        self.current_domain = domain
+        self.session_id = session_id
         self.current_finding_idx = -1
 
         # Calculate severity counts
