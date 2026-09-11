@@ -229,4 +229,98 @@ QLabel.badge_info {
     padding: 3px 8px;
     border-radius: 4px;
 }
+
+/* Minimal 3-Stage Workflow Styling */
+#top_header {
+    background-color: #090d16;
+    border-bottom: 1px solid #1e293b;
+    padding: 12px 24px;
+}
+
+#brand_title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #38bdf8;
+}
+
+#brand_subtitle {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* Breadcrumb Steps */
+.step_btn {
+    border: none;
+    background: transparent;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 13px;
+    color: #64748b;
+}
+
+.step_btn:disabled {
+    color: #475569;
+}
+
+.step_btn_active {
+    background-color: #0369a1;
+    color: #f8fafc;
+    font-weight: 700;
+}
+
+.step_btn_completed {
+    background-color: #0f2e3e;
+    color: #38bdf8;
+}
+
+/* Drop Zone */
+#drop_zone {
+    border: 2px dashed #334155;
+    border-radius: 12px;
+    background-color: #0b1120;
+    padding: 48px;
+}
+
+#drop_zone:hover {
+    border-color: #38bdf8;
+    background-color: #0d172a;
+}
+
+/* Compact Document Card */
+#doc_card {
+    background-color: #111827;
+    border: 1px solid #1f2937;
+    border-radius: 10px;
+    padding: 18px 24px;
+}
+
+/* Mode Selection Cards */
+.mode_card {
+    background-color: #111827;
+    border: 2px solid #1f2937;
+    border-radius: 12px;
+    padding: 24px 20px;
+    text-align: center;
+}
+
+.mode_card:hover {
+    border-color: #475569;
+    background-color: #131d33;
+}
+
+.mode_card_selected {
+    border: 2px solid #38bdf8;
+    background-color: #0c1c2e;
+}
+
+/* Finding Detail Panel */
+#finding_detail_panel {
+    background-color: #0e1526;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    padding: 18px;
+}
 """
+

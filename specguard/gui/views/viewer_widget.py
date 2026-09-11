@@ -110,9 +110,33 @@ class PageCanvas(QWidget):
             painter.setPen(QPen(QColor(56, 189, 248, 255), 3.5, Qt.SolidLine))
             painter.drawRoundedRect(f_rect, 5, 5)
 
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            pos = event.position() if hasattr(event, "position") else event.pos()
+            x = pos.x()
+            y = pos.y()
+            if self.pixmap and self.page_width > 0 and self.page_height > 0:
+                rx = self.pixmap.width() / self.page_width
+                ry = self.pixmap.height() / self.page_height
+                for f in self.findings:
+                    if not f.bbox:
+                        continue
+                    bx0 = f.bbox.x0 * rx - 4
+                    by0 = f.bbox.y0 * ry - 4
+                    bx1 = f.bbox.x1 * rx + 4
+                    by1 = f.bbox.y1 * ry + 4
+                    if bx0 <= x <= bx1 and by0 <= y <= by1:
+                        self.focused_bbox = f.bbox
+                        self.update()
+                        self.finding_clicked.emit(f)
+                        return
+        super().mousePressEvent(event)
+
 
 class DocumentViewerWidget(QWidget):
     """Complete document viewer component with zoom, paging, and jump-to-highlight."""
+    finding_selected = Signal(object)
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.doc: Optional[DocumentModel] = None
@@ -166,6 +190,16 @@ class DocumentViewerWidget(QWidget):
         self.zoom_in_btn.clicked.connect(self._zoom_in)
         tb_layout.addWidget(self.zoom_in_btn)
 
+        self.fit_width_btn = QPushButton("Fit Width")
+        self.fit_width_btn.setProperty("class", "secondary")
+        self.fit_width_btn.clicked.connect(self.fit_to_width)
+        tb_layout.addWidget(self.fit_width_btn)
+
+        self.fit_page_btn = QPushButton("Fit Page")
+        self.fit_page_btn.setProperty("class", "secondary")
+        self.fit_page_btn.clicked.connect(self.fit_to_page)
+        tb_layout.addWidget(self.fit_page_btn)
+
         layout.addWidget(toolbar)
 
         # Scroll area with canvas
@@ -174,8 +208,23 @@ class DocumentViewerWidget(QWidget):
         self.scroll_area.setAlignment(Qt.AlignCenter)
 
         self.canvas = PageCanvas()
+        self.canvas.finding_clicked.connect(self.finding_selected.emit)
         self.scroll_area.setWidget(self.canvas)
         layout.addWidget(self.scroll_area)
+
+    def fit_to_width(self):
+        viewport_w = self.scroll_area.viewport().width()
+        page_w = self.doc.pages[self.current_page - 1].width if self.doc and self.current_page <= len(self.doc.pages) else 612.0
+        if viewport_w > 50 and page_w > 0:
+            self.zoom_level = max(0.4, min(3.0, (viewport_w - 40) / page_w))
+            self._render_current_page()
+
+    def fit_to_page(self):
+        viewport_h = self.scroll_area.viewport().height()
+        page_h = self.doc.pages[self.current_page - 1].height if self.doc and self.current_page <= len(self.doc.pages) else 792.0
+        if viewport_h > 50 and page_h > 0:
+            self.zoom_level = max(0.4, min(3.0, (viewport_h - 40) / page_h))
+            self._render_current_page()
 
     def load_document(self, doc: DocumentModel, findings: List[Finding]):
         self.doc = doc
