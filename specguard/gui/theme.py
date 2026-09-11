@@ -1,285 +1,317 @@
 """
-Formal Government / Public-Sector Institutional Theme for SpecGuard.
-Designed according to official engineering verification portal standards:
-- Conservative, functional, accessible, high-contrast palette
-- Primary: Deep Navy / Government Blue (#002b49, #0a2540)
-- Background: Very Light Gray / Off-White (#f1f5f9, #f8fafc)
-- Crisp rectangular borders (#cbd5e1, #94a3b8)
-- Clean, readable typography (Arial, Noto Sans, sans-serif)
-- Formal severity colors: Critical (Deep Red), High (Dark Orange), Medium (Dark Amber), Low (Government Blue), Info (Slate)
+Modern High-Precision Engineering CAD / Verification Portal Theme for SpecGuard.
+Balances official authoritative engineering aesthetics with clean, premium modern UI:
+- Primary Header: Deep Midnight Slate (#0b1329, #0f172a) with subtle accent border
+- Canvas Background: Clean Off-White / Pale Slate (#f8fafc)
+- Surface Cards: Crisp White (#ffffff) with refined 1px border (#e2e8f0) and subtle radius (8px)
+- Primary Accent: Precision Sky/Ocean Blue (#0284c7, #0369a1)
+- Secondary Accent: Industrial Amber / Safety Orange (#f97316)
+- Typography: High-legibility system sans (-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif)
+- Severity Palette: Modern high-contrast pill badges
 """
 
 GOVERNMENT_THEME_QSS = """
-/* Base Application */
+/* Base Application & Window */
 QMainWindow, QWidget {
-    background-color: #f1f5f9;
+    background-color: #f8fafc;
     color: #0f172a;
-    font-family: Arial, "Noto Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", Helvetica, Arial, sans-serif;
     font-size: 13px;
 }
 
-/* Formal Header Banner */
+/* Formal Top Header Banner */
 #gov_header_banner {
-    background-color: #002b49;
-    border-bottom: 3px solid #b45309;
-    padding: 10px 24px;
+    background-color: #0b1329;
+    border-bottom: 2px solid #1e293b;
+    padding: 12px 28px;
 }
 
 #gov_brand_title {
     font-size: 20px;
-    font-weight: 800;
+    font-weight: 900;
     color: #ffffff;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
 }
 
 #gov_brand_sub {
     font-size: 12px;
     font-weight: 500;
-    color: #93c5fd;
+    color: #94a3b8;
     letter-spacing: 0.5px;
 }
 
 #gov_header_meta {
     font-size: 11px;
-    font-weight: 600;
-    color: #e2e8f0;
-    background-color: #0f3b60;
-    border: 1px solid #1e4e79;
-    border-radius: 2px;
-    padding: 4px 10px;
+    font-weight: 700;
+    color: #10b981;
+    background-color: #064e3b;
+    border: 1px solid #059669;
+    border-radius: 12px;
+    padding: 4px 14px;
+    letter-spacing: 0.5px;
 }
 
-/* Workflow Stage Strip */
+/* Segmented Workflow Step Navigator Strip */
 #workflow_strip {
     background-color: #ffffff;
-    border-bottom: 1px solid #cbd5e1;
-    padding: 6px 24px;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 8px 28px;
 }
 
 .stage_step_btn {
-    border: none;
+    border: 1px solid transparent;
     background: transparent;
-    padding: 8px 16px;
-    border-radius: 0px;
+    padding: 7px 18px;
+    border-radius: 6px;
     font-weight: 700;
     font-size: 12px;
     letter-spacing: 0.5px;
     color: #64748b;
 }
 
+.stage_step_btn:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
+}
+
 .stage_step_btn:disabled {
     color: #94a3b8;
+    background: transparent;
 }
 
 .stage_step_active {
-    background-color: #002b49;
+    background-color: #0284c7;
     color: #ffffff;
-    border-bottom: 3px solid #b45309;
+    font-weight: 800;
+    border: 1px solid #0284c7;
+}
+
+.stage_step_active:hover {
+    background-color: #0369a1;
 }
 
 .stage_step_done {
-    background-color: #e2e8f0;
-    color: #002b49;
+    background-color: #f1f5f9;
+    color: #0369a1;
+    border: 1px solid #cbd5e1;
+    font-weight: 700;
 }
 
-/* Formal Panels and Frames */
+/* Modern Surface Panels & Cards */
 QFrame.gov_panel {
     background-color: #ffffff;
-    border: 1px solid #cbd5e1;
-    border-radius: 0px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
     padding: 24px;
 }
 
 QFrame.gov_box {
     background-color: #ffffff;
-    border: 1px solid #cbd5e1;
-    border-radius: 0px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
 }
 
 /* Headings */
 QLabel.gov_h1 {
     font-size: 18px;
+    font-weight: 900;
+    color: #0f172a;
+    letter-spacing: 0.5px;
+}
+
+QLabel.gov_h2 {
+    font-size: 15px;
     font-weight: 800;
-    color: #002b49;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+    color: #1e293b;
 }
 
-QLabel.gov_instruction {
-    font-size: 13px;
-    color: #334155;
-    margin-bottom: 8px;
+QLabel.gov_meta {
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.4;
 }
 
-/* Buttons */
+/* Modern Industrial Buttons */
 QPushButton.gov_btn_primary {
-    background-color: #002b49;
+    background-color: #0284c7;
     color: #ffffff;
-    font-weight: 700;
-    font-size: 13px;
+    border: 1px solid #0284c7;
+    border-radius: 6px;
+    padding: 9px 20px;
+    font-weight: 800;
+    font-size: 12px;
     letter-spacing: 0.5px;
-    padding: 10px 24px;
-    border-radius: 2px;
-    border: 1px solid #001f35;
 }
 
 QPushButton.gov_btn_primary:hover {
-    background-color: #003e6b;
+    background-color: #0369a1;
+    border-color: #0369a1;
+}
+
+QPushButton.gov_btn_primary:pressed {
+    background-color: #0c4a6e;
+    border-color: #0c4a6e;
 }
 
 QPushButton.gov_btn_primary:disabled {
     background-color: #cbd5e1;
-    color: #64748b;
-    border: 1px solid #94a3b8;
+    color: #94a3b8;
+    border-color: #cbd5e1;
 }
 
 QPushButton.gov_btn_secondary {
     background-color: #ffffff;
-    color: #002b49;
-    font-weight: 600;
+    color: #1e293b;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-weight: 700;
     font-size: 12px;
-    padding: 7px 16px;
-    border-radius: 2px;
-    border: 1px solid #94a3b8;
 }
 
 QPushButton.gov_btn_secondary:hover {
-    background-color: #f1f5f9;
-    border-color: #002b49;
+    background-color: #f8fafc;
+    border-color: #94a3b8;
+    color: #0f172a;
 }
 
-/* Upload Drop Zone */
+QPushButton.gov_btn_secondary:pressed {
+    background-color: #f1f5f9;
+}
+
+QPushButton.gov_btn_danger {
+    background-color: #ffffff;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+QPushButton.gov_btn_danger:hover {
+    background-color: #fee2e2;
+    border-color: #ef4444;
+}
+
+/* Drag & Drop Target Zone */
 #gov_drop_zone {
-    border: 2px dashed #94a3b8;
-    border-radius: 0px;
-    background-color: #f8fafc;
-    padding: 36px;
+    background-color: #ffffff;
+    border: 2px dashed #cbd5e1;
+    border-radius: 10px;
 }
 
 #gov_drop_zone:hover {
-    border-color: #002b49;
-    background-color: #f0f7ff;
+    border-color: #0284c7;
+    background-color: #f0f9ff;
 }
 
-/* Selected Document Card */
-#gov_doc_card {
+/* Domain Mode Selection Cards */
+QFrame.gov_mode_card {
     background-color: #ffffff;
-    border: 1px solid #94a3b8;
-    border-radius: 0px;
-    padding: 16px 20px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 20px;
 }
 
-/* Mode Selection Cards */
-.gov_mode_card {
-    background-color: #ffffff;
-    border: 1px solid #cbd5e1;
-    border-radius: 0px;
-    padding: 20px 16px;
-    text-align: center;
-}
-
-.gov_mode_card:hover {
-    border-color: #002b49;
+QFrame.gov_mode_card:hover {
+    border-color: #0284c7;
     background-color: #f8fafc;
 }
 
-.gov_mode_card_selected {
-    border: 2px solid #002b49;
-    background-color: #f0f7ff;
-}
-
-/* Severity Indicators (Formal & High Contrast) */
+/* Severity Pill Badges */
 QLabel.badge_critical {
-    background-color: #b91c1c;
-    color: #ffffff;
-    font-weight: 800;
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+    border-radius: 12px;
+    padding: 3px 10px;
     font-size: 11px;
+    font-weight: 800;
     letter-spacing: 0.5px;
-    padding: 3px 8px;
-    border-radius: 2px;
 }
 
 QLabel.badge_high {
-    background-color: #c2410c;
-    color: #ffffff;
-    font-weight: 800;
+    background-color: #ffedd5;
+    color: #9a3412;
+    border: 1px solid #fdba74;
+    border-radius: 12px;
+    padding: 3px 10px;
     font-size: 11px;
+    font-weight: 800;
     letter-spacing: 0.5px;
-    padding: 3px 8px;
-    border-radius: 2px;
 }
 
 QLabel.badge_medium {
-    background-color: #b45309;
-    color: #ffffff;
-    font-weight: 800;
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde047;
+    border-radius: 12px;
+    padding: 3px 10px;
     font-size: 11px;
+    font-weight: 800;
     letter-spacing: 0.5px;
-    padding: 3px 8px;
-    border-radius: 2px;
 }
 
 QLabel.badge_low {
-    background-color: #1e40af;
-    color: #ffffff;
-    font-weight: 800;
+    background-color: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #93c5fd;
+    border-radius: 12px;
+    padding: 3px 10px;
     font-size: 11px;
+    font-weight: 800;
     letter-spacing: 0.5px;
-    padding: 3px 8px;
-    border-radius: 2px;
 }
 
 QLabel.badge_info {
-    background-color: #475569;
-    color: #ffffff;
-    font-weight: 800;
+    background-color: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 3px 10px;
     font-size: 11px;
+    font-weight: 800;
     letter-spacing: 0.5px;
-    padding: 3px 8px;
-    border-radius: 2px;
 }
 
-/* Finding Detail Panel */
+/* Formal Finding Detail Panel */
 #gov_detail_panel {
     background-color: #ffffff;
-    border: 1px solid #cbd5e1;
-    border-radius: 0px;
-    padding: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
 }
 
-/* Scrollbars */
-QScrollBar:vertical {
-    border: none;
-    background: #e2e8f0;
-    width: 10px;
-    margin: 0px;
-}
-
-QScrollBar::handle:vertical {
-    background: #94a3b8;
-    min-height: 24px;
-    border-radius: 0px;
-}
-
-QScrollBar::handle:vertical:hover {
-    background: #64748b;
-}
-
-/* Progress bar */
+/* Progress Bar */
 QProgressBar {
     background-color: #e2e8f0;
-    border: 1px solid #cbd5e1;
-    border-radius: 0px;
+    border: none;
+    border-radius: 4px;
+    height: 8px;
     text-align: center;
-    color: #0f172a;
-    font-weight: 700;
-    font-size: 11px;
-    height: 16px;
 }
 
 QProgressBar::chunk {
-    background-color: #002b49;
+    background-color: #0284c7;
+    border-radius: 4px;
+}
+
+/* Custom Clean Scrollbars */
+QScrollBar:vertical {
+    border: none;
+    background: #f8fafc;
+    width: 8px;
+    margin: 0px;
+}
+QScrollBar::handle:vertical {
+    background: #cbd5e1;
+    min-height: 24px;
+    border-radius: 4px;
+}
+QScrollBar::handle:vertical:hover {
+    background: #94a3b8;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0px;
 }
 """
-
-DARK_THEME_QSS = GOVERNMENT_THEME_QSS

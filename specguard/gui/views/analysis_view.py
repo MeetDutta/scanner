@@ -108,15 +108,15 @@ class AnalysisView(QWidget):
 
         # Formal Checklist Box
         checklist_box = QFrame()
-        checklist_box.setStyleSheet("background-color: #f8fafc; border: 1px solid #cbd5e1; padding: 18px 24px;")
+        checklist_box.setStyleSheet("background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px 24px;")
         box_layout = QVBoxLayout(checklist_box)
-        box_layout.setSpacing(12)
+        box_layout.setSpacing(14)
 
         self.stage_status_labels = []
         for stage_name in self.GOV_STAGES:
             row = QHBoxLayout()
             name_lbl = QLabel(stage_name)
-            name_lbl.setStyleSheet("color: #1e293b; font-size: 13px; font-weight: 500;")
+            name_lbl.setStyleSheet("color: #1e293b; font-size: 13px; font-weight: 600;")
 
             status_lbl = QLabel("○")
             status_lbl.setStyleSheet("color: #94a3b8; font-weight: 800; font-size: 14px;")

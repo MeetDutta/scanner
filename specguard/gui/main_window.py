@@ -74,16 +74,16 @@ class MainWindow(QMainWindow):
         header_layout.setSpacing(18)
 
         # Neutral Institutional Emblem (Geometric Crest)
-        emblem_lbl = QLabel("🏛️")
-        emblem_lbl.setStyleSheet("font-size: 32px;")
+        emblem_lbl = QLabel("🛡️")
+        emblem_lbl.setStyleSheet("font-size: 28px;")
         header_layout.addWidget(emblem_lbl)
 
         # Brand / Title Column
         brand_col = QVBoxLayout()
-        brand_col.setSpacing(2)
+        brand_col.setSpacing(1)
         brand_title = QLabel("SPEC GUARD")
         brand_title.setObjectName("gov_brand_title")
-        brand_sub = QLabel("Engineering Document Verification System")
+        brand_sub = QLabel("Autonomous Engineering Specification Verification")
         brand_sub.setObjectName("gov_brand_sub")
         brand_col.addWidget(brand_title)
         brand_col.addWidget(brand_sub)
@@ -91,8 +91,8 @@ class MainWindow(QMainWindow):
 
         header_layout.addStretch()
 
-        # Offline Verification Tag
-        meta_tag = QLabel("Offline Document Analysis & Standards Comparison")
+        # Offline Air-Gapped Verification Tag
+        meta_tag = QLabel("🟢 100% OFFLINE AIR-GAPPED")
         meta_tag.setObjectName("gov_header_meta")
         header_layout.addWidget(meta_tag)
 

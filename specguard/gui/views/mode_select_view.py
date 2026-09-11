@@ -17,70 +17,107 @@ from PySide6.QtCore import Qt, Signal
 
 
 class GovModePanel(QFrame):
-    """Formal rectangular selection panel representing an engineering domain."""
+    """Formal selection card representing an engineering domain."""
     clicked = Signal(str)
 
-    def __init__(self, domain_key: str, title: str, subtitle: str, icon: str, parent=None):
+    def __init__(self, domain_key: str, title: str, standards_tag: str, icon: str, details: str, parent=None):
         super().__init__(parent)
         self.domain_key = domain_key
         self.is_selected = False
         self.setCursor(Qt.PointingHandCursor)
         self.setProperty("class", "gov_mode_card")
-        self.setup_ui(title, subtitle, icon)
+        self.setup_ui(title, standards_tag, icon, details)
 
-    def setup_ui(self, title: str, subtitle: str, icon: str):
+    def setup_ui(self, title: str, standards_tag: str, icon: str, details: str):
         layout = QVBoxLayout(self)
-        layout.setAlignment(Qt.AlignCenter)
-        layout.setContentsMargins(18, 24, 18, 24)
-        layout.setSpacing(10)
+        layout.setContentsMargins(16, 18, 16, 18)
+        layout.setSpacing(8)
 
-        # Checkmark indicator row
-        self.check_lbl = QLabel(" ")
-        self.check_lbl.setStyleSheet("color: #002b49; font-weight: 900; font-size: 14px;")
-        self.check_lbl.setAlignment(Qt.AlignLeft)
-        layout.addWidget(self.check_lbl)
+        # Selection Badge Top Row
+        self.badge_lbl = QLabel("SELECT")
+        self.badge_lbl.setStyleSheet("""
+            background-color: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 10px;
+            font-weight: 800;
+        """)
+        self.badge_lbl.setFixedHeight(20)
+        layout.addWidget(self.badge_lbl, alignment=Qt.AlignRight)
 
-        # Subtle engineering icon
+        # Engineering Icon
         icon_lbl = QLabel(icon)
-        icon_lbl.setStyleSheet("font-size: 28px; color: #334155; margin-bottom: 2px;")
+        icon_lbl.setStyleSheet("font-size: 32px; margin-bottom: 2px;")
         icon_lbl.setAlignment(Qt.AlignCenter)
         layout.addWidget(icon_lbl)
 
+        # Domain Title
         title_lbl = QLabel(title)
-        title_lbl.setStyleSheet("color: #002b49; font-size: 15px; font-weight: 800; letter-spacing: 0.5px;")
+        title_lbl.setStyleSheet("color: #0f172a; font-size: 14px; font-weight: 800; letter-spacing: 0.5px;")
         title_lbl.setAlignment(Qt.AlignCenter)
         layout.addWidget(title_lbl)
 
-        sub_lbl = QLabel(subtitle)
-        sub_lbl.setStyleSheet("color: #475569; font-size: 12px; font-weight: 500;")
-        sub_lbl.setAlignment(Qt.AlignCenter)
-        layout.addWidget(sub_lbl)
+        # Standards Reference Tag
+        std_lbl = QLabel(standards_tag)
+        std_lbl.setStyleSheet("color: #0369a1; font-size: 10.5px; font-weight: 700; background-color: #f0f9ff; border: 1px solid #bae6fd; border-radius: 4px; padding: 3px 6px;")
+        std_lbl.setAlignment(Qt.AlignCenter)
+        layout.addWidget(std_lbl)
+
+        # Details list
+        det_lbl = QLabel(details)
+        det_lbl.setStyleSheet("color: #64748b; font-size: 11px; line-height: 1.3;")
+        det_lbl.setAlignment(Qt.AlignCenter)
+        det_lbl.setWordWrap(True)
+        layout.addWidget(det_lbl)
 
         self._update_style()
 
     def set_selected(self, selected: bool):
         self.is_selected = selected
-        self.check_lbl.setText("✓" if selected else " ")
+        if selected:
+            self.badge_lbl.setText("✓ SELECTED")
+            self.badge_lbl.setStyleSheet("""
+                background-color: #0284c7;
+                color: #ffffff;
+                border: 1px solid #0284c7;
+                border-radius: 10px;
+                padding: 2px 8px;
+                font-size: 10px;
+                font-weight: 800;
+            """)
+        else:
+            self.badge_lbl.setText("SELECT")
+            self.badge_lbl.setStyleSheet("""
+                background-color: #f1f5f9;
+                color: #64748b;
+                border: 1px solid #cbd5e1;
+                border-radius: 10px;
+                padding: 2px 8px;
+                font-size: 10px;
+                font-weight: 800;
+            """)
         self._update_style()
 
     def _update_style(self):
         if self.is_selected:
             self.setStyleSheet("""
                 QFrame {
-                    background-color: #f0f7ff;
-                    border: 2px solid #002b49;
-                    border-radius: 0px;
+                    background-color: #f0f9ff;
+                    border: 2px solid #0284c7;
+                    border-radius: 8px;
                 }
             """)
         else:
             self.setStyleSheet("""
                 QFrame {
                     background-color: #ffffff;
-                    border: 1px solid #cbd5e1;
-                    border-radius: 0px;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 8px;
                 }
                 QFrame:hover {
-                    border-color: #002b49;
+                    border-color: #0284c7;
                     background-color: #f8fafc;
                 }
             """)
@@ -162,8 +199,9 @@ class ModeSelectView(QWidget):
         panel_mech = GovModePanel(
             domain_key="Mechanical",
             title="MECHANICAL",
-            subtitle="Mechanical\nEngineering",
-            icon="⚙"
+            standards_tag="ASME Y14.5 • ISO 2768",
+            icon="⚙️",
+            details="Tolerances • Surface Finish Ra • Operating Pressure • Temperature"
         )
         panel_mech.clicked.connect(self._select_domain)
         self.cards["Mechanical"] = panel_mech
@@ -173,8 +211,9 @@ class ModeSelectView(QWidget):
         panel_elec = GovModePanel(
             domain_key="Electrical",
             title="ELECTRICAL",
-            subtitle="Electrical\nEngineering",
-            icon="⚡"
+            standards_tag="IEC 60364 • IEEE 141",
+            icon="⚡",
+            details="Feeder Voltage • Current Ratings • Frequency • Phase Balance"
         )
         panel_elec.clicked.connect(self._select_domain)
         self.cards["Electrical"] = panel_elec
@@ -184,14 +223,37 @@ class ModeSelectView(QWidget):
         panel_chem = GovModePanel(
             domain_key="Chemical",
             title="CHEMICAL",
-            subtitle="Chemical\nEngineering",
-            icon="🧪"
+            standards_tag="OSHA PSM • PEP-102",
+            icon="🧪",
+            details="Concentration % • Flash Points • Thermal Runaway Thresholds"
         )
         panel_chem.clicked.connect(self._select_domain)
         self.cards["Chemical"] = panel_chem
         modes_row.addWidget(panel_chem)
 
         panel_layout.addLayout(modes_row)
+
+        # Template Info Box
+        self.tmpl_info_box = QFrame()
+        self.tmpl_info_box.setStyleSheet("""
+            QFrame {
+                background-color: #f8fafc;
+                border: 1px solid #e2e8f0;
+                border-left: 3px solid #0284c7;
+                border-radius: 4px;
+                padding: 10px 14px;
+            }
+        """)
+        tmpl_layout = QVBoxLayout(self.tmpl_info_box)
+        tmpl_layout.setContentsMargins(4, 4, 4, 4)
+        tmpl_layout.setSpacing(3)
+        self.tmpl_title = QLabel("DOMAIN TEMPLATE CONFIGURATION")
+        self.tmpl_title.setStyleSheet("color: #0369a1; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;")
+        self.tmpl_desc = QLabel("Select an engineering domain above to review enforced standard rules.")
+        self.tmpl_desc.setStyleSheet("color: #475569; font-size: 12px;")
+        tmpl_layout.addWidget(self.tmpl_title)
+        tmpl_layout.addWidget(self.tmpl_desc)
+        panel_layout.addWidget(self.tmpl_info_box)
 
         # Compare Button
         action_layout = QVBoxLayout()
@@ -228,6 +290,14 @@ class ModeSelectView(QWidget):
         self.selected_domain = domain
         for d, card in self.cards.items():
             card.set_selected(d == domain)
+
+        if domain == "Mechanical":
+            self.tmpl_desc.setText("Active Standard: ASME Y14.5 / ISO 2768 • Enforces Journal Tolerances (≤ ±0.05 mm), Surface Finish Ra (≤ 0.8 μm), Operating Pressure & Temperature bounds.")
+        elif domain == "Electrical":
+            self.tmpl_desc.setText("Active Standard: IEC 60364 / IEEE Std 141 • Enforces 3-Phase Voltage (415 V), Switchgear Feeder Current (≤ 630 A), Grid Frequency (50 Hz ± 0.5 Hz).")
+        elif domain == "Chemical":
+            self.tmpl_desc.setText("Active Standard: OSHA PSM 1910.119 / PEP-102 • Enforces Additive Concentration (≤ 10 wt%), Runaway Temperature (≤ 120°C), Relief Pressure Limits.")
+
         self._update_button_state()
 
     def _update_button_state(self):

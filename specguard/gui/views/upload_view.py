@@ -132,9 +132,50 @@ class UploadView(QWidget):
         self.drop_zone.browse_btn.clicked.connect(self._on_browse)
         panel_layout.addWidget(self.drop_zone)
 
+        # Quick Demo Samples Box
+        self.demo_box = QFrame()
+        self.demo_box.setStyleSheet("""
+            QFrame {
+                background-color: #f8fafc;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                padding: 10px 14px;
+            }
+        """)
+        demo_layout = QVBoxLayout(self.demo_box)
+        demo_layout.setContentsMargins(6, 6, 6, 6)
+        demo_layout.setSpacing(6)
+        demo_header = QLabel("⚡ QUICK TEST DEMO SPECIFICATIONS")
+        demo_header.setStyleSheet("color: #0369a1; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;")
+        demo_layout.addWidget(demo_header)
+
+        demo_btns_row = QHBoxLayout()
+        demo_btns_row.setSpacing(8)
+
+        self.btn_load_mech = QPushButton("⚙️ Mechanical PDF")
+        self.btn_load_mech.setProperty("class", "gov_btn_secondary")
+        self.btn_load_mech.setCursor(Qt.PointingHandCursor)
+        self.btn_load_mech.clicked.connect(lambda: self._load_demo_sample("mechanical_sample_with_errors.pdf"))
+        demo_btns_row.addWidget(self.btn_load_mech)
+
+        self.btn_load_elec = QPushButton("⚡ Electrical PDF")
+        self.btn_load_elec.setProperty("class", "gov_btn_secondary")
+        self.btn_load_elec.setCursor(Qt.PointingHandCursor)
+        self.btn_load_elec.clicked.connect(lambda: self._load_demo_sample("electrical_sample_with_errors.pdf"))
+        demo_btns_row.addWidget(self.btn_load_elec)
+
+        self.btn_load_chem = QPushButton("🧪 Chemical DOCX")
+        self.btn_load_chem.setProperty("class", "gov_btn_secondary")
+        self.btn_load_chem.setCursor(Qt.PointingHandCursor)
+        self.btn_load_chem.clicked.connect(lambda: self._load_demo_sample("chemical_sample_with_errors.docx"))
+        demo_btns_row.addWidget(self.btn_load_chem)
+
+        demo_layout.addLayout(demo_btns_row)
+        panel_layout.addWidget(self.demo_box)
+
         # Format Notice
-        self.formats_lbl = QLabel("Supported formats: PDF, DOCX, XLSX, TXT, PNG, JPG")
-        self.formats_lbl.setStyleSheet("color: #64748b; font-size: 12px; font-weight: 500; margin-top: 4px;")
+        self.formats_lbl = QLabel("Supported formats: PDF, DOCX, XLSX, TXT, PNG, JPG, TIFF")
+        self.formats_lbl.setStyleSheet("color: #64748b; font-size: 11.5px; font-weight: 500; margin-top: 2px;")
         self.formats_lbl.setAlignment(Qt.AlignCenter)
         panel_layout.addWidget(self.formats_lbl)
 
@@ -219,6 +260,7 @@ class UploadView(QWidget):
 
         self.drop_zone.hide()
         self.formats_lbl.hide()
+        self.demo_box.hide()
         self.selected_box.show()
         self.document_selected.emit(self.selected_file_path)
 
@@ -227,6 +269,16 @@ class UploadView(QWidget):
         self.selected_box.hide()
         self.drop_zone.show()
         self.formats_lbl.show()
+        self.demo_box.show()
+
+    def _load_demo_sample(self, sample_name: str):
+        # Locate demo_samples directory relative to project root
+        demo_dir = Path(__file__).resolve().parent.parent.parent / "demo_samples"
+        target_path = demo_dir / sample_name
+        if target_path.exists():
+            self.set_selected_file(str(target_path))
+        else:
+            QMessageBox.warning(self, "Demo Sample", f"Demo sample '{sample_name}' not found at {target_path}")
 
     def _on_continue(self):
         if self.selected_file_path:

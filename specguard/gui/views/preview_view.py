@@ -99,33 +99,69 @@ class GovFindingDetailPanel(QFrame):
         sev_row.addWidget(self.sev_badge)
         fields_layout.addLayout(sev_row)
 
-        # 4. Detected
-        self.detected_val = self._add_field(fields_layout, "Detected", "—")
+        # 4. Detected Box
+        self.detected_val = self._add_field(fields_layout, "Detected Value", "—", is_detected=True)
 
-        # 5. Expected
-        self.expected_val = self._add_field(fields_layout, "Expected", "—")
+        # 5. Expected Standard Box
+        self.expected_val = self._add_field(fields_layout, "Expected / Standard Requirement", "—", is_expected=True)
 
         # 6. Deviation
-        self.deviation_val = self._add_field(fields_layout, "Deviation", "—")
+        self.deviation_val = self._add_field(fields_layout, "Deviation Calculation", "—")
 
         # 7. Recommendation
-        self.recommendation_val = self._add_field(fields_layout, "Recommendation", "—")
+        self.recommendation_val = self._add_field(fields_layout, "Suggested Action", "—", is_action=True)
 
         # 8. Reference
-        self.reference_val = self._add_field(fields_layout, "Reference", "Local Engineering Standard")
+        self.reference_val = self._add_field(fields_layout, "Standard Reference", "Local Engineering Standard")
 
         fields_layout.addStretch()
         scroll.setWidget(fields_widget)
         layout.addWidget(scroll, 1)
 
-    def _add_field(self, parent_layout: QVBoxLayout, label_text: str, default_val: str) -> QLabel:
+    def _add_field(self, parent_layout: QVBoxLayout, label_text: str, default_val: str,
+                   is_detected=False, is_expected=False, is_action=False) -> QLabel:
         col = QVBoxLayout()
-        col.setSpacing(2)
+        col.setSpacing(3)
         lbl = QLabel(label_text)
-        lbl.setStyleSheet("color: #64748b; font-size: 11px; font-weight: 700; text-transform: uppercase;")
+        lbl.setStyleSheet("color: #64748b; font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;")
+        
         val = QLabel(default_val)
         val.setWordWrap(True)
-        val.setStyleSheet("color: #0f172a; font-size: 12px; font-weight: 600; line-height: 1.3;")
+        
+        if is_detected:
+            val.setStyleSheet("""
+                background-color: #fef2f2;
+                border: 1px solid #fecaca;
+                border-radius: 4px;
+                padding: 6px 8px;
+                color: #991b1b;
+                font-weight: 700;
+                font-size: 12px;
+            """)
+        elif is_expected:
+            val.setStyleSheet("""
+                background-color: #f0fdf4;
+                border: 1px solid #bbf7d0;
+                border-radius: 4px;
+                padding: 6px 8px;
+                color: #166534;
+                font-weight: 700;
+                font-size: 12px;
+            """)
+        elif is_action:
+            val.setStyleSheet("""
+                background-color: #f0f9ff;
+                border: 1px solid #bae6fd;
+                border-left: 3px solid #0284c7;
+                border-radius: 4px;
+                padding: 6px 8px;
+                color: #0369a1;
+                font-weight: 600;
+                font-size: 12px;
+            """)
+        else:
+            val.setStyleSheet("color: #0f172a; font-size: 12px; font-weight: 600; padding: 2px 0;")
+            
         col.addWidget(lbl)
         col.addWidget(val)
         parent_layout.addLayout(col)
@@ -443,7 +479,12 @@ class PreviewView(QWidget):
         # Update Summary Details
         filename = Path(doc.file_path).name
         self.meta_summary_lbl.setText(f"Document: {filename} | Mode: {domain}")
-        self.counts_summary_lbl.setText(f"Critical: {crit_count} | High: {high_count} | Medium: {med_count} | Low: {low_count}")
+        self.counts_summary_lbl.setText(
+            f"<span style='background:#fee2e2; color:#991b1b; padding:2px 8px; border-radius:10px; font-weight:800; font-size:11px;'>CRITICAL: {crit_count}</span> &nbsp;"
+            f"<span style='background:#ffedd5; color:#9a3412; padding:2px 8px; border-radius:10px; font-weight:800; font-size:11px;'>HIGH: {high_count}</span> &nbsp;"
+            f"<span style='background:#fef3c7; color:#92400e; padding:2px 8px; border-radius:10px; font-weight:800; font-size:11px;'>MEDIUM: {med_count}</span> &nbsp;"
+            f"<span style='background:#dbeafe; color:#1e40af; padding:2px 8px; border-radius:10px; font-weight:800; font-size:11px;'>LOW: {low_count}</span>"
+        )
 
         # Populate Pages List
         self.pages_list.blockSignals(True)
