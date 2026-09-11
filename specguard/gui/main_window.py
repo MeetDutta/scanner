@@ -15,6 +15,7 @@ from PySide6.QtGui import QIcon
 
 from specguard.storage.database import DatabaseManager
 from specguard.storage.repositories import SessionRepository, DocumentRepository
+from specguard.repository.manager import RepositoryManager
 from specguard.core.models import DocumentModel, Finding
 from specguard.gui.theme import DARK_THEME_QSS
 from specguard.gui.views.dashboard_view import DashboardView
@@ -23,6 +24,8 @@ from specguard.gui.views.analysis_view import AnalysisView
 from specguard.gui.views.results_view import ResultsView
 from specguard.gui.views.standards_view import StandardsView
 from specguard.gui.views.models_view import ModelsView
+from specguard.gui.views.training_view import TrainingView
+from specguard.gui.views.history_view import HistoryView
 from specguard.gui.views.reports_view import ReportsView
 from specguard.gui.views.diagnostics_view import DiagnosticsView
 from specguard.gui.views.settings_view import SettingsView
@@ -32,12 +35,13 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("SpecGuard — Offline Engineering Document Intelligence & Standards Compliance")
-        self.resize(1280, 840)
-        self.setMinimumSize(1024, 700)
+        self.resize(1360, 880)
+        self.setMinimumSize(1080, 720)
 
         self.db = DatabaseManager()
         self.session_repo = SessionRepository(self.db)
         self.doc_repo = DocumentRepository(self.db)
+        self.repo_manager = RepositoryManager(self.db)
 
         self.current_doc: DocumentModel = None
         self.current_findings: List[Finding] = []
@@ -89,12 +93,15 @@ class MainWindow(QMainWindow):
         self.btn_results = self._create_nav_button("🔍 Results & Preview", 3)
         self.btn_standards = self._create_nav_button("📚 Standards Rules", 4)
         self.btn_models = self._create_nav_button("🧠 AI Models", 5)
-        self.btn_reports = self._create_nav_button("📤 Export Center", 6)
-        self.btn_diag = self._create_nav_button("🛡️ Diagnostics", 7)
-        self.btn_settings = self._create_nav_button("⚙️ Settings", 8)
+        self.btn_training = self._create_nav_button("🏋️ Model Training", 6)
+        self.btn_history = self._create_nav_button("📁 Repository & History", 7)
+        self.btn_reports = self._create_nav_button("📤 Export Center", 8)
+        self.btn_diag = self._create_nav_button("🛡️ Diagnostics", 9)
+        self.btn_settings = self._create_nav_button("⚙️ Settings", 10)
 
         for btn in [self.btn_dashboard, self.btn_upload, self.btn_analysis, self.btn_results,
-                    self.btn_standards, self.btn_models, self.btn_reports, self.btn_diag, self.btn_settings]:
+                    self.btn_standards, self.btn_models, self.btn_training, self.btn_history,
+                    self.btn_reports, self.btn_diag, self.btn_settings]:
             sb_layout.addWidget(btn)
 
         sb_layout.addStretch()
@@ -113,6 +120,8 @@ class MainWindow(QMainWindow):
         self.view_results = ResultsView()
         self.view_standards = StandardsView()
         self.view_models = ModelsView()
+        self.view_training = TrainingView()
+        self.view_history = HistoryView(self.repo_manager)
         self.view_reports = ReportsView()
         self.view_diagnostics = DiagnosticsView(self.db)
         self.view_settings = SettingsView()
@@ -123,9 +132,11 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(self.view_results)      # 3
         self.stack.addWidget(self.view_standards)    # 4
         self.stack.addWidget(self.view_models)       # 5
-        self.stack.addWidget(self.view_reports)      # 6
-        self.stack.addWidget(self.view_diagnostics)  # 7
-        self.stack.addWidget(self.view_settings)     # 8
+        self.stack.addWidget(self.view_training)     # 6
+        self.stack.addWidget(self.view_history)      # 7
+        self.stack.addWidget(self.view_reports)      # 8
+        self.stack.addWidget(self.view_diagnostics)  # 9
+        self.stack.addWidget(self.view_settings)     # 10
 
         main_layout.addWidget(self.stack, 1)
 
@@ -134,11 +145,13 @@ class MainWindow(QMainWindow):
         self.view_dashboard.open_session_requested.connect(self._load_session_into_results)
         self.view_upload.start_analysis_requested.connect(self._start_analysis_flow)
         self.view_analysis.analysis_finished.connect(self._on_analysis_finished)
+        self.view_history.reopen_comparison_requested.connect(self._reopen_repository_comparison)
+        self.view_history.reanalyze_requested.connect(self._start_analysis_flow)
 
         # Status Bar
         self.status_bar = QStatusBar()
         self.status_bar.setStyleSheet("background-color: #0b1120; color: #94a3b8; border-top: 1px solid #1e293b;")
-        self.status_bar.showMessage("Ready | 100% Offline Mode Verified | Local SQLite & PyMuPDF Engine Active")
+        self.status_bar.showMessage("Ready | 100% Offline Mode Verified | Local SQLite, PyTorch & PyMuPDF Engine Active")
         self.setStatusBar(self.status_bar)
 
         self._switch_tab(0)
@@ -159,7 +172,50 @@ class MainWindow(QMainWindow):
         if index == 0:
             self.view_dashboard.refresh_data()
         elif index == 7:
+            self.view_history.refresh_data()
+        elif index == 9:
             self.view_diagnostics.refresh_diagnostics()
+
+    def _reopen_repository_comparison(self, comparison_id: str):
+        record = self.repo_manager.get_comparison_record(comparison_id)
+        if not record:
+            self.status_bar.showMessage(f"Comparison record {comparison_id} not found.")
+            return
+
+        findings = self.repo_manager.get_comparison_findings(comparison_id)
+        repo_doc = self.repo_manager.get_document(record.document_id)
+
+        doc_path = None
+        if repo_doc:
+            if Path(repo_doc.original_path).exists():
+                doc_path = repo_doc.original_path
+            else:
+                stored = self.repo_manager.docs_dir / repo_doc.document_id / "original" / repo_doc.filename
+                if stored.exists():
+                    doc_path = str(stored)
+
+        from specguard.core.document_parser import DocumentParser
+        try:
+            if doc_path and Path(doc_path).exists():
+                doc = DocumentParser.parse_file(doc_path)
+            else:
+                doc = DocumentModel(
+                    file_path=repo_doc.original_path if repo_doc else record.document_filename,
+                    file_name=record.document_filename,
+                    file_type="pdf",
+                    file_size=0,
+                    page_count=1,
+                    file_hash=record.document_sha256
+                )
+            self.current_doc = doc
+            self.current_findings = findings
+            self.current_session_id = comparison_id
+            self.view_results.display_results(doc, findings, comparison_id)
+            self.view_reports.set_session_data(doc, findings, comparison_id)
+            self._switch_tab(3)
+            self.status_bar.showMessage(f"Loaded comparison {comparison_id} (0ms inference overhead).")
+        except Exception as e:
+            self.status_bar.showMessage(f"Error reopening comparison: {e}")
 
     def _start_analysis_flow(self, file_path: str, domain: str, standards: list, modules: list):
         self._switch_tab(2)

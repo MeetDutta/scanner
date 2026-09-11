@@ -24,6 +24,7 @@ from specguard.analyzers.severity import SeverityEngine
 from specguard.storage.database import DatabaseManager
 from specguard.storage.repositories import DocumentRepository, SessionRepository
 from specguard.security.audit import AuditLogger
+from specguard.repository.manager import RepositoryManager
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +37,8 @@ class AnalysisPipeline:
         self.doc_repo = DocumentRepository(self.db)
         self.session_repo = SessionRepository(self.db)
         self.audit = AuditLogger(self.db)
+        self.repo_manager = RepositoryManager(db=self.db)
+
 
         # Initialize analyzers
         self.formatting_analyzer = FormattingAnalyzer()
@@ -157,6 +160,19 @@ class AnalysisPipeline:
 
         duration_ms = int((time.time() - start_time) * 1000)
 
+        # Archive immutable comparison into Repository
+        try:
+            cmp_record = self.repo_manager.archive_comparison(
+                doc_model=doc,
+                findings=ranked_findings,
+                domain=domain,
+                standards=selected_standards or [],
+                duration_ms=duration_ms
+            )
+            session_id = cmp_record.comparison_id
+        except Exception as repo_err:
+            logger.error("Failed archiving comparison into repository: %s", repo_err)
+
         # Save to SQLite database
         self.session_repo.save_session(
             session_id=session_id,
@@ -176,3 +192,4 @@ class AnalysisPipeline:
 
         report("Analysis complete.", 100)
         return doc, ranked_findings, session_id
+
