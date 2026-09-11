@@ -1,0 +1,41 @@
+{
+  "standard_name": "DEMO STANDARD: ASME Y14.5 / ISO 2768 Precision Mechanical Rules",
+  "domain": "mechanical",
+  "version": "2024.1-DEMO",
+  "description": "Demonstration rules for precision mechanical machining tolerances, pressure vessel bounds, and surface finish.",
+  "rules": [
+    {
+      "rule_id": "MECH-001",
+      "domain": "mechanical",
+      "parameter": "tolerance",
+      "operator": "less_than_or_equal",
+      "max_value": 0.05,
+      "unit": "mm",
+      "severity": "Critical",
+      "description": "Precision engineering tolerance must not exceed ±0.05 mm.",
+      "reference": "ASME Y14.5-2018 §2.4 (Precision Mechanical Tolerancing)"
+    },
+    {
+      "rule_id": "MECH-002",
+      "domain": "mechanical",
+      "parameter": "pressure",
+      "operator": "less_than_or_equal",
+      "max_value": 16.0,
+      "unit": "bar",
+      "severity": "High",
+      "description": "Pneumatic/Hydraulic piping design pressure must not exceed 16 bar rating.",
+      "reference": "ASME B31.3 Process Piping Rating"
+    },
+    {
+      "rule_id": "MECH-003",
+      "domain": "mechanical",
+      "parameter": "surface_roughness",
+      "operator": "less_than_or_equal",
+      "max_value": 1.6,
+      "unit": "μm",
+      "severity": "Medium",
+      "description": "Bearing journal surface finish roughness Ra must be at or below 1.6 μm.",
+      "reference": "ISO 1302 Surface Texture Specification"
+    }
+  ]
+}

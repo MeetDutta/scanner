@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "specguard"
+version = "1.0.0"
+description = "SpecGuard: An Offline Hybrid Deep Learning and Computer Vision Framework for Intelligent Engineering Document Quality and Standards Compliance Analysis"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "PySide6>=6.5.0",
+    "pymupdf>=1.22.0",
+    "opencv-python-headless>=4.7.0",
+    "python-docx>=0.8.11",
+    "openpyxl>=3.1.0",
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+    "pyyaml>=6.0",
+    "pytest>=7.3.0"
+]
+
+[project.scripts]
+specguard = "app:main"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+

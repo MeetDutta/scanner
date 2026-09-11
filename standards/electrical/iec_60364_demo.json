@@ -1,0 +1,41 @@
+{
+  "standard_name": "DEMO STANDARD: IEC 60364 / IEEE 141 Low Voltage Industrial Electrical Rules",
+  "domain": "electrical",
+  "version": "2024.1-DEMO",
+  "description": "Demonstration rules for three-phase and single-phase industrial electrical power installations.",
+  "rules": [
+    {
+      "rule_id": "ELEC-001",
+      "domain": "electrical",
+      "parameter": "voltage",
+      "operator": "allowed_values",
+      "allowed_values": [415],
+      "unit": "V",
+      "severity": "Critical",
+      "description": "Three-phase industrial motor feeders must operate at standard rated 415 V supply.",
+      "reference": "IEC 60038 / IEC 60364-4 §4.1 (Standard Low Voltage Distribution)"
+    },
+    {
+      "rule_id": "ELEC-002",
+      "domain": "electrical",
+      "parameter": "frequency",
+      "operator": "allowed_values",
+      "allowed_values": [50, 60],
+      "unit": "Hz",
+      "severity": "High",
+      "description": "System AC line frequency must be standard 50 Hz or 60 Hz.",
+      "reference": "IEEE 141 Industrial Power Systems §3.2"
+    },
+    {
+      "rule_id": "ELEC-003",
+      "domain": "electrical",
+      "parameter": "current",
+      "operator": "less_than_or_equal",
+      "max_value": 630.0,
+      "unit": "A",
+      "severity": "Critical",
+      "description": "Busbar continuous feeder current must not exceed switchgear frame rating of 630 A.",
+      "reference": "IEC 61439-2 Low-voltage switchgear ratings"
+    }
+  ]
+}

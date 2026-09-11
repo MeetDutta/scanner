@@ -1,0 +1,30 @@
+{
+  "standard_name": "DEMO STANDARD: Process Safety & Chemical Engineering Limits",
+  "domain": "chemical",
+  "version": "2024.1-DEMO",
+  "description": "Demonstration rules for chemical process reactor concentrations, thermal runaways, and flash point safety.",
+  "rules": [
+    {
+      "rule_id": "CHEM-001",
+      "domain": "chemical",
+      "parameter": "concentration",
+      "operator": "less_than_or_equal",
+      "max_value": 10.0,
+      "unit": "%",
+      "severity": "Critical",
+      "description": "Aqueous solution reactant concentration must not exceed critical safety limit of 10.0%.",
+      "reference": "OSHA Process Safety Management 1910.119 / CCPS Reactive Hazards"
+    },
+    {
+      "rule_id": "CHEM-002",
+      "domain": "chemical",
+      "parameter": "temperature",
+      "operator": "less_than_or_equal",
+      "max_value": 120.0,
+      "unit": "°C",
+      "severity": "Critical",
+      "description": "Exothermic reactor batch temperature must not exceed runaway threshold of 120°C.",
+      "reference": "NFPA 654 / API 521 Vapor Depressuring"
+    }
+  ]
+}

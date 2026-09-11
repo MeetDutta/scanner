@@ -1,0 +1,49 @@
+"""
+SpecGuard Desktop Application Entry Point.
+Command: python app.py
+100% Offline Hybrid Deep Learning and Computer Vision Engineering Quality Framework.
+"""
+
+import sys
+import os
+import logging
+from pathlib import Path
+
+# Ensure local specguard package is in sys.path
+BASE_DIR = Path(__file__).resolve().parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
+from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import Qt
+from specguard.gui.main_window import MainWindow
+
+# Configure clean local logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+)
+logger = logging.getLogger("SpecGuard")
+
+
+def main():
+    logger.info("Initializing SpecGuard Offline Desktop Application...")
+
+    # Configure High-DPI attributes
+    QApplication.setHighDpiScaleFactorRoundingPolicy(
+        Qt.HighDpiScaleFactorRoundingPolicy.PassThrough
+    )
+
+    app = QApplication(sys.argv)
+    app.setApplicationName("SpecGuard")
+    app.setOrganizationName("SpecGuard Research")
+
+    window = MainWindow()
+    window.show()
+
+    logger.info("SpecGuard main window launched successfully.")
+    sys.exit(app.exec())
+
+
+if __name__ == "__main__":
+    main()
