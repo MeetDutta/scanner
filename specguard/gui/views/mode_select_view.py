@@ -26,12 +26,14 @@ class GovModePanel(QFrame):
         self.is_selected = False
         self.setCursor(Qt.PointingHandCursor)
         self.setProperty("class", "gov_mode_card")
+        self.setFixedHeight(198)
+        self.setMinimumWidth(185)
         self.setup_ui(title, standards_tag, icon, details)
 
     def setup_ui(self, title: str, standards_tag: str, icon: str, details: str):
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(16, 18, 16, 18)
-        layout.setSpacing(8)
+        layout.setContentsMargins(12, 10, 12, 10)
+        layout.setSpacing(4)
 
         # Selection Badge Top Row
         self.badge_lbl = QLabel("SELECT")
@@ -39,35 +41,35 @@ class GovModePanel(QFrame):
             background-color: #f1f5f9;
             color: #64748b;
             border: 1px solid #cbd5e1;
-            border-radius: 10px;
+            border-radius: 9px;
             padding: 2px 8px;
             font-size: 10px;
             font-weight: 800;
         """)
-        self.badge_lbl.setFixedHeight(20)
+        self.badge_lbl.setFixedHeight(18)
         layout.addWidget(self.badge_lbl, alignment=Qt.AlignRight)
 
         # Engineering Icon
         icon_lbl = QLabel(icon)
-        icon_lbl.setStyleSheet("font-size: 32px; margin-bottom: 2px;")
+        icon_lbl.setStyleSheet("font-size: 26px; background: transparent;")
         icon_lbl.setAlignment(Qt.AlignCenter)
         layout.addWidget(icon_lbl)
 
         # Domain Title
         title_lbl = QLabel(title)
-        title_lbl.setStyleSheet("color: #0f172a; font-size: 14px; font-weight: 800; letter-spacing: 0.5px;")
+        title_lbl.setStyleSheet("color: #0f172a; font-size: 13px; font-weight: 800; letter-spacing: 0.5px; background: transparent;")
         title_lbl.setAlignment(Qt.AlignCenter)
         layout.addWidget(title_lbl)
 
         # Standards Reference Tag
         std_lbl = QLabel(standards_tag)
-        std_lbl.setStyleSheet("color: #0369a1; font-size: 10.5px; font-weight: 700; background-color: #f0f9ff; border: 1px solid #bae6fd; border-radius: 4px; padding: 3px 6px;")
+        std_lbl.setStyleSheet("color: #0369a1; font-size: 9.5px; font-weight: 700; background-color: #f0f9ff; border: 1px solid #bae6fd; border-radius: 4px; padding: 2px 5px;")
         std_lbl.setAlignment(Qt.AlignCenter)
         layout.addWidget(std_lbl)
 
         # Details list
         det_lbl = QLabel(details)
-        det_lbl.setStyleSheet("color: #64748b; font-size: 11px; line-height: 1.3;")
+        det_lbl.setStyleSheet("color: #64748b; font-size: 10px; line-height: 1.2; background: transparent;")
         det_lbl.setAlignment(Qt.AlignCenter)
         det_lbl.setWordWrap(True)
         layout.addWidget(det_lbl)
@@ -103,7 +105,7 @@ class GovModePanel(QFrame):
     def _update_style(self):
         if self.is_selected:
             self.setStyleSheet("""
-                QFrame {
+                GovModePanel, QFrame[class="gov_mode_card"] {
                     background-color: #f0f9ff;
                     border: 2px solid #0284c7;
                     border-radius: 8px;
@@ -111,12 +113,12 @@ class GovModePanel(QFrame):
             """)
         else:
             self.setStyleSheet("""
-                QFrame {
+                GovModePanel, QFrame[class="gov_mode_card"] {
                     background-color: #ffffff;
-                    border: 1px solid #e2e8f0;
+                    border: 1px solid #cbd5e1;
                     border-radius: 8px;
                 }
-                QFrame:hover {
+                GovModePanel:hover, QFrame[class="gov_mode_card"]:hover {
                     border-color: #0284c7;
                     background-color: #f8fafc;
                 }
@@ -146,12 +148,12 @@ class ModeSelectView(QWidget):
 
     def setup_ui(self):
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(40, 24, 40, 40)
+        main_layout.setContentsMargins(32, 10, 32, 16)
         main_layout.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
 
         # Top Control Row
         top_row = QHBoxLayout()
-        top_row.setContentsMargins(0, 0, 0, 12)
+        top_row.setContentsMargins(0, 0, 0, 2)
 
         self.back_btn = QPushButton("← BACK TO UPLOAD")
         self.back_btn.setProperty("class", "gov_btn_secondary")
@@ -165,20 +167,20 @@ class ModeSelectView(QWidget):
         self.doc_summary_lbl.setStyleSheet("""
             background-color: #ffffff;
             border: 1px solid #cbd5e1;
-            padding: 5px 12px;
+            padding: 4px 12px;
             color: #002b49;
-            font-size: 12px;
+            font-size: 11.5px;
             font-weight: 700;
         """)
         top_row.addWidget(self.doc_summary_lbl)
 
-        # Wrap in 680px panel
+        # Wrap in 700px panel
         self.panel = QFrame()
         self.panel.setProperty("class", "gov_panel")
         self.panel.setFixedWidth(700)
         panel_layout = QVBoxLayout(self.panel)
-        panel_layout.setContentsMargins(32, 28, 32, 32)
-        panel_layout.setSpacing(20)
+        panel_layout.setContentsMargins(28, 16, 28, 18)
+        panel_layout.setSpacing(12)
 
         panel_layout.addLayout(top_row)
 
@@ -251,6 +253,7 @@ class ModeSelectView(QWidget):
         self.tmpl_title.setStyleSheet("color: #0369a1; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;")
         self.tmpl_desc = QLabel("Select an engineering domain above to review enforced standard rules.")
         self.tmpl_desc.setStyleSheet("color: #475569; font-size: 12px;")
+        self.tmpl_desc.setWordWrap(True)
         tmpl_layout.addWidget(self.tmpl_title)
         tmpl_layout.addWidget(self.tmpl_desc)
         panel_layout.addWidget(self.tmpl_info_box)
@@ -258,7 +261,7 @@ class ModeSelectView(QWidget):
         # Compare Button
         action_layout = QVBoxLayout()
         action_layout.setAlignment(Qt.AlignCenter)
-        action_layout.setContentsMargins(0, 12, 0, 0)
+        action_layout.setContentsMargins(0, 6, 0, 0)
 
         self.compare_btn = QPushButton("COMPARE DOCUMENT")
         self.compare_btn.setProperty("class", "gov_btn_primary")
@@ -266,10 +269,10 @@ class ModeSelectView(QWidget):
         self.compare_btn.setFixedWidth(280)
         self.compare_btn.setStyleSheet("""
             QPushButton {
-                font-size: 14px;
+                font-size: 13px;
                 font-weight: 800;
                 letter-spacing: 0.5px;
-                padding: 12px 24px;
+                padding: 10px 24px;
             }
         """)
         self.compare_btn.setEnabled(False)

@@ -75,7 +75,7 @@ class MainWindow(QMainWindow):
 
         # Neutral Institutional Emblem (Geometric Crest)
         emblem_lbl = QLabel("🛡️")
-        emblem_lbl.setStyleSheet("font-size: 28px;")
+        emblem_lbl.setStyleSheet("font-size: 28px; background: transparent; border: none;")
         header_layout.addWidget(emblem_lbl)
 
         # Brand / Title Column
@@ -83,18 +83,15 @@ class MainWindow(QMainWindow):
         brand_col.setSpacing(1)
         brand_title = QLabel("SPEC GUARD")
         brand_title.setObjectName("gov_brand_title")
+        brand_title.setStyleSheet("background: transparent; border: none;")
         brand_sub = QLabel("Autonomous Engineering Specification Verification")
         brand_sub.setObjectName("gov_brand_sub")
+        brand_sub.setStyleSheet("background: transparent; border: none;")
         brand_col.addWidget(brand_title)
         brand_col.addWidget(brand_sub)
         header_layout.addLayout(brand_col)
 
         header_layout.addStretch()
-
-        # Offline Air-Gapped Verification Tag
-        meta_tag = QLabel("🟢 100% OFFLINE AIR-GAPPED")
-        meta_tag.setObjectName("gov_header_meta")
-        header_layout.addWidget(meta_tag)
 
         root_layout.addWidget(top_header)
 
@@ -102,32 +99,35 @@ class MainWindow(QMainWindow):
         workflow_strip = QFrame()
         workflow_strip.setObjectName("workflow_strip")
         wf_layout = QHBoxLayout(workflow_strip)
-        wf_layout.setContentsMargins(24, 4, 24, 4)
-        wf_layout.setSpacing(12)
+        wf_layout.setContentsMargins(28, 6, 28, 6)
+        wf_layout.setSpacing(14)
 
         self.btn_step_upload = QPushButton("01  DOCUMENT UPLOAD")
-        self.btn_step_upload.setProperty("class", "stage_step_btn")
+        self.btn_step_upload.setProperty("class", "stage_step_active")
+        self.btn_step_upload.setProperty("active", "true")
         self.btn_step_upload.setCursor(Qt.PointingHandCursor)
         self.btn_step_upload.clicked.connect(self._goto_upload)
         wf_layout.addWidget(self.btn_step_upload)
 
-        arrow_1 = QLabel("→")
-        arrow_1.setStyleSheet("color: #94a3b8; font-weight: bold; font-size: 14px;")
+        arrow_1 = QLabel("›")
+        arrow_1.setStyleSheet("color: #94a3b8; font-weight: 800; font-size: 16px; margin: 0 4px; background: transparent;")
         wf_layout.addWidget(arrow_1)
 
         self.btn_step_mode = QPushButton("02  COMPARISON MODE")
         self.btn_step_mode.setProperty("class", "stage_step_btn")
+        self.btn_step_mode.setProperty("active", "false")
         self.btn_step_mode.setCursor(Qt.PointingHandCursor)
         self.btn_step_mode.clicked.connect(self._goto_mode)
         self.btn_step_mode.setEnabled(False)
         wf_layout.addWidget(self.btn_step_mode)
 
-        arrow_2 = QLabel("→")
-        arrow_2.setStyleSheet("color: #94a3b8; font-weight: bold; font-size: 14px;")
+        arrow_2 = QLabel("›")
+        arrow_2.setStyleSheet("color: #94a3b8; font-weight: 800; font-size: 16px; margin: 0 4px; background: transparent;")
         wf_layout.addWidget(arrow_2)
 
         self.btn_step_preview = QPushButton("03  DOCUMENT PREVIEW")
         self.btn_step_preview.setProperty("class", "stage_step_btn")
+        self.btn_step_preview.setProperty("active", "false")
         self.btn_step_preview.setCursor(Qt.PointingHandCursor)
         self.btn_step_preview.clicked.connect(self._goto_preview)
         self.btn_step_preview.setEnabled(False)
@@ -178,7 +178,7 @@ class MainWindow(QMainWindow):
                 padding: 3px 16px;
             }
         """)
-        self.status_bar.showMessage("Official Verification System • 100% Offline Local Architecture")
+        self.status_bar.showMessage("Engineering Document Verification System • Ready")
         self.setStatusBar(self.status_bar)
 
         self._switch_stage(0)
@@ -192,8 +192,16 @@ class MainWindow(QMainWindow):
         self.btn_step_preview.setText("03  DOCUMENT PREVIEW")
 
         self.btn_step_upload.setProperty("class", "stage_step_active" if index == 0 else ("stage_step_done" if index > 0 else "stage_step_btn"))
+        self.btn_step_upload.setProperty("active", "true" if index == 0 else "false")
+        self.btn_step_upload.setProperty("done", "true" if index > 0 else "false")
+
         self.btn_step_mode.setProperty("class", "stage_step_active" if index == 1 else ("stage_step_done" if index > 1 else "stage_step_btn"))
+        self.btn_step_mode.setProperty("active", "true" if index == 1 else "false")
+        self.btn_step_mode.setProperty("done", "true" if index > 1 else "false")
+
         self.btn_step_preview.setProperty("class", "stage_step_active" if index == 3 else "stage_step_btn")
+        self.btn_step_preview.setProperty("active", "true" if index == 3 else "false")
+        self.btn_step_preview.setProperty("done", "false")
 
         for btn in [self.btn_step_upload, self.btn_step_mode, self.btn_step_preview]:
             btn.style().unpolish(btn)

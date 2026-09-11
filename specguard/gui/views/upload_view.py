@@ -47,23 +47,25 @@ class GovDropZoneWidget(QFrame):
         layout.setSpacing(14)
 
         icon_lbl = QLabel("📄")
-        icon_lbl.setStyleSheet("font-size: 36px; margin-bottom: 2px;")
+        icon_lbl.setStyleSheet("font-size: 36px; margin-bottom: 2px; background: transparent; border: none;")
         icon_lbl.setAlignment(Qt.AlignCenter)
         layout.addWidget(icon_lbl)
 
         prompt_lbl = QLabel("Drag and drop document here")
-        prompt_lbl.setStyleSheet("color: #0f172a; font-size: 15px; font-weight: 700;")
+        prompt_lbl.setStyleSheet("color: #0f172a; font-size: 15px; font-weight: 700; background: transparent; border: none;")
         prompt_lbl.setAlignment(Qt.AlignCenter)
         layout.addWidget(prompt_lbl)
 
         or_lbl = QLabel("or")
-        or_lbl.setStyleSheet("color: #64748b; font-size: 12px;")
+        or_lbl.setStyleSheet("color: #64748b; font-size: 12px; background: transparent; border: none;")
         or_lbl.setAlignment(Qt.AlignCenter)
         layout.addWidget(or_lbl)
 
         self.browse_btn = QPushButton("Browse Files")
         self.browse_btn.setProperty("class", "gov_btn_primary")
         self.browse_btn.setCursor(Qt.PointingHandCursor)
+        self.browse_btn.setMinimumWidth(150)
+        self.browse_btn.setFixedHeight(36)
         layout.addWidget(self.browse_btn, alignment=Qt.AlignCenter)
 
     def dragEnterEvent(self, event: QDragEnterEvent):
@@ -146,7 +148,7 @@ class UploadView(QWidget):
         demo_layout.setContentsMargins(6, 6, 6, 6)
         demo_layout.setSpacing(6)
         demo_header = QLabel("⚡ QUICK TEST DEMO SPECIFICATIONS")
-        demo_header.setStyleSheet("color: #0369a1; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;")
+        demo_header.setStyleSheet("color: #0369a1; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; background: transparent;")
         demo_layout.addWidget(demo_header)
 
         demo_btns_row = QHBoxLayout()
@@ -175,7 +177,7 @@ class UploadView(QWidget):
 
         # Format Notice
         self.formats_lbl = QLabel("Supported formats: PDF, DOCX, XLSX, TXT, PNG, JPG, TIFF")
-        self.formats_lbl.setStyleSheet("color: #64748b; font-size: 11.5px; font-weight: 500; margin-top: 2px;")
+        self.formats_lbl.setStyleSheet("color: #64748b; font-size: 11.5px; font-weight: 500; margin-top: 2px; background: transparent;")
         self.formats_lbl.setAlignment(Qt.AlignCenter)
         panel_layout.addWidget(self.formats_lbl)
 

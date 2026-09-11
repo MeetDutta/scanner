@@ -108,8 +108,20 @@ class AnalysisView(QWidget):
 
         # Formal Checklist Box
         checklist_box = QFrame()
-        checklist_box.setStyleSheet("background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px 24px;")
+        checklist_box.setObjectName("analysis_checklist_box")
+        checklist_box.setStyleSheet("""
+            #analysis_checklist_box {
+                background-color: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+            }
+            #analysis_checklist_box QLabel {
+                background-color: transparent;
+                border: none;
+            }
+        """)
         box_layout = QVBoxLayout(checklist_box)
+        box_layout.setContentsMargins(24, 18, 24, 18)
         box_layout.setSpacing(14)
 
         self.stage_status_labels = []

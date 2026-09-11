@@ -12,11 +12,19 @@ Balances official authoritative engineering aesthetics with clean, premium moder
 
 GOVERNMENT_THEME_QSS = """
 /* Base Application & Window */
-QMainWindow, QWidget {
+QMainWindow {
     background-color: #f8fafc;
+}
+
+QWidget {
     color: #0f172a;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", Helvetica, Arial, sans-serif;
     font-size: 13px;
+}
+
+QLabel {
+    background-color: transparent;
+    color: #0f172a;
 }
 
 /* Formal Top Header Banner */
@@ -26,11 +34,17 @@ QMainWindow, QWidget {
     padding: 12px 28px;
 }
 
+#gov_header_banner QLabel {
+    background-color: transparent;
+    border: none;
+}
+
 #gov_brand_title {
     font-size: 20px;
     font-weight: 900;
     color: #ffffff;
     letter-spacing: 1.5px;
+    background-color: transparent;
 }
 
 #gov_brand_sub {
@@ -38,17 +52,7 @@ QMainWindow, QWidget {
     font-weight: 500;
     color: #94a3b8;
     letter-spacing: 0.5px;
-}
-
-#gov_header_meta {
-    font-size: 11px;
-    font-weight: 700;
-    color: #10b981;
-    background-color: #064e3b;
-    border: 1px solid #059669;
-    border-radius: 12px;
-    padding: 4px 14px;
-    letter-spacing: 0.5px;
+    background-color: transparent;
 }
 
 /* Segmented Workflow Step Navigator Strip */
@@ -58,9 +62,14 @@ QMainWindow, QWidget {
     padding: 8px 28px;
 }
 
+#workflow_strip QLabel {
+    background-color: transparent;
+}
+
+#workflow_strip QPushButton,
 .stage_step_btn {
     border: 1px solid transparent;
-    background: transparent;
+    background-color: transparent;
     padding: 7px 18px;
     border-radius: 6px;
     font-weight: 700;
@@ -69,16 +78,19 @@ QMainWindow, QWidget {
     color: #64748b;
 }
 
+#workflow_strip QPushButton:hover,
 .stage_step_btn:hover {
     background-color: #f1f5f9;
     color: #0f172a;
 }
 
+#workflow_strip QPushButton:disabled,
 .stage_step_btn:disabled {
-    color: #94a3b8;
-    background: transparent;
+    color: #cbd5e1;
+    background-color: transparent;
 }
 
+#workflow_strip QPushButton[active="true"],
 .stage_step_active {
     background-color: #0284c7;
     color: #ffffff;
@@ -86,15 +98,24 @@ QMainWindow, QWidget {
     border: 1px solid #0284c7;
 }
 
+#workflow_strip QPushButton[active="true"]:hover,
 .stage_step_active:hover {
     background-color: #0369a1;
+    border-color: #0369a1;
 }
 
+#workflow_strip QPushButton[done="true"],
 .stage_step_done {
-    background-color: #f1f5f9;
-    color: #0369a1;
-    border: 1px solid #cbd5e1;
+    background-color: #f0f9ff;
+    color: #0284c7;
+    border: 1px solid #bae6fd;
     font-weight: 700;
+}
+
+#workflow_strip QPushButton[done="true"]:hover,
+.stage_step_done:hover {
+    background-color: #e0f2fe;
+    border-color: #7dd3fc;
 }
 
 /* Modern Surface Panels & Cards */
@@ -204,6 +225,11 @@ QPushButton.gov_btn_danger:hover {
 #gov_drop_zone:hover {
     border-color: #0284c7;
     background-color: #f0f9ff;
+}
+
+#gov_drop_zone QLabel {
+    background-color: transparent;
+    border: none;
 }
 
 /* Domain Mode Selection Cards */
