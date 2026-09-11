@@ -154,15 +154,15 @@ class Finding:
     domain: str
     location: str
     page: int
-    bbox: Optional[BBox]
-    original_content: str
-    detected_value: Any
-    expected_value: Any
-    deviation: Optional[str]
-    severity: str
-    confidence: float
-    explanation: str
-    suggested_correction: str
+    bbox: Optional[BBox] = None
+    original_content: str = ""
+    detected_value: Any = ""
+    expected_value: Any = ""
+    deviation: Optional[str] = None
+    severity: str = "Medium"
+    confidence: float = 1.0
+    explanation: str = ""
+    suggested_correction: str = ""
     rule_reference: Optional[str] = None
     priority_score: float = 0.0
 

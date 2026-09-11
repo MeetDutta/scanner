@@ -9,7 +9,7 @@ import json
 import shutil
 import hashlib
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Dict, Optional, Any, Tuple
 import logging
 
@@ -236,15 +236,22 @@ class RepositoryManager:
         duration_ms: int,
         model_version: str = "Deterministic-v1.0",
         annotated_pdf_path: Optional[str] = None,
-        report_html_path: Optional[str] = None
+        report_html_path: Optional[str] = None,
+        analysis_started_at: Optional[str] = None,
+        analysis_completed_at: Optional[str] = None,
+        model_id: str = "SG-DEFAULT",
+        dataset_version: str = "v1.0"
     ) -> ComparisonRecord:
-        """Creates an immutable comparison archive with all findings and output links."""
+        """Creates an immutable comparison archive with all findings, artifact SHA-256 hashes, and reproducibility metadata."""
         repo_doc = self.register_document(doc_model)
         cmp_id = self._next_sequential_id("CMP", "repo_comparisons", "comparison_id")
         cmp_folder = self.comps_dir / cmp_id
         cmp_folder.mkdir(parents=True, exist_ok=True)
 
-        now_iso = datetime.now().isoformat()
+        now_utc = datetime.now(timezone.utc).isoformat()
+        started_at = analysis_started_at or now_utc
+        completed_at = analysis_completed_at or now_utc
+
         crit = sum(1 for f in findings if f.severity == "Critical")
         high = sum(1 for f in findings if f.severity == "High")
         med = sum(1 for f in findings if f.severity == "Medium")
@@ -256,16 +263,34 @@ class RepositoryManager:
         with open(findings_json_file, "w", encoding="utf-8") as f:
             json.dump([f.to_dict() for f in findings], f, indent=2)
 
+        artifact_hashes = {}
+        # Hash findings JSON
+        sha_findings = hashlib.sha256()
+        with open(findings_json_file, "rb") as f:
+            while chunk := f.read(65536):
+                sha_findings.update(chunk)
+        artifact_hashes["findings_json"] = sha_findings.hexdigest()
+
         # Copy generated report if provided
         dest_report = None
         if report_html_path and Path(report_html_path).exists():
             dest_report = str(cmp_folder / "report.html")
             shutil.copy2(report_html_path, dest_report)
+            sha_rep = hashlib.sha256()
+            with open(dest_report, "rb") as f:
+                while chunk := f.read(65536):
+                    sha_rep.update(chunk)
+            artifact_hashes["report_html"] = sha_rep.hexdigest()
 
         dest_annot_pdf = None
         if annotated_pdf_path and Path(annotated_pdf_path).exists():
             dest_annot_pdf = str(cmp_folder / "annotated.pdf")
             shutil.copy2(annotated_pdf_path, dest_annot_pdf)
+            sha_pdf = hashlib.sha256()
+            with open(dest_annot_pdf, "rb") as f:
+                while chunk := f.read(65536):
+                    sha_pdf.update(chunk)
+            artifact_hashes["annotated_pdf"] = sha_pdf.hexdigest()
 
         record = ComparisonRecord(
             comparison_id=cmp_id,
@@ -274,8 +299,8 @@ class RepositoryManager:
             document_sha256=repo_doc.sha256,
             domain=domain.title(),
             status="COMPLETED",
-            analysis_started_at=now_iso,
-            analysis_completed_at=now_iso,
+            analysis_started_at=started_at,
+            analysis_completed_at=completed_at,
             duration_ms=duration_ms,
             model_version=model_version,
             standards_used=standards,
@@ -287,7 +312,15 @@ class RepositoryManager:
             info_count=info,
             annotated_pdf_path=dest_annot_pdf,
             report_html_path=dest_report,
-            findings_json_path=str(findings_json_file)
+            findings_json_path=str(findings_json_file),
+            artifact_hashes=artifact_hashes,
+            model_id=model_id,
+            dataset_version=dataset_version,
+            standards_version="v1.0",
+            rule_set_version="v1.0",
+            pipeline_version="v1.0",
+            application_version="1.0.0",
+            inference_configuration={"domain": domain, "selected_standards": standards}
         )
 
         with open(cmp_folder / "comparison.json", "w", encoding="utf-8") as f:
@@ -305,7 +338,7 @@ class RepositoryManager:
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 cmp_id, repo_doc.document_id, repo_doc.filename, repo_doc.sha256, domain.title(), "COMPLETED",
-                now_iso, now_iso, duration_ms, model_version, json.dumps(standards),
+                started_at, completed_at, duration_ms, model_version, json.dumps(standards),
                 len(findings), crit, high, med, low, info, dest_annot_pdf, dest_report, str(findings_json_file)
             ))
 
@@ -323,11 +356,24 @@ class RepositoryManager:
                 ))
             conn.commit()
 
-        logger.info("Archived comparison %s for document %s", cmp_id, repo_doc.document_id)
+        logger.info("Archived comparison %s for document %s (elapsed %d ms)", cmp_id, repo_doc.document_id, duration_ms)
         return record
 
     def get_comparison_findings(self, comparison_id: str) -> List[Finding]:
-        """Loads findings snapshot from disk/database for zero-inference reopen."""
+        """
+        Loads findings snapshot from disk/database for zero-inference reopen.
+        Strictly does NOT trigger re-analysis. Warns if artifacts are missing.
+        """
+        # Integrity check on disk snapshot
+        cmp_dir = self.comps_dir / comparison_id
+        findings_json = cmp_dir / "findings.json"
+        if not findings_json.exists():
+            logger.warning(
+                "Historical Reopen Warning: Stored findings.json artifact for comparison %s is missing from %s! "
+                "Zero-inference reopen preserved: Not rerunning analysis. Returning database snapshot.",
+                comparison_id, findings_json
+            )
+
         with self.db.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM repo_findings WHERE comparison_id = ? ORDER BY priority_score DESC", (comparison_id,))
@@ -356,6 +402,16 @@ class RepositoryManager:
             return findings
 
     def get_comparison_record(self, comparison_id: str) -> Optional[ComparisonRecord]:
+        """Loads comparison metadata record with stored artifact hash references."""
+        cmp_file = self.comps_dir / comparison_id / "comparison.json"
+        if cmp_file.exists():
+            try:
+                with open(cmp_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                return ComparisonRecord(**data)
+            except Exception as e:
+                logger.warning("Could not read comparison.json for %s: %s", comparison_id, e)
+
         with self.db.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM repo_comparisons WHERE comparison_id = ?", (comparison_id,))
@@ -384,6 +440,117 @@ class RepositoryManager:
                 report_html_path=r["report_html_path"],
                 findings_json_path=r["findings_json_path"]
             )
+
+    def verify_comparison_artifacts(self, comparison_id: str) -> Dict[str, Any]:
+        """
+        Audits stored artifacts for a comparison, verifying existence and cryptographic SHA-256 hashes.
+        Returns detailed integrity health dict.
+        """
+        cmp_folder = self.comps_dir / comparison_id
+        if not cmp_folder.exists():
+            return {"valid": False, "comparison_id": comparison_id, "error": "Comparison directory not found"}
+
+        record = self.get_comparison_record(comparison_id)
+        if not record:
+            return {"valid": False, "comparison_id": comparison_id, "error": "Comparison record not found"}
+
+        expected_hashes = getattr(record, "artifact_hashes", {})
+        results = {"valid": True, "comparison_id": comparison_id, "artifacts": {}}
+
+        # Check findings JSON
+        f_json = cmp_folder / "findings.json"
+        if f_json.exists():
+            sha = hashlib.sha256()
+            with open(f_json, "rb") as f:
+                while chunk := f.read(65536):
+                    sha.update(chunk)
+            current_hash = sha.hexdigest()
+            exp = expected_hashes.get("findings_json")
+            match = (current_hash == exp) if exp else True
+            results["artifacts"]["findings_json"] = {"present": True, "sha256": current_hash, "match": match}
+            if not match:
+                results["valid"] = False
+        else:
+            results["artifacts"]["findings_json"] = {"present": False, "match": False}
+            results["valid"] = False
+
+        # Check report HTML if expected
+        rep_html = cmp_folder / "report.html"
+        if rep_html.exists():
+            sha = hashlib.sha256()
+            with open(rep_html, "rb") as f:
+                while chunk := f.read(65536):
+                    sha.update(chunk)
+            current_hash = sha.hexdigest()
+            exp = expected_hashes.get("report_html")
+            match = (current_hash == exp) if exp else True
+            results["artifacts"]["report_html"] = {"present": True, "sha256": current_hash, "match": match}
+            if not match:
+                results["valid"] = False
+
+        # Check annotated PDF if expected
+        ann_pdf = cmp_folder / "annotated.pdf"
+        if ann_pdf.exists():
+            sha = hashlib.sha256()
+            with open(ann_pdf, "rb") as f:
+                while chunk := f.read(65536):
+                    sha.update(chunk)
+            current_hash = sha.hexdigest()
+            exp = expected_hashes.get("annotated_pdf")
+            match = (current_hash == exp) if exp else True
+            results["artifacts"]["annotated_pdf"] = {"present": True, "sha256": current_hash, "match": match}
+            if not match:
+                results["valid"] = False
+
+        return results
+
+    def compare_revisions(self, comparison_id_1: str, comparison_id_2: str) -> Dict[str, Any]:
+        """
+        Compares findings between two comparisons (e.g. Revision 1 vs Revision 2).
+        Categorizes: New, Resolved, Changed, Unchanged findings and Severity shifts.
+        """
+        f1 = {f.finding_id: f for f in self.get_comparison_findings(comparison_id_1)}
+        f2 = {f.finding_id: f for f in self.get_comparison_findings(comparison_id_2)}
+
+        new_findings = [f2[fid].to_dict() for fid in f2 if fid not in f1]
+        resolved_findings = [f1[fid].to_dict() for fid in f1 if fid not in f2]
+        changed_findings = []
+        unchanged_findings = []
+        severity_changes = []
+
+        for fid in f1:
+            if fid in f2:
+                item1 = f1[fid]
+                item2 = f2[fid]
+                if item1.severity != item2.severity or item1.deviation != item2.deviation:
+                    changed_findings.append({
+                        "finding_id": fid,
+                        "rev1": item1.to_dict(),
+                        "rev2": item2.to_dict()
+                    })
+                    if item1.severity != item2.severity:
+                        severity_changes.append({
+                            "finding_id": fid,
+                            "previous_severity": item1.severity,
+                            "new_severity": item2.severity
+                        })
+                else:
+                    unchanged_findings.append(item1.to_dict())
+
+        return {
+            "comparison_id_1": comparison_id_1,
+            "comparison_id_2": comparison_id_2,
+            "new_count": len(new_findings),
+            "resolved_count": len(resolved_findings),
+            "changed_count": len(changed_findings),
+            "unchanged_count": len(unchanged_findings),
+            "severity_changes_count": len(severity_changes),
+            "new_findings": new_findings,
+            "resolved_findings": resolved_findings,
+            "changed_findings": changed_findings,
+            "unchanged_findings": unchanged_findings,
+            "severity_changes": severity_changes
+        }
 
     def delete_comparison(self, comparison_id: str):
         """Safely removes a comparison archive and its outputs."""

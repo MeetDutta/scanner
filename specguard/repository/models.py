@@ -46,6 +46,14 @@ class ComparisonRecord:
     annotated_docx_path: Optional[str] = None
     report_html_path: Optional[str] = None
     findings_json_path: Optional[str] = None
+    artifact_hashes: Dict[str, str] = field(default_factory=dict)
+    model_id: str = "SG-DEFAULT"
+    dataset_version: str = "v1.0"
+    standards_version: str = "v1.0"
+    rule_set_version: str = "v1.0"
+    pipeline_version: str = "v1.0"
+    application_version: str = "1.0.0"
+    inference_configuration: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

@@ -14,9 +14,10 @@ BASE_DIR = Path(__file__).resolve().parent
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QMessageBox
 from PySide6.QtCore import Qt
 from specguard.gui.main_window import MainWindow
+from specguard.core.startup import verify_environment
 
 # Configure clean local logging
 logging.basicConfig(
@@ -29,6 +30,9 @@ logger = logging.getLogger("SpecGuard")
 def main():
     logger.info("Initializing SpecGuard Offline Desktop Application...")
 
+    # Pre-flight startup verification
+    report = verify_environment()
+
     # Configure High-DPI attributes
     QApplication.setHighDpiScaleFactorRoundingPolicy(
         Qt.HighDpiScaleFactorRoundingPolicy.PassThrough
@@ -37,6 +41,12 @@ def main():
     app = QApplication(sys.argv)
     app.setApplicationName("SpecGuard")
     app.setOrganizationName("SpecGuard Research")
+
+    if not report.is_ready:
+        err_msg = "SpecGuard Pre-flight Verification Failed:\n\n" + "\n".join(f"• {e}" for e in report.errors)
+        logger.critical(err_msg)
+        QMessageBox.critical(None, "SpecGuard Startup Error", err_msg)
+        sys.exit(1)
 
     window = MainWindow()
     window.show()

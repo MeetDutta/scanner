@@ -343,7 +343,7 @@ class HistoryView(QWidget):
                 QMessageBox.Yes | QMessageBox.No
             )
             if confirm == QMessageBox.Yes:
-                success, msg = RepositoryBackupEngine.restore_backup(path, self.repo_manager.repo_dir)
+                success, msg, _ = RepositoryBackupEngine.restore_backup(path, self.repo_manager.repo_dir)
                 if success:
                     QMessageBox.information(self, "Restore Successful", msg)
                     self._execute_search()

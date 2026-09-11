@@ -17,7 +17,7 @@ __pycache__/
 data/
 /repository/
 /datasets/
-models/checkpoints/
+models/
 *.db
 *.sqlite3
 reports/

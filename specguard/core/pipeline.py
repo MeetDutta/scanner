@@ -6,6 +6,7 @@ Provides fine-grained stage progress events for background worker threads.
 
 import time
 import uuid
+from datetime import datetime, timezone
 from typing import List, Dict, Tuple, Optional, Callable, Any
 import logging
 
@@ -65,6 +66,7 @@ class AnalysisPipeline:
         Returns: (document_model, ranked_findings, session_id)
         """
         start_time = time.time()
+        analysis_started_at = datetime.now(timezone.utc).isoformat()
         session_id = f"SES-{uuid.uuid4().hex[:8].upper()}"
 
         def report(stage: str, pct: int):
@@ -158,7 +160,8 @@ class AnalysisPipeline:
         report("Computing severity scores and ranking critical issues...", 98)
         ranked_findings = self.severity_engine.rank_findings(all_findings)
 
-        duration_ms = int((time.time() - start_time) * 1000)
+        duration_ms = max(1, int((time.time() - start_time) * 1000))
+        analysis_completed_at = datetime.now(timezone.utc).isoformat()
 
         # Archive immutable comparison into Repository
         try:
@@ -167,7 +170,9 @@ class AnalysisPipeline:
                 findings=ranked_findings,
                 domain=domain,
                 standards=selected_standards or [],
-                duration_ms=duration_ms
+                duration_ms=duration_ms,
+                analysis_started_at=analysis_started_at,
+                analysis_completed_at=analysis_completed_at
             )
             session_id = cmp_record.comparison_id
         except Exception as repo_err:
