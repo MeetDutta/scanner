@@ -1,10 +1,10 @@
 """
-Automated Offscreen GUI Workflow Test for SpecGuard Minimal UI.
+Automated Offscreen GUI Workflow Test for SpecGuard Government Portal UI.
 Verifies the complete 3-stage flow:
-1. Upload Document -> compact doc card
-2. Select Comparison Mode -> Mechanical / Chemical / Electrical
-3. Run Pipeline -> User-facing progress
-4. Preview Compared Document -> Canvas, pages list, finding inspector
+1. Document Upload -> compact doc card
+2. Comparison Mode -> Mechanical / Chemical / Electrical
+3. Verification Progress -> Formal checklist
+4. Compared Document Preview -> Canvas, pages list, formal finding inspector
 5. New Comparison reset
 """
 
@@ -32,7 +32,7 @@ def test_minimal_gui_3_stage_workflow():
 
     # 1. Initial State: Screen 0 (Upload)
     assert window.stack.currentIndex() == 0
-    assert window.btn_step_upload.property("class") == "step_btn_active"
+    assert window.btn_step_upload.property("class") == "stage_step_active"
     assert not window.btn_step_mode.isEnabled()
     assert not window.btn_step_preview.isEnabled()
 
@@ -41,7 +41,7 @@ def test_minimal_gui_3_stage_workflow():
     assert test_pdf.exists(), "Sample PDF must exist for GUI test"
 
     window.view_upload.set_selected_file(str(test_pdf))
-    assert window.view_upload.doc_card.isVisible()
+    assert window.view_upload.selected_box.isVisible()
     assert not window.view_upload.drop_zone.isVisible()
     assert window.current_file_path == str(test_pdf)
     assert window.btn_step_mode.isEnabled()
@@ -49,7 +49,7 @@ def test_minimal_gui_3_stage_workflow():
     # 3. Transition to Screen 1 (Mode Selection)
     window.view_upload.continue_btn.click()
     assert window.stack.currentIndex() == 1
-    assert window.btn_step_mode.property("class") == "step_btn_active"
+    assert window.btn_step_mode.property("class") == "stage_step_active"
     assert not window.view_mode.compare_btn.isEnabled()
 
     # 4. Select Mode: Mechanical
@@ -70,18 +70,18 @@ def test_minimal_gui_3_stage_workflow():
 
     # 6. Verify Screen 3 (Preview) automatically opened
     assert window.stack.currentIndex() == 3
-    assert window.btn_step_preview.property("class") == "step_btn_active"
+    assert window.btn_step_preview.property("class") == "stage_step_active"
     assert len(window.current_findings) > 0
 
     # 7. Check Preview View Elements
     assert window.view_preview.pages_list.count() >= 1
     assert window.view_preview.viewer.canvas.pixmap is not None
     assert window.view_preview.detail_panel.isVisible()
-    assert window.view_preview.detail_panel.problem_val.text() != ""
+    assert window.view_preview.detail_panel.detected_val.text() != ""
     assert window.view_preview.detail_panel.expected_val.text() != ""
 
     # 8. Test Navigation: Back to Mode
-    window.btn_top_back.click()
+    window.view_preview.back_btn.click()
     assert window.stack.currentIndex() == 1
 
     # 9. Return to Preview via Breadcrumb
@@ -89,13 +89,13 @@ def test_minimal_gui_3_stage_workflow():
     assert window.stack.currentIndex() == 3
 
     # 10. Test "New Comparison" Reset
-    window.btn_top_new.click()
+    window.view_preview.new_btn.click()
     assert window.stack.currentIndex() == 0
     assert window.current_file_path is None
     assert window.current_doc is None
     assert not window.btn_step_mode.isEnabled()
     assert not window.btn_step_preview.isEnabled()
     assert window.view_upload.drop_zone.isVisible()
-    assert not window.view_upload.doc_card.isVisible()
+    assert not window.view_upload.selected_box.isVisible()
 
     window.close()

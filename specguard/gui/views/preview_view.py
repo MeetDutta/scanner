@@ -1,11 +1,12 @@
 """
 Compared Document Preview View for SpecGuard.
-Screen 3 in the 3-stage minimal workflow:
-- Left page navigation panel with issue counts
-- Center interactive DocumentViewerWidget with severity-highlighted findings
-- Right / Overlay Finding Detail Panel (Category, Problem, Expected, Difference, Severity, Correction)
-- Minimal preview toolbar (Previous, Next, Zoom In/Out, Fit Width, Fit Page, Prev/Next Issue)
-- Top actions: Back to Comparison, New Comparison
+Step 3 in the Formal Government Engineering Verification Workflow:
+- Heading: COMPARED DOCUMENT
+- Formal summary bar (COMPARISON RESULT, Document, Mode, Status, Counts)
+- Left: DOCUMENT PAGES vertical list
+- Center: High-contrast document canvas with highlighted findings
+- Right: Formal FINDING DETAILS panel (Finding ID, Category, Severity, Detected, Expected, Deviation, Recommendation, Reference)
+- Toolbar and Top Actions (NEW COMPARISON, ← BACK TO COMPARISON)
 """
 
 from pathlib import Path
@@ -21,133 +22,156 @@ from specguard.core.models import DocumentModel, Finding
 from specguard.gui.views.viewer_widget import DocumentViewerWidget
 
 
-class FindingDetailPanel(QFrame):
-    """Clean, focused finding detail inspector."""
+class GovFindingDetailPanel(QFrame):
+    """Formal government-style finding details panel."""
     closed = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setObjectName("finding_detail_panel")
+        self.setObjectName("gov_detail_panel")
         self.setFixedWidth(360)
         self.setup_ui()
 
     def setup_ui(self):
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(18, 18, 18, 18)
-        layout.setSpacing(14)
+        layout.setContentsMargins(18, 16, 18, 18)
+        layout.setSpacing(12)
 
-        # Header with severity badge and close button
+        # Header Row
         header_row = QHBoxLayout()
-        self.sev_badge = QLabel("Critical")
-        self.sev_badge.setProperty("class", "badge_critical")
-        header_row.addWidget(self.sev_badge)
-
-        self.category_lbl = QLabel("Finding Category")
-        self.category_lbl.setStyleSheet("color: #f8fafc; font-weight: 700; font-size: 14px; margin-left: 6px;")
-        header_row.addWidget(self.category_lbl, 1)
+        header_lbl = QLabel("FINDING DETAILS")
+        header_lbl.setStyleSheet("color: #002b49; font-size: 13px; font-weight: 800; letter-spacing: 0.5px;")
+        header_row.addWidget(header_lbl)
+        header_row.addStretch()
 
         close_btn = QPushButton("✕")
-        close_btn.setFixedSize(24, 24)
+        close_btn.setFixedSize(22, 22)
         close_btn.setStyleSheet("""
             QPushButton {
                 background: transparent;
-                border: none;
-                color: #94a3b8;
-                font-size: 14px;
+                border: 1px solid #cbd5e1;
+                color: #64748b;
+                font-size: 12px;
                 font-weight: bold;
             }
             QPushButton:hover {
-                color: #f8fafc;
+                background-color: #f1f5f9;
+                color: #002b49;
             }
         """)
         close_btn.setCursor(Qt.PointingHandCursor)
         close_btn.clicked.connect(self.closed.emit)
         header_row.addWidget(close_btn)
-
         layout.addLayout(header_row)
 
-        # Field items container
-        fields_box = QFrame()
-        fields_box.setStyleSheet("background-color: #0b1120; border: 1px solid #1e293b; border-radius: 8px; padding: 12px;")
-        fields_layout = QVBoxLayout(fields_box)
-        fields_layout.setSpacing(12)
+        divider = QFrame()
+        divider.setStyleSheet("background-color: #cbd5e1; max-height: 1px;")
+        layout.addWidget(divider)
 
-        # 1. Problem
-        self.problem_title = QLabel("Problem Detected")
-        self.problem_title.setStyleSheet("color: #38bdf8; font-size: 11px; font-weight: 700; text-transform: uppercase;")
-        self.problem_val = QLabel("")
-        self.problem_val.setWordWrap(True)
-        self.problem_val.setStyleSheet("color: #e2e8f0; font-size: 13px; line-height: 1.3;")
-        fields_layout.addWidget(self.problem_title)
-        fields_layout.addWidget(self.problem_val)
+        # Fields Scroll Area
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setStyleSheet("border: none; background: transparent;")
 
-        # 2. Expected
-        self.expected_title = QLabel("Expected Specification")
-        self.expected_title.setStyleSheet("color: #10b981; font-size: 11px; font-weight: 700; text-transform: uppercase;")
-        self.expected_val = QLabel("")
-        self.expected_val.setWordWrap(True)
-        self.expected_val.setStyleSheet("color: #cbd5e1; font-size: 12px;")
-        fields_layout.addWidget(self.expected_title)
-        fields_layout.addWidget(self.expected_val)
+        fields_widget = QWidget()
+        fields_layout = QVBoxLayout(fields_widget)
+        fields_layout.setContentsMargins(0, 0, 4, 0)
+        fields_layout.setSpacing(10)
 
-        # 3. Difference
-        self.diff_title = QLabel("Deviation / Difference")
-        self.diff_title.setStyleSheet("color: #f59e0b; font-size: 11px; font-weight: 700; text-transform: uppercase;")
-        self.diff_val = QLabel("")
-        self.diff_val.setWordWrap(True)
-        self.diff_val.setStyleSheet("color: #cbd5e1; font-size: 12px;")
-        fields_layout.addWidget(self.diff_title)
-        fields_layout.addWidget(self.diff_val)
+        # 1. Finding ID
+        self.id_val = self._add_field(fields_layout, "Finding ID", "CMP-00000")
 
-        # 4. Suggested Correction
-        self.correction_title = QLabel("Suggested Correction")
-        self.correction_title.setStyleSheet("color: #a855f7; font-size: 11px; font-weight: 700; text-transform: uppercase;")
-        self.correction_val = QLabel("")
-        self.correction_val.setWordWrap(True)
-        self.correction_val.setStyleSheet("color: #cbd5e1; font-size: 12px;")
-        fields_layout.addWidget(self.correction_title)
-        fields_layout.addWidget(self.correction_val)
+        # 2. Category
+        self.cat_val = self._add_field(fields_layout, "Category", "Engineering Requirement")
 
-        layout.addWidget(fields_box)
-        layout.addStretch()
+        # 3. Severity
+        sev_row = QVBoxLayout()
+        sev_lbl = QLabel("Severity")
+        sev_lbl.setStyleSheet("color: #64748b; font-size: 11px; font-weight: 700; text-transform: uppercase;")
+        self.sev_badge = QLabel("CRITICAL")
+        self.sev_badge.setProperty("class", "badge_critical")
+        self.sev_badge.setFixedWidth(90)
+        self.sev_badge.setAlignment(Qt.AlignCenter)
+        sev_row.addWidget(sev_lbl)
+        sev_row.addWidget(self.sev_badge)
+        fields_layout.addLayout(sev_row)
+
+        # 4. Detected
+        self.detected_val = self._add_field(fields_layout, "Detected", "—")
+
+        # 5. Expected
+        self.expected_val = self._add_field(fields_layout, "Expected", "—")
+
+        # 6. Deviation
+        self.deviation_val = self._add_field(fields_layout, "Deviation", "—")
+
+        # 7. Recommendation
+        self.recommendation_val = self._add_field(fields_layout, "Recommendation", "—")
+
+        # 8. Reference
+        self.reference_val = self._add_field(fields_layout, "Reference", "Local Engineering Standard")
+
+        fields_layout.addStretch()
+        scroll.setWidget(fields_widget)
+        layout.addWidget(scroll, 1)
+
+    def _add_field(self, parent_layout: QVBoxLayout, label_text: str, default_val: str) -> QLabel:
+        col = QVBoxLayout()
+        col.setSpacing(2)
+        lbl = QLabel(label_text)
+        lbl.setStyleSheet("color: #64748b; font-size: 11px; font-weight: 700; text-transform: uppercase;")
+        val = QLabel(default_val)
+        val.setWordWrap(True)
+        val.setStyleSheet("color: #0f172a; font-size: 12px; font-weight: 600; line-height: 1.3;")
+        col.addWidget(lbl)
+        col.addWidget(val)
+        parent_layout.addLayout(col)
+        return val
 
     def display_finding(self, finding: Finding):
-        # Severity Badge
-        sev = finding.severity or "Medium"
-        self.sev_badge.setText(sev.upper())
+        # ID
+        self.id_val.setText(finding.finding_id or "CMP-00001")
+
+        # Category
+        self.cat_val.setText(finding.category or "Engineering Finding")
+
+        # Severity
+        sev = (finding.severity or "Medium").upper()
+        self.sev_badge.setText(sev)
         badge_class = f"badge_{sev.lower()}" if sev.lower() in ["critical", "high", "medium", "low", "info"] else "badge_medium"
         self.sev_badge.setProperty("class", badge_class)
         self.sev_badge.style().unpolish(self.sev_badge)
         self.sev_badge.style().polish(self.sev_badge)
 
-        # Category
-        self.category_lbl.setText(finding.category or "Engineering Finding")
-
-        # Problem
-        problem_text = finding.explanation or finding.original_content or finding.detected_value or "Deviation identified in document text or formatting."
-        self.problem_val.setText(str(problem_text))
+        # Detected
+        detected_text = finding.original_content or finding.detected_value or finding.explanation or "Deviation detected in specification text."
+        self.detected_val.setText(str(detected_text))
 
         # Expected
-        expected_text = finding.expected_value or "Standard compliant engineering parameter or formatting requirement."
+        expected_text = finding.expected_value or "Standard engineering specification requirement."
         self.expected_val.setText(str(expected_text))
 
-        # Difference
-        diff_text = finding.deviation or (f"Detected: {finding.detected_value} | Expected: {finding.expected_value}" if finding.detected_value else "Requirement mismatch")
-        self.diff_val.setText(str(diff_text))
+        # Deviation
+        dev_text = finding.deviation or finding.explanation or "Requirement mismatch detected against standard rule."
+        self.deviation_val.setText(str(dev_text))
 
-        # Suggested Correction
-        correction_text = finding.suggested_correction or "Verify section against standard engineering specification."
-        self.correction_val.setText(str(correction_text))
+        # Recommendation
+        rec_text = finding.suggested_correction or "Review and align with local engineering standard specifications."
+        self.recommendation_val.setText(str(rec_text))
+
+        # Reference
+        ref_text = finding.rule_reference or f"Local {finding.domain or 'Engineering'} Standard"
+        self.reference_val.setText(str(ref_text))
 
 
 class PreviewView(QWidget):
     """
-    Screen 3 — Compared Document Preview
-    Occupies the largest available window area:
-    - Page thumbnails on left
-    - Visual canvas in center with highlighted findings
-    - Finding inspector on right
-    - Top toolbar with navigation and zoom
+    Step 3 — Compared Document Preview
+    Formal institutional two-column inspection interface:
+    - Top formal result summary
+    - Left: Document Pages list
+    - Center: Document Preview with visual highlights
+    - Right: Finding Details
     """
     back_requested = Signal()
     new_comparison_requested = Signal()
@@ -161,85 +185,96 @@ class PreviewView(QWidget):
 
     def setup_ui(self):
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(16, 12, 16, 16)
+        main_layout.setContentsMargins(20, 16, 20, 16)
         main_layout.setSpacing(10)
 
-        # 1. Top Bar (Header + Actions)
+        # 1. Top Control Bar (Navigation & New Comparison)
         top_bar = QHBoxLayout()
         top_bar.setSpacing(12)
 
-        self.back_btn = QPushButton("← Back to Comparison")
-        self.back_btn.setProperty("class", "secondary")
+        self.back_btn = QPushButton("← BACK TO COMPARISON")
+        self.back_btn.setProperty("class", "gov_btn_secondary")
         self.back_btn.setCursor(Qt.PointingHandCursor)
         self.back_btn.clicked.connect(self.back_requested.emit)
         top_bar.addWidget(self.back_btn)
 
-        self.new_btn = QPushButton("New Comparison")
-        self.new_btn.setProperty("class", "secondary")
+        self.new_btn = QPushButton("NEW COMPARISON")
+        self.new_btn.setProperty("class", "gov_btn_primary")
         self.new_btn.setCursor(Qt.PointingHandCursor)
         self.new_btn.clicked.connect(self.new_comparison_requested.emit)
         top_bar.addWidget(self.new_btn)
 
-        # Document & Mode Title
-        self.doc_title_lbl = QLabel("Compared Document")
-        self.doc_title_lbl.setStyleSheet("color: #f8fafc; font-size: 16px; font-weight: 700; margin-left: 8px;")
-        top_bar.addWidget(self.doc_title_lbl)
-
-        self.mode_badge = QLabel("⚙ Mechanical")
-        self.mode_badge.setStyleSheet("""
-            background-color: #0c1c2e;
-            color: #38bdf8;
-            border: 1px solid #1e3a5f;
-            border-radius: 12px;
-            padding: 3px 10px;
-            font-size: 11px;
-            font-weight: 600;
-        """)
-        top_bar.addWidget(self.mode_badge)
-
-        self.findings_badge = QLabel("0 Issues")
-        self.findings_badge.setStyleSheet("""
-            background-color: #271418;
-            color: #f87171;
-            border: 1px solid #4c1d24;
-            border-radius: 12px;
-            padding: 3px 10px;
-            font-size: 11px;
-            font-weight: 700;
-        """)
-        top_bar.addWidget(self.findings_badge)
-
         top_bar.addStretch()
 
-        # Issue cycling navigation
-        self.prev_issue_btn = QPushButton("▲ Prev Issue")
-        self.prev_issue_btn.setProperty("class", "secondary")
+        # Findings Navigation
+        self.prev_issue_btn = QPushButton("▲ Prev Finding")
+        self.prev_issue_btn.setProperty("class", "gov_btn_secondary")
         self.prev_issue_btn.setCursor(Qt.PointingHandCursor)
         self.prev_issue_btn.clicked.connect(self._prev_issue)
         top_bar.addWidget(self.prev_issue_btn)
 
-        self.next_issue_btn = QPushButton("▼ Next Issue")
-        self.next_issue_btn.setProperty("class", "secondary")
+        self.next_issue_btn = QPushButton("▼ Next Finding")
+        self.next_issue_btn.setProperty("class", "gov_btn_secondary")
         self.next_issue_btn.setCursor(Qt.PointingHandCursor)
         self.next_issue_btn.clicked.connect(self._next_issue)
         top_bar.addWidget(self.next_issue_btn)
 
         main_layout.addLayout(top_bar)
 
-        # 2. Main 3-Column Splitter (Pages List | Canvas Viewer | Finding Details)
-        self.splitter = QSplitter(Qt.Horizontal)
-        self.splitter.setStyleSheet("QSplitter::handle { background-color: #1e293b; width: 3px; }")
+        # 2. Formal Summary Bar (COMPARISON RESULT)
+        self.summary_frame = QFrame()
+        self.summary_frame.setStyleSheet("""
+            QFrame {
+                background-color: #ffffff;
+                border: 1px solid #cbd5e1;
+                border-left: 4px solid #002b49;
+                padding: 10px 16px;
+            }
+        """)
+        sum_layout = QHBoxLayout(self.summary_frame)
+        sum_layout.setContentsMargins(8, 6, 8, 6)
+        sum_layout.setSpacing(20)
 
-        # LEFT: Pages Column
+        # Left Info
+        info_col = QVBoxLayout()
+        info_col.setSpacing(3)
+        self.res_title_lbl = QLabel("COMPARISON RESULT")
+        self.res_title_lbl.setStyleSheet("color: #002b49; font-size: 13px; font-weight: 800; letter-spacing: 0.5px;")
+        self.meta_summary_lbl = QLabel("Document: — | Mode: —")
+        self.meta_summary_lbl.setStyleSheet("color: #475569; font-size: 12px; font-weight: 600;")
+        info_col.addWidget(self.res_title_lbl)
+        info_col.addWidget(self.meta_summary_lbl)
+        sum_layout.addLayout(info_col)
+
+        sum_layout.addStretch()
+
+        # Status & Counts
+        stat_col = QVBoxLayout()
+        stat_col.setSpacing(3)
+        self.status_banner_lbl = QLabel("COMPARISON COMPLETED — DEVIATIONS DETECTED")
+        self.status_banner_lbl.setStyleSheet("color: #b45309; font-size: 12px; font-weight: 800;")
+        self.counts_summary_lbl = QLabel("Critical: 0 | High: 0 | Medium: 0 | Low: 0")
+        self.counts_summary_lbl.setStyleSheet("color: #334155; font-size: 12px; font-weight: 700;")
+        stat_col.addWidget(self.status_banner_lbl, alignment=Qt.AlignRight)
+        stat_col.addWidget(self.counts_summary_lbl, alignment=Qt.AlignRight)
+        sum_layout.addLayout(stat_col)
+
+        main_layout.addWidget(self.summary_frame)
+
+        # 3. Main Splitter: Document Pages | Document Preview | Finding Details
+        self.splitter = QSplitter(Qt.Horizontal)
+        self.splitter.setStyleSheet("QSplitter::handle { background-color: #cbd5e1; width: 2px; }")
+
+        # LEFT: Document Pages List
         pages_box = QFrame()
-        pages_box.setStyleSheet("background-color: #090d16; border: 1px solid #1e293b; border-radius: 8px;")
+        pages_box.setStyleSheet("background-color: #ffffff; border: 1px solid #cbd5e1;")
         pages_box.setFixedWidth(160)
         pages_layout = QVBoxLayout(pages_box)
-        pages_layout.setContentsMargins(8, 12, 8, 8)
+        pages_layout.setContentsMargins(10, 12, 10, 10)
         pages_layout.setSpacing(8)
 
-        pages_title = QLabel("Pages")
-        pages_title.setStyleSheet("color: #94a3b8; font-size: 12px; font-weight: 700; text-transform: uppercase; padding-left: 4px;")
+        pages_title = QLabel("DOCUMENT PAGES")
+        pages_title.setStyleSheet("color: #002b49; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;")
         pages_layout.addWidget(pages_title)
 
         self.pages_list = QListWidget()
@@ -250,18 +285,19 @@ class PreviewView(QWidget):
                 outline: none;
             }
             QListWidget::item {
-                background-color: #111827;
-                color: #cbd5e1;
-                border: 1px solid #1f2937;
-                border-radius: 6px;
-                padding: 10px 12px;
-                margin-bottom: 6px;
-                font-weight: 600;
+                background-color: #f8fafc;
+                color: #0f172a;
+                border: 1px solid #cbd5e1;
+                border-radius: 0px;
+                padding: 8px 10px;
+                margin-bottom: 5px;
+                font-weight: 700;
+                font-size: 12px;
             }
             QListWidget::item:selected {
-                background-color: #0369a1;
-                color: #f8fafc;
-                border-color: #38bdf8;
+                background-color: #002b49;
+                color: #ffffff;
+                border-color: #002b49;
             }
         """)
         self.pages_list.currentRowChanged.connect(self._on_page_selected)
@@ -274,13 +310,12 @@ class PreviewView(QWidget):
         self.viewer.finding_selected.connect(self._on_finding_clicked)
         self.splitter.addWidget(self.viewer)
 
-        # RIGHT: Finding Detail Panel
-        self.detail_panel = FindingDetailPanel()
+        # RIGHT: Formal Finding Detail Panel
+        self.detail_panel = GovFindingDetailPanel()
         self.detail_panel.closed.connect(self.detail_panel.hide)
         self.splitter.addWidget(self.detail_panel)
-        self.detail_panel.hide() # Shown upon clicking an issue
+        self.detail_panel.hide()
 
-        # Initial splitter sizes
         self.splitter.setSizes([160, 800, 360])
         main_layout.addWidget(self.splitter, 1)
 
@@ -289,16 +324,27 @@ class PreviewView(QWidget):
         self.findings = findings
         self.current_finding_idx = -1
 
-        # Update Titles & Badges
+        # Calculate severity counts
+        crit_count = sum(1 for f in findings if (f.severity or "").lower() == "critical")
+        high_count = sum(1 for f in findings if (f.severity or "").lower() == "high")
+        med_count = sum(1 for f in findings if (f.severity or "").lower() == "medium")
+        low_count = sum(1 for f in findings if (f.severity or "").lower() in ("low", "informational"))
+
+        # Formal Status Banner Text
+        if crit_count > 0:
+            self.status_banner_lbl.setText("COMPARISON COMPLETED — CRITICAL FINDINGS REQUIRE REVIEW")
+            self.status_banner_lbl.setStyleSheet("color: #b91c1c; font-size: 12px; font-weight: 800;")
+        elif (high_count + med_count + low_count) > 0:
+            self.status_banner_lbl.setText("COMPARISON COMPLETED — DEVIATIONS DETECTED")
+            self.status_banner_lbl.setStyleSheet("color: #b45309; font-size: 12px; font-weight: 800;")
+        else:
+            self.status_banner_lbl.setText("COMPARISON COMPLETED — NO SIGNIFICANT DEVIATIONS DETECTED")
+            self.status_banner_lbl.setStyleSheet("color: #15803d; font-size: 12px; font-weight: 800;")
+
+        # Update Summary Details
         filename = Path(doc.file_path).name
-        self.doc_title_lbl.setText(filename)
-
-        domain_icons = {"Mechanical": "⚙", "Chemical": "🧪", "Electrical": "⚡"}
-        icon = domain_icons.get(domain, "⚙")
-        self.mode_badge.setText(f"{icon} {domain}")
-
-        issue_text = f"{len(findings)} Issue{'s' if len(findings) != 1 else ''}"
-        self.findings_badge.setText(issue_text)
+        self.meta_summary_lbl.setText(f"Document: {filename} | Mode: {domain}")
+        self.counts_summary_lbl.setText(f"Critical: {crit_count} | High: {high_count} | Medium: {med_count} | Low: {low_count}")
 
         # Populate Pages List
         self.pages_list.blockSignals(True)
@@ -307,7 +353,7 @@ class PreviewView(QWidget):
 
         for p_idx in range(1, total_pages + 1):
             count_on_page = sum(1 for f in findings if f.page == p_idx)
-            item_text = f"Page {p_idx}"
+            item_text = f"Page {p_idx:02d}"
             if count_on_page > 0:
                 item_text += f"  ({count_on_page})"
             item = QListWidgetItem(item_text)
@@ -316,10 +362,9 @@ class PreviewView(QWidget):
         self.pages_list.setCurrentRow(0)
         self.pages_list.blockSignals(False)
 
-        # Load Document into Viewer Canvas
+        # Load Document into Canvas
         self.viewer.load_document(doc, findings)
 
-        # If there are findings, highlight the first finding by default
         if findings:
             self._select_finding_by_index(0)
         else:
@@ -344,16 +389,13 @@ class PreviewView(QWidget):
         self.current_finding_idx = index
         f = self.findings[index]
 
-        # Jump viewer to finding
         self.viewer.jump_to_finding(f)
 
-        # Update page list selection
         if 1 <= f.page <= self.pages_list.count():
             self.pages_list.blockSignals(True)
             self.pages_list.setCurrentRow(f.page - 1)
             self.pages_list.blockSignals(False)
 
-        # Display details in inspector panel
         self.detail_panel.display_finding(f)
         self.detail_panel.show()
 

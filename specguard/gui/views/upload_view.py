@@ -1,11 +1,12 @@
 """
-Upload Document View for SpecGuard.
-Screen 1 in the 3-stage minimal workflow:
-Drag & drop ingestion, local file browsing, compact document card, and navigation to Comparison Mode.
+Document Upload View for SpecGuard.
+Step 1 in the Formal Government Engineering Verification Workflow:
+- Rectangular bordered institutional upload panel
+- Formal document drag & drop target
+- Compact SELECTED DOCUMENT card with [ Remove ] and progression button
 """
 
 from pathlib import Path
-import os
 from typing import Optional
 
 from PySide6.QtWidgets import (
@@ -29,54 +30,48 @@ def format_file_size(num_bytes: int) -> str:
         return f"{num_bytes / (1024 * 1024):.1f} MB"
 
 
-class DropZoneWidget(QFrame):
-    """Interactive drag-and-drop file target."""
+class GovDropZoneWidget(QFrame):
+    """Formal rectangular drag-and-drop document target."""
     file_dropped = Signal(str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setObjectName("drop_zone")
+        self.setObjectName("gov_drop_zone")
         self.setAcceptDrops(True)
         self.setup_ui()
 
     def setup_ui(self):
         layout = QVBoxLayout(self)
         layout.setAlignment(Qt.AlignCenter)
-        layout.setContentsMargins(40, 48, 40, 48)
+        layout.setContentsMargins(32, 40, 32, 40)
         layout.setSpacing(14)
 
         icon_lbl = QLabel("📄")
-        icon_lbl.setStyleSheet("font-size: 52px; margin-bottom: 4px;")
+        icon_lbl.setStyleSheet("font-size: 36px; margin-bottom: 2px;")
         icon_lbl.setAlignment(Qt.AlignCenter)
         layout.addWidget(icon_lbl)
 
-        primary_lbl = QLabel("Upload your engineering document")
-        primary_lbl.setStyleSheet("color: #f8fafc; font-size: 18px; font-weight: 700;")
-        primary_lbl.setAlignment(Qt.AlignCenter)
-        layout.addWidget(primary_lbl)
+        prompt_lbl = QLabel("Drag and drop document here")
+        prompt_lbl.setStyleSheet("color: #0f172a; font-size: 15px; font-weight: 700;")
+        prompt_lbl.setAlignment(Qt.AlignCenter)
+        layout.addWidget(prompt_lbl)
 
-        sec_lbl = QLabel("Drag & drop your file here or browse from your computer")
-        sec_lbl.setStyleSheet("color: #94a3b8; font-size: 13px;")
-        sec_lbl.setAlignment(Qt.AlignCenter)
-        layout.addWidget(sec_lbl)
+        or_lbl = QLabel("or")
+        or_lbl.setStyleSheet("color: #64748b; font-size: 12px;")
+        or_lbl.setAlignment(Qt.AlignCenter)
+        layout.addWidget(or_lbl)
 
         self.browse_btn = QPushButton("Browse Files")
-        self.browse_btn.setProperty("class", "primary")
-        self.browse_btn.setStyleSheet("font-size: 13px; font-weight: 600; padding: 10px 24px; border-radius: 6px;")
+        self.browse_btn.setProperty("class", "gov_btn_primary")
         self.browse_btn.setCursor(Qt.PointingHandCursor)
         layout.addWidget(self.browse_btn, alignment=Qt.AlignCenter)
-
-        format_lbl = QLabel("PDF • DOCX • XLSX • TXT • PNG • JPG • JPEG • TIFF")
-        format_lbl.setStyleSheet("color: #64748b; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; margin-top: 8px;")
-        format_lbl.setAlignment(Qt.AlignCenter)
-        layout.addWidget(format_lbl)
 
     def dragEnterEvent(self, event: QDragEnterEvent):
         if event.mimeData().hasUrls():
             urls = event.mimeData().urls()
             if urls and Path(urls[0].toLocalFile()).suffix.lower() in SUPPORTED_EXTENSIONS:
                 event.acceptProposedAction()
-                self.setStyleSheet("border-color: #38bdf8; background-color: #0d1e38;")
+                self.setStyleSheet("border-color: #002b49; background-color: #f0f7ff;")
                 return
         event.ignore()
 
@@ -98,10 +93,8 @@ class DropZoneWidget(QFrame):
 
 class UploadView(QWidget):
     """
-    Screen 1 — Upload Document
-    Allows drag-and-drop or browsing for an engineering document,
-    displays a compact document card upon selection, and enables
-    progression to Comparison Mode.
+    Step 1 — Document Upload
+    Formal rectangular layout conforming to public-sector document portal standards.
     """
     document_selected = Signal(str)
     continue_requested = Signal(str)
@@ -113,91 +106,89 @@ class UploadView(QWidget):
 
     def setup_ui(self):
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(32, 28, 32, 32)
-        main_layout.setSpacing(24)
+        main_layout.setContentsMargins(40, 32, 40, 40)
+        main_layout.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
 
-        # 1. Minimal Header
-        header_layout = QVBoxLayout()
-        header_layout.setSpacing(4)
-        title = QLabel("SpecGuard")
-        title.setObjectName("brand_title")
-        subtitle = QLabel("Engineering Document Comparison")
-        subtitle.setObjectName("brand_subtitle")
-        header_layout.addWidget(title)
-        header_layout.addWidget(subtitle)
-        main_layout.addLayout(header_layout)
+        # Center Container
+        self.panel = QFrame()
+        self.panel.setProperty("class", "gov_panel")
+        self.panel.setFixedWidth(680)
+        panel_layout = QVBoxLayout(self.panel)
+        panel_layout.setContentsMargins(32, 28, 32, 32)
+        panel_layout.setSpacing(16)
 
-        # Centered container
-        center_container = QWidget()
-        center_layout = QVBoxLayout(center_container)
-        center_layout.setAlignment(Qt.AlignCenter)
-        center_layout.setContentsMargins(0, 20, 0, 20)
+        # Panel Header
+        h1 = QLabel("DOCUMENT UPLOAD")
+        h1.setProperty("class", "gov_h1")
+        panel_layout.addWidget(h1)
 
-        self.content_frame = QFrame()
-        self.content_frame.setFixedWidth(640)
-        self.content_layout = QVBoxLayout(self.content_frame)
-        self.content_layout.setContentsMargins(0, 0, 0, 0)
-        self.content_layout.setSpacing(18)
+        instruction = QLabel("Select an engineering document for comparison.")
+        instruction.setProperty("class", "gov_instruction")
+        panel_layout.addWidget(instruction)
 
-        # Drop Zone (Empty State)
-        self.drop_zone = DropZoneWidget()
+        # Drop Zone (Upload Area)
+        self.drop_zone = GovDropZoneWidget()
         self.drop_zone.file_dropped.connect(self.set_selected_file)
         self.drop_zone.browse_btn.clicked.connect(self._on_browse)
-        self.content_layout.addWidget(self.drop_zone)
+        panel_layout.addWidget(self.drop_zone)
 
-        # Selected Document Card (Hidden initially)
-        self.doc_card = QFrame()
-        self.doc_card.setObjectName("doc_card")
-        doc_card_layout = QVBoxLayout(self.doc_card)
-        doc_card_layout.setSpacing(14)
+        # Format Notice
+        self.formats_lbl = QLabel("Supported formats: PDF, DOCX, XLSX, TXT, PNG, JPG")
+        self.formats_lbl.setStyleSheet("color: #64748b; font-size: 12px; font-weight: 500; margin-top: 4px;")
+        self.formats_lbl.setAlignment(Qt.AlignCenter)
+        panel_layout.addWidget(self.formats_lbl)
 
-        card_header = QHBoxLayout()
-        card_icon = QLabel("📄")
-        card_icon.setStyleSheet("font-size: 32px; padding-right: 8px;")
-        card_header.addWidget(card_icon)
+        # Selected Document Box (Hidden Initially)
+        self.selected_box = QFrame()
+        self.selected_box.setObjectName("gov_doc_card")
+        sel_layout = QVBoxLayout(self.selected_box)
+        sel_layout.setContentsMargins(18, 16, 18, 16)
+        sel_layout.setSpacing(12)
+
+        box_header = QLabel("SELECTED DOCUMENT")
+        box_header.setStyleSheet("color: #002b49; font-size: 12px; font-weight: 800; letter-spacing: 0.5px;")
+        sel_layout.addWidget(box_header)
+
+        divider = QFrame()
+        divider.setStyleSheet("background-color: #cbd5e1; max-height: 1px;")
+        sel_layout.addWidget(divider)
+
+        doc_row = QHBoxLayout()
+        icon = QLabel("📄")
+        icon.setStyleSheet("font-size: 28px; padding-right: 6px;")
+        doc_row.addWidget(icon)
 
         meta_col = QVBoxLayout()
-        meta_col.setSpacing(3)
+        meta_col.setSpacing(2)
         self.card_filename = QLabel("")
-        self.card_filename.setStyleSheet("color: #f8fafc; font-size: 15px; font-weight: 700;")
+        self.card_filename.setStyleSheet("color: #0f172a; font-size: 14px; font-weight: 700;")
         self.card_details = QLabel("")
-        self.card_details.setStyleSheet("color: #94a3b8; font-size: 12px; font-weight: 500;")
+        self.card_details.setStyleSheet("color: #475569; font-size: 12px;")
         meta_col.addWidget(self.card_filename)
         meta_col.addWidget(self.card_details)
-        card_header.addLayout(meta_col, 1)
+        doc_row.addLayout(meta_col, 1)
 
-        doc_card_layout.addLayout(card_header)
-
-        # Card Actions
-        actions_row = QHBoxLayout()
         self.remove_btn = QPushButton("Remove")
-        self.remove_btn.setProperty("class", "secondary")
+        self.remove_btn.setProperty("class", "gov_btn_secondary")
         self.remove_btn.setCursor(Qt.PointingHandCursor)
         self.remove_btn.clicked.connect(self.reset_upload)
-        actions_row.addWidget(self.remove_btn)
+        doc_row.addWidget(self.remove_btn)
 
-        self.replace_btn = QPushButton("Replace File")
-        self.replace_btn.setProperty("class", "secondary")
-        self.replace_btn.setCursor(Qt.PointingHandCursor)
-        self.replace_btn.clicked.connect(self._on_browse)
-        actions_row.addWidget(self.replace_btn)
+        sel_layout.addLayout(doc_row)
 
-        actions_row.addStretch()
-
-        self.continue_btn = QPushButton("Continue to Mode Selection →")
-        self.continue_btn.setProperty("class", "primary")
+        action_row = QHBoxLayout()
+        action_row.addStretch()
+        self.continue_btn = QPushButton("PROCEED TO COMPARISON MODE →")
+        self.continue_btn.setProperty("class", "gov_btn_primary")
         self.continue_btn.setCursor(Qt.PointingHandCursor)
-        self.continue_btn.setStyleSheet("font-weight: 700; padding: 9px 22px; font-size: 13px;")
         self.continue_btn.clicked.connect(self._on_continue)
-        actions_row.addWidget(self.continue_btn)
+        action_row.addWidget(self.continue_btn)
+        sel_layout.addLayout(action_row)
 
-        doc_card_layout.addLayout(actions_row)
+        panel_layout.addWidget(self.selected_box)
+        self.selected_box.hide()
 
-        self.content_layout.addWidget(self.doc_card)
-        self.doc_card.hide()
-
-        center_layout.addWidget(self.content_frame, alignment=Qt.AlignCenter)
-        main_layout.addWidget(center_container, 1)
+        main_layout.addWidget(self.panel)
 
     def _on_browse(self):
         file_path, _ = QFileDialog.getOpenFileName(
@@ -224,16 +215,18 @@ class UploadView(QWidget):
         file_ext = path.suffix.upper().lstrip(".")
 
         self.card_filename.setText(path.name)
-        self.card_details.setText(f"{file_ext} Document • {size_str}")
+        self.card_details.setText(f"{file_ext} | {size_str}")
 
         self.drop_zone.hide()
-        self.doc_card.show()
+        self.formats_lbl.hide()
+        self.selected_box.show()
         self.document_selected.emit(self.selected_file_path)
 
     def reset_upload(self):
         self.selected_file_path = None
-        self.doc_card.hide()
+        self.selected_box.hide()
         self.drop_zone.show()
+        self.formats_lbl.show()
 
     def _on_continue(self):
         if self.selected_file_path:

@@ -21,20 +21,21 @@ from specguard.core.models import Finding, BBox, DocumentModel
 logger = logging.getLogger(__name__)
 
 SEVERITY_COLORS = {
-    "Critical": QColor(239, 68, 68, 120),
-    "High": QColor(249, 115, 22, 120),
-    "Medium": QColor(234, 179, 8, 110),
-    "Low": QColor(59, 130, 246, 100),
-    "Informational": QColor(100, 116, 139, 90)
+    "Critical": QColor(185, 28, 28, 110),
+    "High": QColor(194, 65, 12, 110),
+    "Medium": QColor(180, 83, 9, 100),
+    "Low": QColor(30, 64, 175, 90),
+    "Informational": QColor(71, 85, 105, 80)
 }
 
 BORDER_COLORS = {
-    "Critical": QColor(239, 68, 68, 240),
-    "High": QColor(249, 115, 22, 240),
-    "Medium": QColor(234, 179, 8, 240),
-    "Low": QColor(59, 130, 246, 220),
-    "Informational": QColor(100, 116, 139, 200)
+    "Critical": QColor(185, 28, 28, 255),
+    "High": QColor(194, 65, 12, 255),
+    "Medium": QColor(180, 83, 9, 255),
+    "Low": QColor(30, 64, 175, 255),
+    "Informational": QColor(71, 85, 105, 240)
 }
+
 
 
 class PageCanvas(QWidget):
@@ -154,49 +155,49 @@ class DocumentViewerWidget(QWidget):
 
         # Toolbar
         toolbar = QFrame()
-        toolbar.setStyleSheet("background-color: #0b1120; border-bottom: 1px solid #1e293b; padding: 4px 8px;")
+        toolbar.setStyleSheet("background-color: #ffffff; border-bottom: 1px solid #cbd5e1; padding: 4px 8px;")
         tb_layout = QHBoxLayout(toolbar)
         tb_layout.setContentsMargins(4, 4, 4, 4)
 
-        self.prev_btn = QPushButton("◀ Prev")
-        self.prev_btn.setProperty("class", "secondary")
+        self.prev_btn = QPushButton("← Previous")
+        self.prev_btn.setProperty("class", "gov_btn_secondary")
         self.prev_btn.clicked.connect(self._prev_page)
         tb_layout.addWidget(self.prev_btn)
 
         self.page_lbl = QLabel("Page 1 of 1")
-        self.page_lbl.setStyleSheet("color: #cbd5e1; font-weight: 600; padding: 0 8px;")
+        self.page_lbl.setStyleSheet("color: #002b49; font-weight: 700; padding: 0 8px;")
         tb_layout.addWidget(self.page_lbl)
 
-        self.next_btn = QPushButton("Next ▶")
-        self.next_btn.setProperty("class", "secondary")
+        self.next_btn = QPushButton("Next →")
+        self.next_btn.setProperty("class", "gov_btn_secondary")
         self.next_btn.clicked.connect(self._next_page)
         tb_layout.addWidget(self.next_btn)
 
         tb_layout.addStretch()
 
         self.zoom_out_btn = QPushButton("−")
-        self.zoom_out_btn.setProperty("class", "secondary")
+        self.zoom_out_btn.setProperty("class", "gov_btn_secondary")
         self.zoom_out_btn.setFixedWidth(32)
         self.zoom_out_btn.clicked.connect(self._zoom_out)
         tb_layout.addWidget(self.zoom_out_btn)
 
         self.zoom_lbl = QLabel("125%")
-        self.zoom_lbl.setStyleSheet("color: #94a3b8; font-size: 12px;")
+        self.zoom_lbl.setStyleSheet("color: #475569; font-size: 12px; font-weight: 700;")
         tb_layout.addWidget(self.zoom_lbl)
 
         self.zoom_in_btn = QPushButton("+")
-        self.zoom_in_btn.setProperty("class", "secondary")
+        self.zoom_in_btn.setProperty("class", "gov_btn_secondary")
         self.zoom_in_btn.setFixedWidth(32)
         self.zoom_in_btn.clicked.connect(self._zoom_in)
         tb_layout.addWidget(self.zoom_in_btn)
 
         self.fit_width_btn = QPushButton("Fit Width")
-        self.fit_width_btn.setProperty("class", "secondary")
+        self.fit_width_btn.setProperty("class", "gov_btn_secondary")
         self.fit_width_btn.clicked.connect(self.fit_to_width)
         tb_layout.addWidget(self.fit_width_btn)
 
         self.fit_page_btn = QPushButton("Fit Page")
-        self.fit_page_btn.setProperty("class", "secondary")
+        self.fit_page_btn.setProperty("class", "gov_btn_secondary")
         self.fit_page_btn.clicked.connect(self.fit_to_page)
         tb_layout.addWidget(self.fit_page_btn)
 
@@ -204,7 +205,7 @@ class DocumentViewerWidget(QWidget):
 
         # Scroll area with canvas
         self.scroll_area = QScrollArea()
-        self.scroll_area.setStyleSheet("background-color: #090d16; border: none;")
+        self.scroll_area.setStyleSheet("background-color: #e2e8f0; border: 1px solid #cbd5e1;")
         self.scroll_area.setAlignment(Qt.AlignCenter)
 
         self.canvas = PageCanvas()

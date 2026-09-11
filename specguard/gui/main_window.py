@@ -1,13 +1,11 @@
 """
 SpecGuard Main Application Window.
-Redesigned Minimal User Interface:
-Focuses strictly on three primary functions:
-1. Upload Document
-2. Select Comparison Mode (Mechanical, Chemical, Electrical)
-3. Preview Compared Document
-
-Maintains 100% offline local processing, zero cloud dependencies,
-and coordinates the existing deep learning, computer vision, and standards pipeline.
+Formal Government / Public-Sector Engineering Portal Architecture:
+- Institutional header banner (SPEC GUARD, Engineering Document Verification System)
+- Three-stage formal workflow strip:
+  01 DOCUMENT UPLOAD → 02 COMPARISON MODE → 03 DOCUMENT PREVIEW
+- Strict three-step workflow (Upload, Mode Select, Preview)
+- 100% offline local processing
 """
 
 from pathlib import Path
@@ -19,12 +17,11 @@ from PySide6.QtWidgets import (
     QPushButton, QLabel, QFrame, QMessageBox, QStatusBar
 )
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QIcon
 
 from specguard.storage.database import DatabaseManager
 from specguard.repository.manager import RepositoryManager
 from specguard.core.models import DocumentModel, Finding
-from specguard.gui.theme import DARK_THEME_QSS
+from specguard.gui.theme import GOVERNMENT_THEME_QSS
 from specguard.gui.views.upload_view import UploadView
 from specguard.gui.views.mode_select_view import ModeSelectView
 from specguard.gui.views.analysis_view import AnalysisView
@@ -35,18 +32,18 @@ logger = logging.getLogger("SpecGuard.MainWindow")
 
 class MainWindow(QMainWindow):
     """
-    Focused, three-stage desktop window for SpecGuard:
-    Stage 0: Upload Document
-    Stage 1: Select Comparison Mode
-    Stage 2: Processing Progress
+    Formal Government Institutional Window for SpecGuard:
+    Stage 0: Document Upload
+    Stage 1: Comparison Mode
+    Stage 2: Analysis in Progress
     Stage 3: Compared Document Preview
     """
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("SpecGuard — Engineering Document Comparison")
-        self.resize(1280, 820)
-        self.setMinimumSize(1024, 680)
+        self.setWindowTitle("SPEC GUARD — Engineering Document Verification System")
+        self.resize(1300, 840)
+        self.setMinimumSize(1040, 700)
 
         # Internal backend managers preserved
         self.db = DatabaseManager()
@@ -60,7 +57,7 @@ class MainWindow(QMainWindow):
         self.current_session_id: str = ""
 
         self.setup_ui()
-        self.setStyleSheet(DARK_THEME_QSS)
+        self.setStyleSheet(GOVERNMENT_THEME_QSS)
 
     def setup_ui(self):
         central_widget = QWidget()
@@ -69,104 +66,87 @@ class MainWindow(QMainWindow):
         root_layout.setContentsMargins(0, 0, 0, 0)
         root_layout.setSpacing(0)
 
-        # 1. Top Minimal Header Bar
+        # 1. Formal Institutional Top Header Banner
         top_header = QFrame()
-        top_header.setObjectName("top_header")
+        top_header.setObjectName("gov_header_banner")
         header_layout = QHBoxLayout(top_header)
-        header_layout.setContentsMargins(20, 10, 20, 10)
-        header_layout.setSpacing(16)
+        header_layout.setContentsMargins(24, 12, 24, 12)
+        header_layout.setSpacing(18)
 
-        # Brand / Title
+        # Neutral Institutional Emblem (Geometric Crest)
+        emblem_lbl = QLabel("🏛️")
+        emblem_lbl.setStyleSheet("font-size: 32px;")
+        header_layout.addWidget(emblem_lbl)
+
+        # Brand / Title Column
         brand_col = QVBoxLayout()
-        brand_col.setSpacing(1)
-        brand_title = QLabel("SpecGuard")
-        brand_title.setObjectName("brand_title")
-        brand_sub = QLabel("Engineering Document Comparison")
-        brand_sub.setObjectName("brand_subtitle")
+        brand_col.setSpacing(2)
+        brand_title = QLabel("SPEC GUARD")
+        brand_title.setObjectName("gov_brand_title")
+        brand_sub = QLabel("Engineering Document Verification System")
+        brand_sub.setObjectName("gov_brand_sub")
         brand_col.addWidget(brand_title)
         brand_col.addWidget(brand_sub)
         header_layout.addLayout(brand_col)
 
         header_layout.addStretch()
 
-        # Step Breadcrumbs: [1 Upload] → [2 Compare] → [3 Preview]
-        steps_layout = QHBoxLayout()
-        steps_layout.setSpacing(8)
+        # Offline Verification Tag
+        meta_tag = QLabel("Offline Document Analysis & Standards Comparison")
+        meta_tag.setObjectName("gov_header_meta")
+        header_layout.addWidget(meta_tag)
 
-        self.btn_step_upload = QPushButton("1  Upload")
-        self.btn_step_upload.setProperty("class", "step_btn")
+        root_layout.addWidget(top_header)
+
+        # 2. Formal Workflow Strip (01 DOCUMENT UPLOAD → 02 COMPARISON MODE → 03 DOCUMENT PREVIEW)
+        workflow_strip = QFrame()
+        workflow_strip.setObjectName("workflow_strip")
+        wf_layout = QHBoxLayout(workflow_strip)
+        wf_layout.setContentsMargins(24, 4, 24, 4)
+        wf_layout.setSpacing(12)
+
+        self.btn_step_upload = QPushButton("01  DOCUMENT UPLOAD")
+        self.btn_step_upload.setProperty("class", "stage_step_btn")
         self.btn_step_upload.setCursor(Qt.PointingHandCursor)
         self.btn_step_upload.clicked.connect(self._goto_upload)
-        steps_layout.addWidget(self.btn_step_upload)
+        wf_layout.addWidget(self.btn_step_upload)
 
         arrow_1 = QLabel("→")
-        arrow_1.setStyleSheet("color: #475569; font-weight: bold; font-size: 14px;")
-        steps_layout.addWidget(arrow_1)
+        arrow_1.setStyleSheet("color: #94a3b8; font-weight: bold; font-size: 14px;")
+        wf_layout.addWidget(arrow_1)
 
-        self.btn_step_mode = QPushButton("2  Mode")
-        self.btn_step_mode.setProperty("class", "step_btn")
+        self.btn_step_mode = QPushButton("02  COMPARISON MODE")
+        self.btn_step_mode.setProperty("class", "stage_step_btn")
         self.btn_step_mode.setCursor(Qt.PointingHandCursor)
         self.btn_step_mode.clicked.connect(self._goto_mode)
         self.btn_step_mode.setEnabled(False)
-        steps_layout.addWidget(self.btn_step_mode)
+        wf_layout.addWidget(self.btn_step_mode)
 
         arrow_2 = QLabel("→")
-        arrow_2.setStyleSheet("color: #475569; font-weight: bold; font-size: 14px;")
-        steps_layout.addWidget(arrow_2)
+        arrow_2.setStyleSheet("color: #94a3b8; font-weight: bold; font-size: 14px;")
+        wf_layout.addWidget(arrow_2)
 
-        self.btn_step_preview = QPushButton("3  Preview")
-        self.btn_step_preview.setProperty("class", "step_btn")
+        self.btn_step_preview = QPushButton("03  DOCUMENT PREVIEW")
+        self.btn_step_preview.setProperty("class", "stage_step_btn")
         self.btn_step_preview.setCursor(Qt.PointingHandCursor)
         self.btn_step_preview.clicked.connect(self._goto_preview)
         self.btn_step_preview.setEnabled(False)
-        steps_layout.addWidget(self.btn_step_preview)
+        wf_layout.addWidget(self.btn_step_preview)
 
-        header_layout.addLayout(steps_layout)
-        header_layout.addStretch()
+        wf_layout.addStretch()
 
-        # Right Action & Status
-        right_actions = QHBoxLayout()
-        right_actions.setSpacing(10)
+        root_layout.addWidget(workflow_strip)
 
-        self.btn_top_back = QPushButton("← Back")
-        self.btn_top_back.setProperty("class", "secondary")
-        self.btn_top_back.setCursor(Qt.PointingHandCursor)
-        self.btn_top_back.clicked.connect(self._on_back_clicked)
-        self.btn_top_back.setVisible(False)
-        right_actions.addWidget(self.btn_top_back)
-
-        self.btn_top_new = QPushButton("New Comparison")
-        self.btn_top_new.setProperty("class", "secondary")
-        self.btn_top_new.setCursor(Qt.PointingHandCursor)
-        self.btn_top_new.clicked.connect(self._reset_to_new_comparison)
-        self.btn_top_new.setVisible(False)
-        right_actions.addWidget(self.btn_top_new)
-
-        offline_badge = QLabel("🔒 Offline")
-        offline_badge.setStyleSheet("""
-            color: #10b981;
-            font-size: 11px;
-            font-weight: 700;
-            background-color: #064e3b;
-            border: 1px solid #059669;
-            border-radius: 4px;
-            padding: 4px 8px;
-        """)
-        right_actions.addWidget(offline_badge)
-
-        header_layout.addLayout(right_actions)
-        root_layout.addWidget(top_header)
-
-        # 2. Main Stacked Widget Container
+        # 3. Main Stacked Content Container
         self.stack = QStackedWidget()
 
-        # Screen 0: Upload
+        # Screen 0: Document Upload
         self.view_upload = UploadView()
         self.view_upload.document_selected.connect(self._on_document_selected)
         self.view_upload.continue_requested.connect(self._on_continue_to_mode)
         self.stack.addWidget(self.view_upload) # Index 0
 
-        # Screen 1: Mode Selection
+        # Screen 1: Comparison Mode
         self.view_mode = ModeSelectView()
         self.view_mode.back_requested.connect(self._goto_upload)
         self.view_mode.start_comparison_requested.connect(self._start_comparison)
@@ -186,10 +166,19 @@ class MainWindow(QMainWindow):
 
         root_layout.addWidget(self.stack, 1)
 
-        # 3. Minimal Status Bar
+        # 4. Formal Institutional Status Bar
         self.status_bar = QStatusBar()
-        self.status_bar.setStyleSheet("background-color: #090d16; color: #64748b; font-size: 11px; border-top: 1px solid #1e293b; padding: 2px 12px;")
-        self.status_bar.showMessage("Ready • 100% Offline Local Processing")
+        self.status_bar.setStyleSheet("""
+            QStatusBar {
+                background-color: #ffffff;
+                color: #475569;
+                font-size: 11px;
+                font-weight: 600;
+                border-top: 1px solid #cbd5e1;
+                padding: 3px 16px;
+            }
+        """)
+        self.status_bar.showMessage("Official Verification System • 100% Offline Local Architecture")
         self.setStatusBar(self.status_bar)
 
         self._switch_stage(0)
@@ -197,28 +186,28 @@ class MainWindow(QMainWindow):
     def _switch_stage(self, index: int):
         self.stack.setCurrentIndex(index)
 
-        # Update Breadcrumb Buttons Styling
-        self.btn_step_upload.setProperty("class", "step_btn_active" if index == 0 else ("step_btn_completed" if index > 0 else "step_btn"))
-        self.btn_step_mode.setProperty("class", "step_btn_active" if index == 1 else ("step_btn_completed" if index > 1 else "step_btn"))
-        self.btn_step_preview.setProperty("class", "step_btn_active" if index == 3 else "step_btn")
+        # Update Workflow Step Labels & Styling
+        self.btn_step_upload.setText("01  ✓ DOCUMENT UPLOAD" if index > 0 else "01  DOCUMENT UPLOAD")
+        self.btn_step_mode.setText("02  ✓ COMPARISON MODE" if index > 1 else "02  COMPARISON MODE")
+        self.btn_step_preview.setText("03  DOCUMENT PREVIEW")
+
+        self.btn_step_upload.setProperty("class", "stage_step_active" if index == 0 else ("stage_step_done" if index > 0 else "stage_step_btn"))
+        self.btn_step_mode.setProperty("class", "stage_step_active" if index == 1 else ("stage_step_done" if index > 1 else "stage_step_btn"))
+        self.btn_step_preview.setProperty("class", "stage_step_active" if index == 3 else "stage_step_btn")
 
         for btn in [self.btn_step_upload, self.btn_step_mode, self.btn_step_preview]:
             btn.style().unpolish(btn)
             btn.style().polish(btn)
 
-        # Update Top Action Buttons Visibility
-        self.btn_top_back.setVisible(index in (1, 3))
-        self.btn_top_new.setVisible(index == 3)
-
         if index == 0:
-            self.status_bar.showMessage("Select an engineering document to begin.")
+            self.status_bar.showMessage("Select an engineering document to begin verification.")
         elif index == 1:
-            self.status_bar.showMessage("Choose an engineering domain mode.")
+            self.status_bar.showMessage("Select applicable engineering domain.")
         elif index == 2:
-            self.status_bar.showMessage("Analyzing document...")
+            self.status_bar.showMessage("Document analysis in progress...")
         elif index == 3:
             doc_name = Path(self.current_doc.file_path).name if self.current_doc else "Document"
-            self.status_bar.showMessage(f"Compared {doc_name}: {len(self.current_findings)} findings identified.")
+            self.status_bar.showMessage(f"Verification completed for {doc_name} • {len(self.current_findings)} findings recorded.")
 
     def _on_document_selected(self, file_path: str):
         self.current_file_path = file_path
@@ -241,21 +230,11 @@ class MainWindow(QMainWindow):
         if self.current_doc:
             self._switch_stage(3)
 
-    def _on_back_clicked(self):
-        curr = self.stack.currentIndex()
-        if curr == 3:
-            self._switch_stage(1)
-        elif curr == 1:
-            self._switch_stage(0)
-
     def _start_comparison(self, file_path: str, domain: str):
         self.current_file_path = file_path
         self.current_domain = domain
 
-        # Switch to Progress Screen
         self._switch_stage(2)
-
-        # Launch offline background pipeline
         self.view_analysis.start_pipeline(file_path, domain)
 
     def _on_analysis_finished(self, doc: DocumentModel, findings: List[Finding], session_id: str):
@@ -263,17 +242,14 @@ class MainWindow(QMainWindow):
         self.current_findings = findings
         self.current_session_id = session_id
 
-        # Enable preview step button
         self.btn_step_preview.setEnabled(True)
-
-        # Populate and display Screen 3 (Preview)
         self.view_preview.display_results(doc, findings, self.current_domain)
         self._switch_stage(3)
 
     def _on_analysis_failed(self, error_msg: str):
         QMessageBox.critical(
             self,
-            "Comparison Error",
+            "Document Verification Error",
             "The document comparison could not be completed. Please check that the file is valid and try again."
         )
         self._switch_stage(1)

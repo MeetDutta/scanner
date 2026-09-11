@@ -1,8 +1,9 @@
 """
 Comparison Mode Selection View for SpecGuard.
-Screen 2 in the 3-stage minimal workflow:
-Allows selecting exactly one of three engineering domains (Mechanical, Chemical, Electrical)
-and launching the comparison pipeline.
+Step 2 in the Formal Government Engineering Verification Workflow:
+- Three rectangular institutional domain selection panels: MECHANICAL, ELECTRICAL, CHEMICAL
+- Single selection with strong border, check indicator, and clear selected state
+- Formal primary COMPARE DOCUMENT button and back navigation
 """
 
 from pathlib import Path
@@ -10,77 +11,77 @@ from typing import Optional
 
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame, QPushButton,
-    QButtonGroup, QMessageBox
+    QMessageBox
 )
 from PySide6.QtCore import Qt, Signal
 
 
-class ModeCard(QFrame):
-    """Large interactive card representing an engineering domain."""
+class GovModePanel(QFrame):
+    """Formal rectangular selection panel representing an engineering domain."""
     clicked = Signal(str)
 
-    def __init__(self, domain_key: str, icon: str, title: str, description: str, parent=None):
+    def __init__(self, domain_key: str, title: str, subtitle: str, icon: str, parent=None):
         super().__init__(parent)
         self.domain_key = domain_key
         self.is_selected = False
         self.setCursor(Qt.PointingHandCursor)
-        self.setProperty("class", "mode_card")
-        self.setup_ui(icon, title, description)
+        self.setProperty("class", "gov_mode_card")
+        self.setup_ui(title, subtitle, icon)
 
-    def setup_ui(self, icon: str, title: str, description: str):
+    def setup_ui(self, title: str, subtitle: str, icon: str):
         layout = QVBoxLayout(self)
         layout.setAlignment(Qt.AlignCenter)
-        layout.setContentsMargins(20, 24, 20, 24)
-        layout.setSpacing(12)
+        layout.setContentsMargins(18, 24, 18, 24)
+        layout.setSpacing(10)
 
+        # Checkmark indicator row
+        self.check_lbl = QLabel(" ")
+        self.check_lbl.setStyleSheet("color: #002b49; font-weight: 900; font-size: 14px;")
+        self.check_lbl.setAlignment(Qt.AlignLeft)
+        layout.addWidget(self.check_lbl)
+
+        # Subtle engineering icon
         icon_lbl = QLabel(icon)
-        icon_lbl.setStyleSheet("font-size: 42px; margin-bottom: 4px;")
+        icon_lbl.setStyleSheet("font-size: 28px; color: #334155; margin-bottom: 2px;")
         icon_lbl.setAlignment(Qt.AlignCenter)
         layout.addWidget(icon_lbl)
 
         title_lbl = QLabel(title)
-        title_lbl.setStyleSheet("color: #f8fafc; font-size: 17px; font-weight: 700;")
+        title_lbl.setStyleSheet("color: #002b49; font-size: 15px; font-weight: 800; letter-spacing: 0.5px;")
         title_lbl.setAlignment(Qt.AlignCenter)
         layout.addWidget(title_lbl)
 
-        desc_lbl = QLabel(description)
-        desc_lbl.setStyleSheet("color: #94a3b8; font-size: 12px; line-height: 1.4;")
-        desc_lbl.setWordWrap(True)
-        desc_lbl.setAlignment(Qt.AlignCenter)
-        layout.addWidget(desc_lbl)
-
-        self.check_badge = QLabel("✓ Selected")
-        self.check_badge.setStyleSheet("color: #38bdf8; font-weight: 700; font-size: 11px; margin-top: 6px;")
-        self.check_badge.setAlignment(Qt.AlignCenter)
-        self.check_badge.setVisible(False)
-        layout.addWidget(self.check_badge)
+        sub_lbl = QLabel(subtitle)
+        sub_lbl.setStyleSheet("color: #475569; font-size: 12px; font-weight: 500;")
+        sub_lbl.setAlignment(Qt.AlignCenter)
+        layout.addWidget(sub_lbl)
 
         self._update_style()
 
     def set_selected(self, selected: bool):
         self.is_selected = selected
-        self.check_badge.setVisible(selected)
+        self.check_lbl.setText("✓" if selected else " ")
         self._update_style()
 
     def _update_style(self):
         if self.is_selected:
             self.setStyleSheet("""
                 QFrame {
-                    background-color: #0c1c2e;
-                    border: 2px solid #38bdf8;
-                    border-radius: 12px;
+                    background-color: #f0f7ff;
+                    border: 2px solid #002b49;
+                    border-radius: 0px;
                 }
             """)
         else:
             self.setStyleSheet("""
                 QFrame {
-                    background-color: #111827;
-                    border: 2px solid #1f2937;
-                    border-radius: 12px;
+                    background-color: #ffffff;
+                    border: 1px solid #cbd5e1;
+                    border-radius: 0px;
                 }
                 QFrame:hover {
-                    border-color: #475569;
-                    background-color: #162032;
+                    border-color: #002b49;
+                    background-color: #f8fafc;
                 }
             """)
 
@@ -92,11 +93,9 @@ class ModeCard(QFrame):
 
 class ModeSelectView(QWidget):
     """
-    Screen 2 — Select Comparison Mode
-    Three large selectable cards:
-      ⚙ Mechanical
-      🧪 Chemical
-      ⚡ Electrical
+    Step 2 — Comparison Mode
+    Three and only three formal selection choices:
+    MECHANICAL, ELECTRICAL, CHEMICAL.
     """
     start_comparison_requested = Signal(str, str) # (file_path, domain)
     back_requested = Signal()
@@ -105,132 +104,124 @@ class ModeSelectView(QWidget):
         super().__init__(parent)
         self.file_path: Optional[str] = None
         self.selected_domain: Optional[str] = None
-        self.cards: dict[str, ModeCard] = {}
+        self.cards: dict[str, GovModePanel] = {}
         self.setup_ui()
 
     def setup_ui(self):
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(32, 28, 32, 32)
-        main_layout.setSpacing(24)
+        main_layout.setContentsMargins(40, 24, 40, 40)
+        main_layout.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
 
-        # 1. Top navigation row with back button
+        # Top Control Row
         top_row = QHBoxLayout()
-        self.back_btn = QPushButton("← Back to Upload")
-        self.back_btn.setProperty("class", "secondary")
+        top_row.setContentsMargins(0, 0, 0, 12)
+
+        self.back_btn = QPushButton("← BACK TO UPLOAD")
+        self.back_btn.setProperty("class", "gov_btn_secondary")
         self.back_btn.setCursor(Qt.PointingHandCursor)
         self.back_btn.clicked.connect(self.back_requested.emit)
         top_row.addWidget(self.back_btn)
+
         top_row.addStretch()
 
-        # Selected document chip
-        self.doc_chip = QLabel("📄 No document loaded")
-        self.doc_chip.setStyleSheet("""
-            background-color: #111827;
-            border: 1px solid #1f2937;
-            border-radius: 16px;
-            padding: 6px 14px;
-            color: #cbd5e1;
+        self.doc_summary_lbl = QLabel("DOCUMENT: No document loaded")
+        self.doc_summary_lbl.setStyleSheet("""
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            padding: 5px 12px;
+            color: #002b49;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
         """)
-        top_row.addWidget(self.doc_chip)
-        main_layout.addLayout(top_row)
+        top_row.addWidget(self.doc_summary_lbl)
 
-        # 2. Centered mode selection container
-        center_widget = QWidget()
-        center_layout = QVBoxLayout(center_widget)
-        center_layout.setAlignment(Qt.AlignCenter)
-        center_layout.setContentsMargins(0, 10, 0, 10)
-        center_layout.setSpacing(24)
+        # Wrap in 680px panel
+        self.panel = QFrame()
+        self.panel.setProperty("class", "gov_panel")
+        self.panel.setFixedWidth(700)
+        panel_layout = QVBoxLayout(self.panel)
+        panel_layout.setContentsMargins(32, 28, 32, 32)
+        panel_layout.setSpacing(20)
 
-        title_col = QVBoxLayout()
-        title_col.setSpacing(6)
-        title = QLabel("Select Comparison Mode")
-        title.setStyleSheet("color: #f8fafc; font-size: 24px; font-weight: 800;")
-        title.setAlignment(Qt.AlignCenter)
-        subtitle = QLabel("Choose the engineering domain for standards and specification checks")
-        subtitle.setStyleSheet("color: #94a3b8; font-size: 14px;")
-        subtitle.setAlignment(Qt.AlignCenter)
-        title_col.addWidget(title)
-        title_col.addWidget(subtitle)
-        center_layout.addLayout(title_col)
+        panel_layout.addLayout(top_row)
 
-        # Three cards row
-        cards_layout = QHBoxLayout()
-        cards_layout.setSpacing(20)
+        # Headings
+        h1 = QLabel("COMPARISON MODE")
+        h1.setProperty("class", "gov_h1")
+        panel_layout.addWidget(h1)
+
+        instruction = QLabel("Select the applicable engineering domain.")
+        instruction.setProperty("class", "gov_instruction")
+        panel_layout.addWidget(instruction)
+
+        # Three Formal Selection Panels
+        modes_row = QHBoxLayout()
+        modes_row.setSpacing(16)
 
         # Mechanical
-        card_mech = ModeCard(
+        panel_mech = GovModePanel(
             domain_key="Mechanical",
-            icon="⚙",
-            title="Mechanical",
-            description="For mechanical engineering specifications, ASME/ISO tolerances, pressure ratings, and material limits."
+            title="MECHANICAL",
+            subtitle="Mechanical\nEngineering",
+            icon="⚙"
         )
-        card_mech.setFixedWidth(240)
-        card_mech.clicked.connect(self._select_domain)
-        self.cards["Mechanical"] = card_mech
-        cards_layout.addWidget(card_mech)
-
-        # Chemical
-        card_chem = ModeCard(
-            domain_key="Chemical",
-            icon="🧪",
-            title="Chemical",
-            description="For chemical process documents, concentrations, temperatures, flow rates, and safety standards."
-        )
-        card_chem.setFixedWidth(240)
-        card_chem.clicked.connect(self._select_domain)
-        self.cards["Chemical"] = card_chem
-        cards_layout.addWidget(card_chem)
+        panel_mech.clicked.connect(self._select_domain)
+        self.cards["Mechanical"] = panel_mech
+        modes_row.addWidget(panel_mech)
 
         # Electrical
-        card_elec = ModeCard(
+        panel_elec = GovModePanel(
             domain_key="Electrical",
-            icon="⚡",
-            title="Electrical",
-            description="For electrical diagrams and specs, IEEE/IEC voltages, currents, frequencies, and wiring codes."
+            title="ELECTRICAL",
+            subtitle="Electrical\nEngineering",
+            icon="⚡"
         )
-        card_elec.setFixedWidth(240)
-        card_elec.clicked.connect(self._select_domain)
-        self.cards["Electrical"] = card_elec
-        cards_layout.addWidget(card_elec)
+        panel_elec.clicked.connect(self._select_domain)
+        self.cards["Electrical"] = panel_elec
+        modes_row.addWidget(panel_elec)
 
-        center_layout.addLayout(cards_layout)
+        # Chemical
+        panel_chem = GovModePanel(
+            domain_key="Chemical",
+            title="CHEMICAL",
+            subtitle="Chemical\nEngineering",
+            icon="🧪"
+        )
+        panel_chem.clicked.connect(self._select_domain)
+        self.cards["Chemical"] = panel_chem
+        modes_row.addWidget(panel_chem)
+
+        panel_layout.addLayout(modes_row)
 
         # Compare Button
-        action_col = QVBoxLayout()
-        action_col.setAlignment(Qt.AlignCenter)
-        action_col.setContentsMargins(0, 12, 0, 0)
+        action_layout = QVBoxLayout()
+        action_layout.setAlignment(Qt.AlignCenter)
+        action_layout.setContentsMargins(0, 12, 0, 0)
 
-        self.compare_btn = QPushButton("Compare Document")
-        self.compare_btn.setProperty("class", "primary")
+        self.compare_btn = QPushButton("COMPARE DOCUMENT")
+        self.compare_btn.setProperty("class", "gov_btn_primary")
         self.compare_btn.setCursor(Qt.PointingHandCursor)
-        self.compare_btn.setFixedWidth(260)
+        self.compare_btn.setFixedWidth(280)
         self.compare_btn.setStyleSheet("""
             QPushButton {
-                font-size: 15px;
-                font-weight: 700;
-                padding: 13px 28px;
-                border-radius: 8px;
-            }
-            QPushButton:disabled {
-                background-color: #1e293b;
-                color: #475569;
-                border: 1px solid #334155;
+                font-size: 14px;
+                font-weight: 800;
+                letter-spacing: 0.5px;
+                padding: 12px 24px;
             }
         """)
         self.compare_btn.setEnabled(False)
         self.compare_btn.clicked.connect(self._on_start_compare)
-        action_col.addWidget(self.compare_btn, alignment=Qt.AlignCenter)
+        action_layout.addWidget(self.compare_btn, alignment=Qt.AlignCenter)
 
-        center_layout.addLayout(action_col)
+        panel_layout.addLayout(action_layout)
 
-        main_layout.addWidget(center_widget, 1)
+        main_layout.addWidget(self.panel)
 
     def set_document(self, file_path: str):
         self.file_path = file_path
         path = Path(file_path)
-        self.doc_chip.setText(f"📄 {path.name}")
+        self.doc_summary_lbl.setText(f"DOCUMENT: {path.name}")
         self._update_button_state()
 
     def _select_domain(self, domain: str):
