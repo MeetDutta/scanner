@@ -17,20 +17,36 @@ from specguard.storage.database import DatabaseManager
 from specguard.core.models import DocumentModel
 from specguard.core.document_parser import DocumentParser
 from specguard.repository.manager import RepositoryManager
+from specguard.core.config import DEMO_SAMPLES_DIR, DATA_DIR
 
 logger = logging.getLogger("SpecGuard.API.Documents")
 router = APIRouter(prefix="/documents", tags=["documents"])
 
 
 def _find_document_path(doc_identifier: str) -> Optional[Path]:
-    """Finds document file path by document_id (DOC-XXXX) or SHA-256 hash."""
+    """Finds document file path by document_id (DOC-XXXX), SHA-256 hash, or filename."""
+    # Direct path check
+    direct_p = Path(doc_identifier)
+    if direct_p.exists() and direct_p.is_file():
+        return direct_p
+
+    # Check demo_samples directory
+    demo_p = DEMO_SAMPLES_DIR / doc_identifier
+    if demo_p.exists():
+        return demo_p
+
+    # Check uploads directory
+    uploads_p = DATA_DIR / "uploads" / doc_identifier
+    if uploads_p.exists():
+        return uploads_p
+
     db = DatabaseManager()
     with db.get_connection() as conn:
         cursor = conn.cursor()
         # Try repo_documents first
         cursor.execute(
-            "SELECT original_path, filename FROM repo_documents WHERE document_id = ? OR sha256 = ?",
-            (doc_identifier, doc_identifier)
+            "SELECT original_path, filename FROM repo_documents WHERE document_id = ? OR sha256 = ? OR filename = ?",
+            (doc_identifier, doc_identifier, doc_identifier)
         )
         row = cursor.fetchone()
         if row and Path(row["original_path"]).exists():
@@ -38,8 +54,8 @@ def _find_document_path(doc_identifier: str) -> Optional[Path]:
 
         # Try documents table
         cursor.execute(
-            "SELECT file_path, filename FROM documents WHERE file_hash = ?",
-            (doc_identifier,)
+            "SELECT file_path, filename FROM documents WHERE file_hash = ? OR filename = ?",
+            (doc_identifier, doc_identifier)
         )
         row = cursor.fetchone()
         if row and Path(row["file_path"]).exists():
