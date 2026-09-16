@@ -58,19 +58,27 @@ A permanent **100% OFFLINE** verification badge and diagnostic screen continuous
 
 ### Running SpecGuard
 
+#### 1. Modern Web Application (Recommended)
 ```bash
-# Activate virtual environment
-source .venv/bin/activate
+# Launch the modern local web interface (opens default browser automatically)
+./.venv/bin/python run_web.py
 
-# Launch the desktop application
-python app.py
+# Or run via main entry point:
+./.venv/bin/python app.py
+```
+The application starts the local backend at `http://127.0.0.1:8765` and launches the user interface in your default browser.
+
+#### 2. Legacy PySide6 Desktop GUI (Rollback Fallback)
+```bash
+./.venv/bin/python app.py --gui
 ```
 
 ### Running Automated Test Suite
 
 ```bash
-.venv/bin/pytest -v
+./.venv/bin/pytest -v
 ```
+All 68 tests (core analyzers, parsers, training pipelines, and web REST API endpoints) execute 100% offline.
 
 ---
 
@@ -96,29 +104,28 @@ Pre-generated synthetic engineering test documents containing realistic deviatio
 ## 6. Project Structure
 
 ```text
-├── app.py                      # Main desktop launcher
+├── app.py                      # Main entry point (defaults to web, accepts --gui)
+├── run_web.py                  # Local web application launcher (uvicorn + browser)
 ├── pyproject.toml              # Dependencies & packaging metadata
-├── create_demo_samples.py      # Synthetic document generator
-├── demo_samples/               # Pre-generated sample documents
-├── templates/                  # Fixed domain document templates
-│   ├── mechanical/             # Mechanical sections, parameters, vocabulary
-│   ├── electrical/             # Electrical sections, parameters, vocabulary
-│   └── chemical/               # Chemical sections, parameters, vocabulary
-├── rules/                      # Local deterministic standards rules
-│   ├── mechanical/             # ASME Y14.5 / ISO 2768 rules
-│   ├── electrical/             # IEC 60364 / IEEE 141 rules
-│   └── chemical/               # Process Safety / OSHA rules
 ├── specguard/
-│   ├── core/                   # DocumentParser, CV layout, Pipeline, Models
-│   ├── templates/              # TemplateManager
-│   ├── analyzers/              # 10 modular analysis engines + TemplateAnalyzer
-│   ├── export/                 # PDF annotator, ReportGenerator (HTML/JSON)
-│   ├── gui/                    # 3-stage Government Portal GUI (Upload, Mode, Preview)
-│   ├── models/                 # Optional ML inference models (NER, Logical)
-│   ├── training/               # Isolated research-grade training & evaluation tools
-│   ├── storage/                # SQLite local session persistence
-│   └── repository/             # Immutable comparison archives
-└── tests/                      # Full automated test suite (60 test cases)
+│   ├── analyzers/              # 10 pure Python analysis & severity modules
+│   ├── core/                   # Pipeline orchestrator, document parsers, models
+│   ├── export/                 # PDF annotator, DOCX annotator, HTML/JSON reports
+│   ├── models/                 # Dynamic model registry & ML services
+│   ├── repository/             # Document archive & revision diff engine
+│   ├── security/               # Audit logger & SHA-256 integrity verifier
+│   ├── storage/                # SQLite database manager & repositories
+│   ├── templates/              # Domain template manager & definitions
+│   ├── training/               # Offline training pipelines & hardware manager
+│   ├── gui/                    # Legacy PySide6 desktop GUI (preserved for rollback)
+│   ├── server/                 # Local FastAPI service & REST API endpoints
+│   └── web/                    # Modern offline HTML5/CSS3/JS user interface
+│       ├── templates/          # Semantic index.html application shell
+│       └── static/             # Pure vanilla CSS design system & JS components
+├── demo_samples/               # Ready-to-analyze engineering test files
+├── standards/                  # Local machine-readable standards (ASME, IEC, etc.)
+├── templates/                  # Fixed domain templates (Mechanical, Electrical, Chemical)
+└── tests/                      # Pytest automated test suite (68 passing tests)
 ```
 
 ---
