@@ -17,10 +17,12 @@ class DatabaseManager:
     """Manages SQLite connection lifecycle, migrations, and transactional execution."""
 
     def __init__(self, db_path: Path = DB_PATH):
-        self.db_path = db_path
+        self.db_path = Path(db_path)
+        self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self.init_db()
 
     def get_connection(self) -> sqlite3.Connection:
+        self.db_path.parent.mkdir(parents=True, exist_ok=True)
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA foreign_keys = ON")

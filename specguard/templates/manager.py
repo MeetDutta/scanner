@@ -13,9 +13,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-TEMPLATES_DIR = BASE_DIR / "templates"
-RULES_DIR = BASE_DIR / "rules"
+from specguard.core.config import BASE_DIR, TEMPLATES_DIR, RULES_DIR
 
 
 @dataclass

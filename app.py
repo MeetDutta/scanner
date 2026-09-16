@@ -61,9 +61,10 @@ def main():
     if "--gui" in sys.argv or "--pyside" in sys.argv:
         launch_gui()
     else:
-        import run_web
-        run_web.main()
+        import portable_launcher
+        portable_launcher.main()
 
 
 if __name__ == "__main__":
     main()
+

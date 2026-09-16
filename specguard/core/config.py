@@ -8,22 +8,45 @@ from pathlib import Path
 from dataclasses import dataclass, field
 from typing import Dict, Any
 
-# Root application directory
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+from specguard.core.runtime_paths import (
+    get_app_dir,
+    get_data_dir,
+    get_resource_dir,
+    get_database_path,
+    get_reports_dir,
+    get_uploads_dir,
+    get_log_file_path,
+    get_web_dir,
+    get_repository_dir,
+    is_frozen,
+)
 
-# Application storage paths
-DATA_DIR = BASE_DIR / "data"
-STANDARDS_DIR = BASE_DIR / "standards"
-MODELS_DIR = BASE_DIR / "models"
-REPORTS_DIR = BASE_DIR / "reports"
-DATASETS_DIR = BASE_DIR / "datasets"
-DEMO_SAMPLES_DIR = BASE_DIR / "demo_samples"
-LOGS_DIR = DATA_DIR / "logs"
-DB_PATH = DATA_DIR / "specguard.db"
+# Root application directory (frozen-aware)
+BASE_DIR = get_app_dir()
 
-# Ensure essential runtime directories exist
-for directory in [DATA_DIR, STANDARDS_DIR, MODELS_DIR, REPORTS_DIR, DATASETS_DIR, DEMO_SAMPLES_DIR, LOGS_DIR]:
-    directory.mkdir(parents=True, exist_ok=True)
+# Persistent user data paths
+DATA_DIR = get_data_dir()
+REPORTS_DIR = get_reports_dir()
+LOGS_DIR = get_data_dir("logs")
+UPLOADS_DIR = get_uploads_dir()
+DB_PATH = get_database_path()
+REPO_DIR = get_repository_dir()
+
+# Bundled application resource paths
+STANDARDS_DIR = get_resource_dir("standards")
+MODELS_DIR = get_resource_dir("models")
+DATASETS_DIR = get_resource_dir("datasets")
+DEMO_SAMPLES_DIR = get_resource_dir("demo_samples")
+TEMPLATES_DIR = get_resource_dir("templates")
+RULES_DIR = get_resource_dir("rules")
+WEB_DIR = get_web_dir()
+
+# Ensure writable runtime directories exist
+for directory in [DATA_DIR, REPORTS_DIR, LOGS_DIR, UPLOADS_DIR]:
+    try:
+        directory.mkdir(parents=True, exist_ok=True)
+    except Exception:
+        pass
 
 
 @dataclass

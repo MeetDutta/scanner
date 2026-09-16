@@ -12,7 +12,7 @@ import os
 import logging
 
 from specguard.core.config import (
-    BASE_DIR, DATA_DIR, DB_PATH, MODELS_DIR, REPORTS_DIR, STANDARDS_DIR
+    BASE_DIR, DATA_DIR, DB_PATH, MODELS_DIR, REPORTS_DIR, STANDARDS_DIR, REPO_DIR
 )
 from specguard.core.startup import verify_environment
 from specguard.storage.database import DatabaseManager
@@ -41,9 +41,9 @@ def get_environment_health() -> Dict[str, Any]:
 @router.get("/storage")
 def get_storage_statistics() -> Dict[str, Any]:
     """Inspects local filesystem usage and repository size."""
-    repo_dir = BASE_DIR / "repository"
-    docs_dir = repo_dir / "documents"
-    comps_dir = repo_dir / "comparisons"
+    docs_dir = REPO_DIR / "documents"
+    comps_dir = REPO_DIR / "comparisons"
+
 
     db_size = DB_PATH.stat().st_size if DB_PATH.exists() else 0
     repo_docs_size = _dir_size(docs_dir)
@@ -118,3 +118,28 @@ def list_audit_logs(
         "offset": offset,
         "logs": logs
     }
+
+
+@router.post("/backup")
+def trigger_user_data_backup() -> Dict[str, Any]:
+    """Creates a full transactional snapshot backup of SQLite database, reports, and uploads."""
+    from specguard.storage.backup import create_backup
+    try:
+        backup_path = create_backup()
+        return {
+            "success": True,
+            "filename": backup_path.name,
+            "path": str(backup_path),
+            "size_mb": round(backup_path.stat().st_size / (1024 * 1024), 2)
+        }
+    except Exception as e:
+        logger.exception("Backup generation failed: %s", e)
+        raise HTTPException(status_code=500, detail=f"Backup generation failed: {str(e)}")
+
+
+@router.get("/backups")
+def get_user_data_backups() -> List[Dict[str, Any]]:
+    """Lists existing local backup archives."""
+    from specguard.storage.backup import list_backups
+    return list_backups()
+

@@ -10,19 +10,18 @@ import shutil
 import hashlib
 from pathlib import Path
 from datetime import datetime, timezone
-from typing import List, Dict, Optional, Any, Tuple
+from typing import List, Dict, Optional, Any, Tuple, Union
 import logging
 
-from specguard.core.config import BASE_DIR
+
+
+from specguard.core.config import BASE_DIR, REPO_DIR
 from specguard.core.models import DocumentModel, Finding, BBox
 from specguard.repository.models import RepositoryDocument, ComparisonRecord
 from specguard.storage.database import DatabaseManager
 
-from typing import List, Dict, Any, Optional, Tuple, Union
-
 logger = logging.getLogger(__name__)
 
-REPO_DIR = BASE_DIR / "repository"
 
 
 class RepositoryManager:

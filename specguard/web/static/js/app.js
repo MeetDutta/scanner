@@ -81,6 +81,10 @@ class SpecGuardApp {
 
   start() {
     window.router.init("main-view-container");
+    const hostSpan = document.getElementById("statusbar-host");
+    if (hostSpan && window.location.host) {
+      hostSpan.textContent = `Host: ${window.location.host}`;
+    }
     console.log("SpecGuard 100% Offline Engineering Framework Initialized.");
   }
 }

@@ -14,7 +14,7 @@ from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
-from specguard.core.config import BASE_DIR, DEFAULT_CONFIG
+from specguard.core.config import BASE_DIR, DEFAULT_CONFIG, WEB_DIR
 from specguard.core.startup import verify_environment
 
 # Import all API routers
@@ -30,7 +30,6 @@ from specguard.server.api.settings_api import router as router_settings
 
 logger = logging.getLogger("SpecGuard.Server")
 
-WEB_DIR = Path(__file__).resolve().parent.parent / "web"
 STATIC_DIR = WEB_DIR / "static"
 TEMPLATES_DIR = WEB_DIR / "templates"
 
@@ -59,10 +58,10 @@ def create_app() -> FastAPI:
         redoc_url=None
     )
 
-    # Restrict CORS to localhost only
+    # Restrict CORS strictly to localhost on any allocated port
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://127.0.0.1:8765", "http://localhost:8765"],
+        allow_origin_regex=r"^https?://(127\.0\.0\.1|localhost)(:\d+)?$",
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
