@@ -52,33 +52,53 @@ A permanent **100% OFFLINE** verification badge and diagnostic screen continuous
 
 ## 4. Installation & Quickstart
 
-### Prerequisites
+### Prerequisites (for Development)
 - Python 3.9+ (Python 3.11 recommended)
 - macOS, Linux, or Windows
 
 ### Running SpecGuard
 
-#### 1. Modern Web Application (Recommended)
-```bash
-# Launch the modern local web interface (opens default browser automatically)
-./.venv/bin/python run_web.py
+#### 1. Windows Portable Zero-Install Package (No Python or Node.js Required)
+1. Extract `SpecGuard-v1.0.0-Windows-x64-Portable.zip`.
+2. Double-click `SpecGuard.exe` or `Launch_SpecGuard.bat`.
+3. The local backend initializes automatically on `127.0.0.1:8765` and opens your default browser.
 
-# Or run via main entry point:
+#### 2. Modern Web Application via Python (Development Mode)
+```bash
+# Launch the modern local web interface with auto port discovery & browser launch:
+./.venv/bin/python portable_launcher.py
+
+# Or via convenience launchers:
+./.venv/bin/python run_web.py
 ./.venv/bin/python app.py
 ```
-The application starts the local backend at `http://127.0.0.1:8765` and launches the user interface in your default browser.
+The application starts the local backend at `http://127.0.0.1:8765` (or the next available port) and opens the user interface in your default browser.
 
-#### 2. Legacy PySide6 Desktop GUI (Rollback Fallback)
+#### 3. Legacy PySide6 Desktop GUI (Rollback Fallback)
 ```bash
 ./.venv/bin/python app.py --gui
 ```
+
+### Building the Windows Portable Distribution
+```cmd
+# Automated Windows build script (cmd):
+build_portable.bat
+
+# Or using PowerShell:
+.\build_portable.ps1
+
+# Assemble checksummed ZIP distribution:
+python package_zip.py
+```
+See [BUILD_INSTRUCTIONS.md](BUILD_INSTRUCTIONS.md), [PORTABLE_DEPLOYMENT.md](PORTABLE_DEPLOYMENT.md), and [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for full deployment documentation.
 
 ### Running Automated Test Suite
 
 ```bash
 ./.venv/bin/pytest -v
 ```
-All 68 tests (core analyzers, parsers, training pipelines, and web REST API endpoints) execute 100% offline.
+All 83 tests (core analyzers, parsers, training pipelines, portable packaging, and web REST API endpoints) execute 100% offline.
+
 
 ---
 
