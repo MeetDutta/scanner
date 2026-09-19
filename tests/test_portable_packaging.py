@@ -110,11 +110,12 @@ class TestPortDiscovery:
     def test_find_available_port_avoids_conflict(self):
         """Binds a socket to simulate collision and ensures allocator picks alternative."""
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.bind(("127.0.0.1", 8765))
-            # 8765 is now occupied
-            allocated = find_available_port("127.0.0.1", preferred_port=8765)
-            assert allocated != 8765
-            assert allocated > 8765
+            s.bind(("127.0.0.1", 0))
+            occupied_port = s.getsockname()[1]
+            # occupied_port is now bound and held by socket s
+            allocated = find_available_port("127.0.0.1", preferred_port=occupied_port)
+            assert allocated != occupied_port
+            assert allocated > occupied_port
 
 
 class TestLoggingAndDiagnostics:

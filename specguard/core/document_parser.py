@@ -104,43 +104,107 @@ class DocumentParser:
 
             # Extract detailed text blocks with font and coordinate data
             page_dict = fitz_page.get_text("dict")
+
+            # Extract exact word coordinates from PyMuPDF
+            words_by_line: Dict[Tuple[int, int], List[Tuple[float, float, float, float, str]]] = {}
+            try:
+                for w_item in fitz_page.get_text("words"):
+                    # w_item: (x0, y0, x1, y1, word_text, block_no, line_no, word_no)
+                    k = (int(w_item[5]), int(w_item[6]))
+                    if k not in words_by_line:
+                        words_by_line[k] = []
+                    words_by_line[k].append((float(w_item[0]), float(w_item[1]), float(w_item[2]), float(w_item[3]), str(w_item[4])))
+            except Exception as w_err:
+                logger.debug("Native word extraction error on page %d: %s", page_num, w_err)
+                words_by_line = {}
+
             block_id = 0
-            for b in page_dict.get("blocks", []):
+            for b_idx, b in enumerate(page_dict.get("blocks", [])):
                 if b.get("type") == 0:  # Text block
                     block_words: List[WordModel] = []
                     block_lines: List[LineModel] = []
 
-                    for line in b.get("lines", []):
+                    for l_idx, line in enumerate(b.get("lines", [])):
                         line_text_parts = []
                         line_bbox = line.get("bbox", (0, 0, 0, 0))
                         font_name = "Helvetica"
                         font_size = 11.0
-                        is_bold = False
-                        is_italic = False
                         line_words: List[WordModel] = []
 
-                        for span in line.get("spans", []):
+                        # Gather span styles for this line
+                        spans = line.get("spans", [])
+                        span_info = []
+                        for span in spans:
                             span_text = span.get("text", "")
                             line_text_parts.append(span_text)
-                            font_name = span.get("font", font_name)
-                            font_size = float(span.get("size", font_size))
+                            s_font = span.get("font", font_name)
+                            s_size = float(span.get("size", font_size))
                             flags = span.get("flags", 0)
-                            if flags & 2:
-                                is_italic = True
-                            if flags & 16 or "bold" in font_name.lower():
-                                is_bold = True
-
-                            # Extract words inside span
+                            s_italic = bool(flags & 2)
+                            s_bold = bool(flags & 16 or "bold" in s_font.lower())
                             s_bbox = span.get("bbox", (0, 0, 0, 0))
-                            for word_str in span_text.split():
-                                if word_str.strip():
+                            span_info.append({
+                                "text": span_text,
+                                "font": s_font,
+                                "size": s_size,
+                                "bold": s_bold,
+                                "italic": s_italic,
+                                "bbox": s_bbox
+                            })
+                            font_name = s_font
+                            font_size = s_size
+
+                        # Get exact words for this block and line if available
+                        exact_words = words_by_line.get((b_idx, l_idx), [])
+                        if exact_words:
+                            for wx0, wy0, wx1, wy1, wtext in exact_words:
+                                # Determine matching span for font attributes
+                                matched_span = None
+                                w_mid_x = (wx0 + wx1) / 2.0
+                                for si in span_info:
+                                    sb = si["bbox"]
+                                    if sb[0] - 2.0 <= w_mid_x <= sb[2] + 2.0:
+                                        matched_span = si
+                                        break
+                                if not matched_span and span_info:
+                                    matched_span = span_info[0]
+
+                                w_model = WordModel(
+                                    text=wtext,
+                                    bbox=BBox(x0=wx0, y0=wy0, x1=wx1, y1=wy1),
+                                    font_name=matched_span["font"] if matched_span else font_name,
+                                    font_size=round(matched_span["size"] if matched_span else font_size, 1),
+                                    is_bold=matched_span["bold"] if matched_span else False,
+                                    is_italic=matched_span["italic"] if matched_span else False
+                                )
+                                line_words.append(w_model)
+                                block_words.append(w_model)
+                        else:
+                            # Fallback: Proportional character slicing inside each span
+                            for si in span_info:
+                                span_text = si["text"]
+                                sb = si["bbox"]
+                                s_w = sb[2] - sb[0]
+                                s_len = max(1, len(span_text))
+                                char_w = s_w / s_len
+                                c_offset = 0
+                                for word_str in span_text.split():
+                                    if not word_str.strip():
+                                        continue
+                                    idx_in_span = span_text.find(word_str, c_offset)
+                                    if idx_in_span == -1:
+                                        idx_in_span = c_offset
+                                    w_x0 = sb[0] + idx_in_span * char_w
+                                    w_x1 = w_x0 + len(word_str) * char_w
+                                    c_offset = idx_in_span + len(word_str)
+
                                     w_model = WordModel(
                                         text=word_str,
-                                        bbox=BBox(x0=s_bbox[0], y0=s_bbox[1], x1=s_bbox[2], y1=s_bbox[3]),
-                                        font_name=font_name,
-                                        font_size=round(font_size, 1),
-                                        is_bold=is_bold,
-                                        is_italic=is_italic
+                                        bbox=BBox(x0=w_x0, y0=sb[1], x1=w_x1, y1=sb[3]),
+                                        font_name=si["font"],
+                                        font_size=round(si["size"], 1),
+                                        is_bold=si["bold"],
+                                        is_italic=si["italic"]
                                     )
                                     line_words.append(w_model)
                                     block_words.append(w_model)

@@ -19,6 +19,7 @@ from specguard.core.models import (
     DocumentModel, Finding, FindingCategory, SeverityLevel, FigureData, BBox
 )
 from specguard.core.profiles import ProfileRegistry
+from specguard.core.location_mapper import LocationMapper
 
 logger = logging.getLogger(__name__)
 
@@ -118,25 +119,43 @@ class FigureAnalyzer(BaseAnalyzer):
                     numbered_figures.append((int(m.group(0)), fig))
 
         # Check for duplicate figure labels
-        seen_fig_nums: Dict[int, FigureData] = {}
+        seen_fig_nums: Dict[int, Tuple[FigureData, str]] = {}
         for num_val, fig in numbered_figures:
+            curr_label = fig.label or f"Figure {num_val}"
+            pg_curr = next((p for p in doc.pages if p.page_num == fig.page_num), None)
+            curr_boxes = LocationMapper.find_phrase_bboxes(pg_curr, curr_label) if pg_curr else []
+            curr_bbox = curr_boxes[0] if curr_boxes else fig.bbox
+            curr_precision = "EXACT_LABEL" if curr_boxes else "APPROXIMATE"
+
             if num_val in seen_fig_nums:
-                prev_fig = seen_fig_nums[num_val]
+                prev_fig, prev_fid = seen_fig_nums[num_val]
+                curr_fid = f"FIG-DUP-{finding_counter:03d}"
+                next_expected = max(seen_fig_nums.keys()) + 1 if seen_fig_nums else num_val + 1
+
                 findings.append(Finding(
-                    finding_id=f"FIG-DUP-{finding_counter:03d}",
+                    finding_id=curr_fid,
                     category=self.category.value,
                     domain=profile.domain,
                     location=f"Page {fig.page_num}",
                     page=fig.page_num,
-                    bbox=fig.bbox,
+                    bbox=curr_bbox,
+                    bounding_boxes=curr_boxes if curr_boxes else ([curr_bbox] if curr_bbox else []),
+                    location_precision=curr_precision,
+                    matched_text=curr_label,
+                    expected_text=f"Figure {next_expected}",
+                    issue_type="DUPLICATE_FIGURE_LABEL",
+                    related_finding_ids=[prev_fid],
+                    source_object_id=fig.figure_id,
+                    target_object_id=prev_fig.figure_id,
                     original_content=fig.caption or fig.label,
-                    detected_value=f"Duplicate Figure {num_val}",
-                    expected_value=f"Unique Figure Number (next: {max(seen_fig_nums.keys()) + 1})",
-                    deviation=f"Duplicate Figure {num_val} already declared on Page {prev_fig.page_num}",
+                    detected_value=f"Duplicate {curr_label}",
+                    expected_value=f"Unique Figure Number (next: {next_expected})",
+                    deviation=f"Duplicate {curr_label} already declared on Page {prev_fig.page_num}",
                     severity=SeverityLevel.HIGH.value,
                     confidence=0.96,
-                    explanation=f"Figure numbering conflict: Figure {num_val} is declared on Page {fig.page_num}, but was already defined on Page {prev_fig.page_num}.",
+                    explanation=f"Figure numbering conflict: {curr_label} is declared on Page {fig.page_num}, but was already defined on Page {prev_fig.page_num}.",
                     suggested_correction=f"Renumber Figure on Page {fig.page_num} to maintain unique monotonic sequence.",
+                    suggested_fix=f"Renumber to Figure {next_expected}.",
                     rule_reference="Engineering Document Standards §5.1 (Figure Numbering)",
                     priority_score=6.8,
                     evidence=f"Page {fig.page_num}: '{fig.caption}' conflicts with Page {prev_fig.page_num}: '{prev_fig.caption}'",
@@ -144,7 +163,8 @@ class FigureAnalyzer(BaseAnalyzer):
                 ))
                 finding_counter += 1
             else:
-                seen_fig_nums[num_val] = fig
+                assigned_fid = f"FIG-DECL-{finding_counter:03d}"
+                seen_fig_nums[num_val] = (fig, assigned_fid)
 
         # Check for sequence jumps (e.g. Figure 1 -> Figure 3)
         sorted_nums = sorted(seen_fig_nums.keys())
@@ -152,14 +172,26 @@ class FigureAnalyzer(BaseAnalyzer):
             curr_n = sorted_nums[i]
             next_n = sorted_nums[i + 1]
             if next_n > curr_n + 1:
-                fig = seen_fig_nums[next_n]
+                fig, _ = seen_fig_nums[next_n]
+                pg_fig = next((p for p in doc.pages if p.page_num == fig.page_num), None)
+                lbl_text = fig.label or f"Figure {next_n}"
+                j_boxes = LocationMapper.find_phrase_bboxes(pg_fig, lbl_text) if pg_fig else []
+                j_bbox = j_boxes[0] if j_boxes else fig.bbox
+                j_precision = "EXACT_LABEL" if j_boxes else "APPROXIMATE"
+
                 findings.append(Finding(
                     finding_id=f"FIG-SEQ-{finding_counter:03d}",
                     category=self.category.value,
                     domain=profile.domain,
                     location=f"Page {fig.page_num}",
                     page=fig.page_num,
-                    bbox=fig.bbox,
+                    bbox=j_bbox,
+                    bounding_boxes=j_boxes if j_boxes else ([j_bbox] if j_bbox else []),
+                    location_precision=j_precision,
+                    matched_text=lbl_text,
+                    expected_text=f"Figure {curr_n + 1}",
+                    issue_type="FIGURE_SEQUENCE_GAP",
+                    source_object_id=fig.figure_id,
                     original_content=fig.caption or fig.label,
                     detected_value=f"Figure {next_n}",
                     expected_value=f"Figure {curr_n + 1}",
@@ -168,6 +200,7 @@ class FigureAnalyzer(BaseAnalyzer):
                     confidence=0.92,
                     explanation=f"Figure numbering jumps from Figure {curr_n} directly to Figure {next_n}, skipping Figure {curr_n + 1}.",
                     suggested_correction=f"Renumber Figure {next_n} to Figure {curr_n + 1} or insert the missing figure.",
+                    suggested_fix=f"Renumber to Figure {curr_n + 1}.",
                     rule_reference="Engineering Documentation Standard §5.1",
                     priority_score=5.0,
                     evidence=f"Jump from Figure {curr_n} to Figure {next_n}",

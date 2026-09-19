@@ -51,6 +51,7 @@ window.ViewerView = {
     // Instantiate viewer component
     const docId = activeDoc.file_hash || activeDoc.filename;
     this.viewerInstance = new window.DocumentViewerComponent("viewer-mount-point");
+    window.currentViewer = this.viewerInstance;
     this.viewerInstance.loadDocument(docId, activeDoc.page_count || 1, findings);
 
     if (focusedFinding) {

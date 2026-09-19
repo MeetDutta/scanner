@@ -18,6 +18,7 @@ from specguard.core.models import (
     TOCModel, TOCItem, SectionNode
 )
 from specguard.core.profiles import ProfileRegistry
+from specguard.core.location_mapper import LocationMapper
 
 logger = logging.getLogger(__name__)
 
@@ -220,13 +221,37 @@ class TOCAnalyzer(BaseAnalyzer):
                         if not pagination_verified:
                             exp += " (Note: Exact physical pagination unverified because no local LibreOffice was found)."
 
+                        # Resolve exact page number token bounding box in TOC entry
+                        pg_toc = next((p for p in doc.pages if p.page_num == item.page_num), None)
+                        num_str = str(item.target_page_num)
+                        num_box = None
+                        if pg_toc:
+                            for blk in pg_toc.blocks:
+                                if item.title.lower() in blk.text.lower() or (item.bbox and abs(blk.bbox.y0 - item.bbox.y0) < 5.0):
+                                    num_box = LocationMapper.find_number_in_block(blk, num_str)
+                                    if num_box:
+                                        break
+
+                        toc_f_bbox = num_box if num_box else item.bbox
+                        toc_precision = "EXACT_NUMBER" if num_box else "APPROXIMATE"
+                        toc_fid = f"TOC-PAG-{finding_counter:03d}"
+                        body_fid = f"TOC-DST-{finding_counter:03d}"
+
                         findings.append(Finding(
-                            finding_id=f"TOC-PAG-{finding_counter:03d}",
+                            finding_id=toc_fid,
                             category=self.category.value,
                             domain=profile.domain,
                             location=f"TOC (Page {item.page_num}) vs Body (Page {act_page})",
                             page=item.page_num,
-                            bbox=item.bbox,
+                            bbox=toc_f_bbox,
+                            bounding_boxes=[toc_f_bbox] if toc_f_bbox else [],
+                            location_precision=toc_precision,
+                            matched_text=num_str,
+                            expected_text=str(act_page),
+                            issue_type="TOC_PAGE_DRIFT",
+                            related_finding_ids=[body_fid],
+                            source_object_id=f"toc_{item.title[:20].strip()}",
+                            target_object_id=f"heading_{orig_act_text[:20].strip()}",
                             original_content=item.raw_text,
                             detected_value=f"TOC Page {item.target_page_num}",
                             expected_value=f"Actual Page {act_page}",
@@ -235,9 +260,46 @@ class TOCAnalyzer(BaseAnalyzer):
                             confidence=0.95 if pagination_verified else 0.75,
                             explanation=exp,
                             suggested_correction=f"Update TOC entry '{item.title}' page number to {act_page}.",
+                            suggested_fix=f"Change TOC page from {item.target_page_num} to {act_page}.",
                             rule_reference="Engineering Document Specification Standard §1.3 (TOC Accuracy)",
                             priority_score=6.8 if pagination_verified else 4.0,
                             evidence=f"TOC: '{item.raw_text}' -> Heading: '{orig_act_text}' on Page {act_page}",
+                            detection_method="cross_page_alignment"
+                        ))
+                        finding_counter += 1
+
+                        # Also generate destination link finding in body heading so navigation is bi-directional
+                        pg_act = next((p for p in doc.pages if p.page_num == act_page), None)
+                        h_boxes = LocationMapper.find_phrase_bboxes(pg_act, orig_act_text) if pg_act else []
+                        h_bbox = h_boxes[0] if h_boxes else act_bbox
+
+                        findings.append(Finding(
+                            finding_id=body_fid,
+                            category=self.category.value,
+                            domain=profile.domain,
+                            location=f"Body (Page {act_page})",
+                            page=act_page,
+                            bbox=h_bbox,
+                            bounding_boxes=h_boxes if h_boxes else ([h_bbox] if h_bbox else []),
+                            location_precision="EXACT_PHRASE" if h_boxes else "APPROXIMATE",
+                            matched_text=orig_act_text,
+                            expected_text=f"Referenced by TOC Page {item.page_num}",
+                            issue_type="TOC_DESTINATION_HEADING",
+                            related_finding_ids=[toc_fid],
+                            source_object_id=f"heading_{orig_act_text[:20].strip()}",
+                            target_object_id=f"toc_{item.title[:20].strip()}",
+                            original_content=orig_act_text,
+                            detected_value=f"Page {act_page} Heading",
+                            expected_value=f"TOC references this as Page {item.target_page_num}",
+                            deviation=f"TOC drift target location",
+                            severity=SeverityLevel.LOW.value,
+                            confidence=0.95,
+                            explanation=f"This heading corresponds to TOC entry '{item.title}' which incorrectly indicates Page {item.target_page_num}.",
+                            suggested_correction=f"Verify TOC entry reflects Page {act_page}.",
+                            suggested_fix=f"Update corresponding TOC entry to Page {act_page}.",
+                            rule_reference="Engineering Document Specification Standard §1.3",
+                            priority_score=3.0,
+                            evidence=f"Target heading for drifted TOC entry '{item.title}'",
                             detection_method="cross_page_alignment"
                         ))
                         finding_counter += 1
@@ -245,13 +307,23 @@ class TOCAnalyzer(BaseAnalyzer):
 
             if not match_found and len(clean_toc_key) > 4:
                 # TOC mentions section that does not exist in body
+                pg_toc = next((p for p in doc.pages if p.page_num == item.page_num), None)
+                ext_boxes = LocationMapper.find_phrase_bboxes(pg_toc, item.title) if pg_toc else []
+                ext_bbox = ext_boxes[0] if ext_boxes else item.bbox
+                ext_prec = "EXACT_PHRASE" if ext_boxes else "APPROXIMATE"
+
                 findings.append(Finding(
                     finding_id=f"TOC-EXT-{finding_counter:03d}",
                     category=self.category.value,
                     domain=profile.domain,
                     location=f"TOC (Page {item.page_num})",
                     page=item.page_num,
-                    bbox=item.bbox,
+                    bbox=ext_bbox,
+                    bounding_boxes=ext_boxes if ext_boxes else ([ext_bbox] if ext_bbox else []),
+                    location_precision=ext_prec,
+                    matched_text=item.title,
+                    expected_text="Valid section heading",
+                    issue_type="UNMATCHED_TOC_ENTRY",
                     original_content=item.raw_text,
                     detected_value=f"Unmatched entry: '{item.title}'",
                     expected_value="Corresponding section in document body",
@@ -260,6 +332,7 @@ class TOCAnalyzer(BaseAnalyzer):
                     confidence=0.88,
                     explanation=f"Table of Contents contains entry '{item.title}', but no corresponding section heading was found in the document.",
                     suggested_correction=f"Verify if section '{item.title}' was deleted, moved, or renamed.",
+                    suggested_fix=f"Remove entry '{item.title}' or create corresponding section.",
                     rule_reference="Document Integrity Standards §1.3",
                     priority_score=4.8,
                     evidence=item.raw_text,

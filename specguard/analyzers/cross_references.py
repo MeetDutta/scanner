@@ -24,6 +24,7 @@ from specguard.core.models import (
     CrossReferenceItem, ReferenceItem, BBox, FigureData, TableData, EquationData
 )
 from specguard.core.profiles import ProfileRegistry
+from specguard.core.location_mapper import LocationMapper
 
 logger = logging.getLogger(__name__)
 
@@ -145,6 +146,11 @@ class CrossReferenceAnalyzer(BaseAnalyzer):
                 # Scan Figures
                 for m in fig_ref_re.finditer(txt):
                     digits = re.findall(r'\d+', m.group(1))
+                    mention_str = m.group(0)
+                    m_boxes = LocationMapper.find_phrase_bboxes(page, mention_str, block_id=b.block_id)
+                    m_bbox = m_boxes[0] if m_boxes else b.bbox
+                    m_prec = "EXACT_PHRASE" if m_boxes else "APPROXIMATE"
+
                     for d_str in digits:
                         f_id = int(d_str)
                         referenced_figure_ids.add(f_id)
@@ -152,8 +158,8 @@ class CrossReferenceAnalyzer(BaseAnalyzer):
                         cross_refs.append(CrossReferenceItem(
                             ref_type="figure",
                             source_page=page.page_num,
-                            source_bbox=b.bbox,
-                            mention_text=m.group(0),
+                            source_bbox=m_bbox,
+                            mention_text=mention_str,
                             target_id=f"fig_{f_id}",
                             is_resolved=is_resolved
                         ))
@@ -165,18 +171,25 @@ class CrossReferenceAnalyzer(BaseAnalyzer):
                                 domain=profile.domain,
                                 location=f"Page {page.page_num}",
                                 page=page.page_num,
-                                bbox=b.bbox,
+                                bbox=m_bbox,
+                                bounding_boxes=m_boxes if m_boxes else ([m_bbox] if m_bbox else []),
+                                location_precision=m_prec,
+                                matched_text=mention_str,
+                                expected_text=f"Figure {f_id}",
+                                issue_type="UNRESOLVED_FIGURE_REFERENCE",
+                                target_object_id=f"fig_{f_id}",
                                 original_content=txt,
                                 detected_value=f"Reference to Figure {f_id}",
                                 expected_value=f"Figure {f_id} defined in document",
                                 deviation=f"Unresolved cross-reference: Figure {f_id} does not exist",
                                 severity=SeverityLevel.HIGH.value,
                                 confidence=0.96,
-                                explanation=f"Text on Page {page.page_num} references '{m.group(0)}', but no Figure with label {f_id} exists in the analyzed document.",
+                                explanation=f"Text on Page {page.page_num} references '{mention_str}', but no Figure with label {f_id} exists in the analyzed document.",
                                 suggested_correction=f"Insert Figure {f_id} or update the citation in text.",
+                                suggested_fix=f"Add Figure {f_id} or correct reference '{mention_str}'.",
                                 rule_reference="Document Integrity Standards §5.3 (Cross-Reference Resolution)",
                                 priority_score=7.0,
-                                evidence=f"Mention: '{m.group(0)}' on Page {page.page_num}",
+                                evidence=f"Mention: '{mention_str}' on Page {page.page_num}",
                                 detection_method="reference_graph"
                             ))
                             finding_counter += 1
@@ -185,14 +198,19 @@ class CrossReferenceAnalyzer(BaseAnalyzer):
                 for m in tbl_ref_re.finditer(txt):
                     t_str = m.group(1)
                     t_id = int(t_str) if t_str.isdigit() else roman_to_int(t_str)
+                    mention_str = m.group(0)
+                    m_boxes = LocationMapper.find_phrase_bboxes(page, mention_str, block_id=b.block_id)
+                    m_bbox = m_boxes[0] if m_boxes else b.bbox
+                    m_prec = "EXACT_PHRASE" if m_boxes else "APPROXIMATE"
+
                     if t_id:
                         referenced_table_ids.add(t_id)
                         is_resolved = t_id in declared_tables
                         cross_refs.append(CrossReferenceItem(
                             ref_type="table",
                             source_page=page.page_num,
-                            source_bbox=b.bbox,
-                            mention_text=m.group(0),
+                            source_bbox=m_bbox,
+                            mention_text=mention_str,
                             target_id=f"tbl_{t_id}",
                             is_resolved=is_resolved
                         ))
@@ -204,18 +222,25 @@ class CrossReferenceAnalyzer(BaseAnalyzer):
                                 domain=profile.domain,
                                 location=f"Page {page.page_num}",
                                 page=page.page_num,
-                                bbox=b.bbox,
+                                bbox=m_bbox,
+                                bounding_boxes=m_boxes if m_boxes else ([m_bbox] if m_bbox else []),
+                                location_precision=m_prec,
+                                matched_text=mention_str,
+                                expected_text=f"Table {t_str}",
+                                issue_type="UNRESOLVED_TABLE_REFERENCE",
+                                target_object_id=f"tbl_{t_id}",
                                 original_content=txt,
                                 detected_value=f"Reference to Table {t_str}",
                                 expected_value=f"Table {t_str} defined in document",
                                 deviation=f"Unresolved cross-reference: Table {t_str} does not exist",
                                 severity=SeverityLevel.HIGH.value,
                                 confidence=0.96,
-                                explanation=f"Text on Page {page.page_num} references '{m.group(0)}', but no Table with label '{t_str}' was detected.",
+                                explanation=f"Text on Page {page.page_num} references '{mention_str}', but no Table with label '{t_str}' was detected.",
                                 suggested_correction=f"Add Table {t_str} or update the in-text reference.",
+                                suggested_fix=f"Add Table {t_str} or correct reference '{mention_str}'.",
                                 rule_reference="Document Integrity Standards §5.3 (Cross-Reference Resolution)",
                                 priority_score=7.0,
-                                evidence=f"Mention: '{m.group(0)}' on Page {page.page_num}",
+                                evidence=f"Mention: '{mention_str}' on Page {page.page_num}",
                                 detection_method="reference_graph"
                             ))
                             finding_counter += 1
@@ -223,13 +248,18 @@ class CrossReferenceAnalyzer(BaseAnalyzer):
                 # Scan Equations
                 for m in eq_ref_re.finditer(txt):
                     eq_num = m.group(1)
+                    mention_str = m.group(0)
+                    m_boxes = LocationMapper.find_phrase_bboxes(page, mention_str, block_id=b.block_id)
+                    m_bbox = m_boxes[0] if m_boxes else b.bbox
+                    m_prec = "EXACT_PHRASE" if m_boxes else "APPROXIMATE"
+
                     referenced_equation_ids.add(eq_num)
                     is_resolved = eq_num in declared_equations
                     cross_refs.append(CrossReferenceItem(
                         ref_type="equation",
                         source_page=page.page_num,
-                        source_bbox=b.bbox,
-                        mention_text=m.group(0),
+                        source_bbox=m_bbox,
+                        mention_text=mention_str,
                         target_id=f"eq_{eq_num}",
                         is_resolved=is_resolved
                     ))
@@ -241,7 +271,13 @@ class CrossReferenceAnalyzer(BaseAnalyzer):
                             domain=profile.domain,
                             location=f"Page {page.page_num}",
                             page=page.page_num,
-                            bbox=b.bbox,
+                            bbox=m_bbox,
+                            bounding_boxes=m_boxes if m_boxes else ([m_bbox] if m_bbox else []),
+                            location_precision=m_prec,
+                            matched_text=mention_str,
+                            expected_text=f"Equation ({eq_num})",
+                            issue_type="UNRESOLVED_EQUATION_REFERENCE",
+                            target_object_id=f"eq_{eq_num}",
                             original_content=txt,
                             detected_value=f"Reference to Eq. ({eq_num})",
                             expected_value=f"Equation ({eq_num}) defined in document",
@@ -250,9 +286,10 @@ class CrossReferenceAnalyzer(BaseAnalyzer):
                             confidence=0.90,
                             explanation=f"Text on Page {page.page_num} references Equation ({eq_num}), but no corresponding numbered equation was detected.",
                             suggested_correction=f"Ensure equation ({eq_num}) is properly numbered or update text.",
+                            suggested_fix=f"Number equation ({eq_num}) or update text reference.",
                             rule_reference="Mathematical Formatting Standards §2.2",
                             priority_score=5.5,
-                            evidence=f"Mention: '{m.group(0)}' on Page {page.page_num}",
+                            evidence=f"Mention: '{mention_str}' on Page {page.page_num}",
                             detection_method="reference_graph"
                         ))
                         finding_counter += 1
@@ -277,11 +314,16 @@ class CrossReferenceAnalyzer(BaseAnalyzer):
                         for c_num in c_range:
                             referenced_citation_ids.add(c_num)
                             is_resolved = c_num in declared_citation_ids if declared_citation_ids else True
+                            cite_str = f"[{c_num}]"
+                            c_boxes = LocationMapper.find_token_in_text(txt, cite_str, b.words) or LocationMapper.find_phrase_bboxes(page, cite_str, block_id=b.block_id)
+                            c_bbox = c_boxes[0] if c_boxes else b.bbox
+                            c_prec = "EXACT_TOKEN" if c_boxes else "APPROXIMATE"
+
                             cross_refs.append(CrossReferenceItem(
                                 ref_type="citation",
                                 source_page=page.page_num,
-                                source_bbox=b.bbox,
-                                mention_text=f"[{c_num}]",
+                                source_bbox=c_bbox,
+                                mention_text=cite_str,
                                 target_id=f"ref_{c_num}",
                                 is_resolved=is_resolved
                             ))
@@ -293,7 +335,13 @@ class CrossReferenceAnalyzer(BaseAnalyzer):
                                     domain=profile.domain,
                                     location=f"Page {page.page_num}",
                                     page=page.page_num,
-                                    bbox=b.bbox,
+                                    bbox=c_bbox,
+                                    bounding_boxes=c_boxes if c_boxes else ([c_bbox] if c_bbox else []),
+                                    location_precision=c_prec,
+                                    matched_text=cite_str,
+                                    expected_text=f"Reference [{c_num}] in bibliography",
+                                    issue_type="UNRESOLVED_CITATION",
+                                    target_object_id=f"ref_{c_num}",
                                     original_content=f"[{raw_bracket}]",
                                     detected_value=f"Citation [{c_num}]",
                                     expected_value=f"Bibliography entry [{c_num}]",
@@ -302,6 +350,7 @@ class CrossReferenceAnalyzer(BaseAnalyzer):
                                     confidence=0.95,
                                     explanation=f"Text on Page {page.page_num} cites [{c_num}], but no matching entry was found in the References list.",
                                     suggested_correction=f"Add bibliographic entry for [{c_num}] in References.",
+                                    suggested_fix=f"Add entry for [{c_num}] in bibliography.",
                                     rule_reference="Academic Citation Standards §1.1",
                                     priority_score=6.8,
                                     evidence=f"Citation: [{c_num}] on Page {page.page_num}",

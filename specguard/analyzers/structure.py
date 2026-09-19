@@ -15,6 +15,7 @@ from specguard.core.models import (
     DocumentModel, Finding, FindingCategory, SeverityLevel, BBox, SectionNode
 )
 from specguard.core.profiles import ProfileRegistry
+from specguard.core.location_mapper import LocationMapper
 
 logger = logging.getLogger(__name__)
 
@@ -174,6 +175,12 @@ class StructureAnalyzer(BaseAnalyzer):
             next_txt, next_parts, next_page, next_bbox, _, _ = numeric_headings[i + 1]
 
             if curr_parts and next_parts:
+                pg_next = next((p for p in doc.pages if p.page_num == next_page), None)
+                num_token = ".".join(str(p) for p in next_parts)
+                sec_boxes = LocationMapper.find_phrase_bboxes(pg_next, num_token) if pg_next else []
+                sec_bbox = sec_boxes[0] if sec_boxes else next_bbox
+                sec_prec = "EXACT_NUMBER" if sec_boxes else "APPROXIMATE"
+
                 # Same hierarchy prefix (e.g. 3.1 and 3.3)
                 if len(curr_parts) == len(next_parts) and curr_parts[:-1] == next_parts[:-1]:
                     curr_last = curr_parts[-1]
@@ -186,15 +193,21 @@ class StructureAnalyzer(BaseAnalyzer):
                             domain=profile.domain,
                             location=f"Page {next_page}",
                             page=next_page,
-                            bbox=next_bbox,
+                            bbox=sec_bbox,
+                            bounding_boxes=sec_boxes if sec_boxes else ([sec_bbox] if sec_bbox else []),
+                            location_precision=sec_prec,
+                            matched_text=num_token,
+                            expected_text=missing_sec,
+                            issue_type="SECTION_NUMBER_GAP",
                             original_content=next_txt,
-                            detected_value=f"Section {'.'.join(str(p) for p in next_parts)}",
+                            detected_value=f"Section {num_token}",
                             expected_value=f"Section {missing_sec}",
                             deviation=f"Missing section sequence {missing_sec}",
                             severity=SeverityLevel.HIGH.value,
                             confidence=0.95,
-                            explanation=f"Section numbering jump detected from {'.'.join(str(p) for p in curr_parts)} directly to {'.'.join(str(p) for p in next_parts)}, skipping Section {missing_sec}.",
-                            suggested_correction=f"Insert Section {missing_sec} or renumber {'.'.join(str(p) for p in next_parts)} to {missing_sec}.",
+                            explanation=f"Section numbering jump detected from {'.'.join(str(p) for p in curr_parts)} directly to {num_token}, skipping Section {missing_sec}.",
+                            suggested_correction=f"Insert Section {missing_sec} or renumber {num_token} to {missing_sec}.",
+                            suggested_fix=f"Renumber to Section {missing_sec}.",
                             rule_reference="Engineering Documentation Hierarchy Standard §2.1",
                             priority_score=6.5,
                             evidence=f"Preceding: '{curr_txt}' on Page {curr_page} -> Following: '{next_txt}' on Page {next_page}",
@@ -210,7 +223,12 @@ class StructureAnalyzer(BaseAnalyzer):
                         domain=profile.domain,
                         location=f"Page {next_page}",
                         page=next_page,
-                        bbox=next_bbox,
+                        bbox=sec_bbox,
+                        bounding_boxes=sec_boxes if sec_boxes else ([sec_bbox] if sec_bbox else []),
+                        location_precision=sec_prec,
+                        matched_text=num_token,
+                        expected_text=f"Depth {len(curr_parts) + 1}",
+                        issue_type="SECTION_DEPTH_JUMP",
                         original_content=next_txt,
                         detected_value=f"Depth level {len(next_parts)}",
                         expected_value=f"Depth level {len(curr_parts) + 1}",
@@ -219,6 +237,7 @@ class StructureAnalyzer(BaseAnalyzer):
                         confidence=0.90,
                         explanation=f"Heading jump from depth {len(curr_parts)} ({curr_txt}) directly to depth {len(next_parts)} ({next_txt}) without intermediate level.",
                         suggested_correction="Add intermediate section or adjust outline depth.",
+                        suggested_fix="Insert intermediate section level.",
                         rule_reference="ISO/IEC Document Structure Guide §3.4",
                         priority_score=4.5,
                         evidence=f"From '{curr_txt}' (depth {len(curr_parts)}) to '{next_txt}' (depth {len(next_parts)})",
@@ -235,13 +254,24 @@ class StructureAnalyzer(BaseAnalyzer):
                 curr_val = curr_parts[0]
                 next_val = next_parts[0]
                 if next_val > curr_val + 1:
+                    pg_next = next((p for p in doc.pages if p.page_num == next_page), None)
+                    r_tok = next_txt.split()[0] if next_txt.split() else next_txt
+                    r_boxes = LocationMapper.find_phrase_bboxes(pg_next, r_tok) if pg_next else []
+                    r_bbox = r_boxes[0] if r_boxes else next_bbox
+                    r_prec = "EXACT_NUMBER" if r_boxes else "APPROXIMATE"
+
                     findings.append(Finding(
                         finding_id=f"STR-ROM-{finding_counter:03d}",
                         category=self.category.value,
                         domain=profile.domain,
                         location=f"Page {next_page}",
                         page=next_page,
-                        bbox=next_bbox,
+                        bbox=r_bbox,
+                        bounding_boxes=r_boxes if r_boxes else ([r_bbox] if r_bbox else []),
+                        location_precision=r_prec,
+                        matched_text=r_tok,
+                        expected_text=f"Section {curr_val + 1}",
+                        issue_type="SECTION_ROMAN_GAP",
                         original_content=next_txt,
                         detected_value=next_txt,
                         expected_value=f"Section {curr_val + 1}",
@@ -250,6 +280,7 @@ class StructureAnalyzer(BaseAnalyzer):
                         confidence=0.94,
                         explanation=f"Section sequence jump from Roman numeral heading {curr_txt} to {next_txt}.",
                         suggested_correction="Verify missing section or correct Roman numeral numbering.",
+                        suggested_fix=f"Renumber Roman numeral sequence.",
                         rule_reference="IEEE Publication Style Manual §III",
                         priority_score=6.2,
                         evidence=f"Preceding: '{curr_txt}' -> Following: '{next_txt}'",
@@ -258,18 +289,31 @@ class StructureAnalyzer(BaseAnalyzer):
                     finding_counter += 1
 
         # 2. Check for duplicate headings
-        seen_headings: Dict[str, Tuple[int, BBox]] = {}
+        seen_headings: Dict[str, Tuple[int, BBox, str]] = {}
         for raw_txt, parts, p_num, bbox, title, _ in headings:
             norm_key = re.sub(r'\s+', ' ', raw_txt.lower()).strip()
+            pg_curr = next((p for p in doc.pages if p.page_num == p_num), None)
+            dup_boxes = LocationMapper.find_phrase_bboxes(pg_curr, title) if pg_curr else []
+            dup_bbox = dup_boxes[0] if dup_boxes else bbox
+            dup_prec = "EXACT_PHRASE" if dup_boxes else "APPROXIMATE"
+
             if norm_key in seen_headings:
-                prev_page, prev_bbox = seen_headings[norm_key]
+                prev_page, prev_bbox, prev_fid = seen_headings[norm_key]
+                curr_fid = f"STR-DUP-{finding_counter:03d}"
+
                 findings.append(Finding(
-                    finding_id=f"STR-DUP-{finding_counter:03d}",
+                    finding_id=curr_fid,
                     category=self.category.value,
                     domain=profile.domain,
                     location=f"Page {p_num}",
                     page=p_num,
-                    bbox=bbox,
+                    bbox=dup_bbox,
+                    bounding_boxes=dup_boxes if dup_boxes else ([dup_bbox] if dup_bbox else []),
+                    location_precision=dup_prec,
+                    matched_text=title,
+                    expected_text="Unique section title",
+                    issue_type="DUPLICATE_SECTION_HEADING",
+                    related_finding_ids=[prev_fid],
                     original_content=raw_txt,
                     detected_value=raw_txt,
                     expected_value="Unique section title",
@@ -278,6 +322,7 @@ class StructureAnalyzer(BaseAnalyzer):
                     confidence=0.92,
                     explanation=f"Duplicate section header '{raw_txt}' already defined on Page {prev_page}.",
                     suggested_correction=f"Disambiguate or merge with Page {prev_page} section.",
+                    suggested_fix=f"Rename heading to disambiguate from Page {prev_page}.",
                     rule_reference="Engineering Documentation Standard §2.4",
                     priority_score=4.0,
                     evidence=f"Duplicate header: '{raw_txt}' on Page {p_num} matches Page {prev_page}",
@@ -285,7 +330,8 @@ class StructureAnalyzer(BaseAnalyzer):
                 ))
                 finding_counter += 1
             else:
-                seen_headings[norm_key] = (p_num, bbox)
+                assigned_fid = f"STR-DECL-{finding_counter:03d}"
+                seen_headings[norm_key] = (p_num, bbox, assigned_fid)
 
         # 3. Check for profile-specific mandatory sections
         all_titles_lower = " ".join(h[4].lower() for h in headings)

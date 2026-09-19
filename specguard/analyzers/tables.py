@@ -20,6 +20,7 @@ from specguard.core.models import (
     DocumentModel, Finding, FindingCategory, SeverityLevel, TableData, BBox
 )
 from specguard.core.profiles import ProfileRegistry
+from specguard.core.location_mapper import LocationMapper
 
 logger = logging.getLogger(__name__)
 
@@ -135,27 +136,46 @@ class TableAnalyzer(BaseAnalyzer):
                     numbered_tables.append((num_val, tbl))
 
         # Check for duplicate table numbers
-        seen_numbers: Dict[int, TableData] = {}
+        seen_numbers: Dict[int, Tuple[TableData, str]] = {}
         for num_val, tbl in numbered_tables:
             if tbl.is_split and "Cont" in tbl.label:
                 continue
+
+            curr_lbl = tbl.label or f"Table {num_val}"
+            pg_tbl = next((p for p in doc.pages if p.page_num == tbl.page_num), None)
+            t_boxes = LocationMapper.find_phrase_bboxes(pg_tbl, curr_lbl) if pg_tbl else []
+            t_bbox = t_boxes[0] if t_boxes else tbl.bbox
+            t_precision = "EXACT_LABEL" if t_boxes else "APPROXIMATE"
+
             if num_val in seen_numbers:
-                prev_tbl = seen_numbers[num_val]
+                prev_tbl, prev_fid = seen_numbers[num_val]
+                curr_fid = f"TBL-DUP-{finding_counter:03d}"
+                next_expected = max(k for k in seen_numbers.keys()) + 1
+
                 findings.append(Finding(
-                    finding_id=f"TBL-DUP-{finding_counter:03d}",
+                    finding_id=curr_fid,
                     category=self.category.value,
                     domain=profile.domain,
                     location=f"Page {tbl.page_num}",
                     page=tbl.page_num,
-                    bbox=tbl.bbox,
+                    bbox=t_bbox,
+                    bounding_boxes=t_boxes if t_boxes else ([t_bbox] if t_bbox else []),
+                    location_precision=t_precision,
+                    matched_text=curr_lbl,
+                    expected_text=f"Table {next_expected}",
+                    issue_type="DUPLICATE_TABLE_LABEL",
+                    related_finding_ids=[prev_fid],
+                    source_object_id=tbl.table_id,
+                    target_object_id=prev_tbl.table_id,
                     original_content=tbl.caption or tbl.label,
                     detected_value=f"Duplicate Table {num_val}",
-                    expected_value=f"Unique Table Number (next available: {max(seen_numbers.keys()) + 1})",
+                    expected_value=f"Unique Table Number (next available: {next_expected})",
                     deviation=f"Duplicate Table {num_val} already declared on Page {prev_tbl.page_num}",
                     severity=SeverityLevel.HIGH.value,
                     confidence=0.96,
                     explanation=f"Table numbering collision: Table {num_val} is declared on Page {tbl.page_num}, but was already defined on Page {prev_tbl.page_num}.",
                     suggested_correction=f"Renumber Table on Page {tbl.page_num} to a unique sequence index.",
+                    suggested_fix=f"Renumber to Table {next_expected}.",
                     rule_reference="Engineering Document Standard §4.1 (Table Numbering)",
                     priority_score=6.8,
                     evidence=f"Page {tbl.page_num}: '{tbl.caption}' conflicts with Page {prev_tbl.page_num}: '{prev_tbl.caption}'",
@@ -163,7 +183,8 @@ class TableAnalyzer(BaseAnalyzer):
                 ))
                 finding_counter += 1
             else:
-                seen_numbers[num_val] = tbl
+                assigned_fid = f"TBL-DECL-{finding_counter:03d}"
+                seen_numbers[num_val] = (tbl, assigned_fid)
 
         # Check for sequence jumps (e.g. Table 1 -> Table 3)
         unique_nums = sorted(seen_numbers.keys())
@@ -171,14 +192,26 @@ class TableAnalyzer(BaseAnalyzer):
             curr_n = unique_nums[i]
             next_n = unique_nums[i + 1]
             if next_n > curr_n + 1:
-                tbl = seen_numbers[next_n]
+                tbl, _ = seen_numbers[next_n]
+                curr_lbl = tbl.label or f"Table {next_n}"
+                pg_tbl = next((p for p in doc.pages if p.page_num == tbl.page_num), None)
+                j_boxes = LocationMapper.find_phrase_bboxes(pg_tbl, curr_lbl) if pg_tbl else []
+                j_bbox = j_boxes[0] if j_boxes else tbl.bbox
+                j_precision = "EXACT_LABEL" if j_boxes else "APPROXIMATE"
+
                 findings.append(Finding(
                     finding_id=f"TBL-SEQ-{finding_counter:03d}",
                     category=self.category.value,
                     domain=profile.domain,
                     location=f"Page {tbl.page_num}",
                     page=tbl.page_num,
-                    bbox=tbl.bbox,
+                    bbox=j_bbox,
+                    bounding_boxes=j_boxes if j_boxes else ([j_bbox] if j_bbox else []),
+                    location_precision=j_precision,
+                    matched_text=curr_lbl,
+                    expected_text=f"Table {curr_n + 1}",
+                    issue_type="TABLE_SEQUENCE_GAP",
+                    source_object_id=tbl.table_id,
                     original_content=tbl.caption or tbl.label,
                     detected_value=f"Table {next_n}",
                     expected_value=f"Table {curr_n + 1}",
@@ -187,6 +220,7 @@ class TableAnalyzer(BaseAnalyzer):
                     confidence=0.92,
                     explanation=f"Table numbering jumps from Table {curr_n} to Table {next_n}, skipping Table {curr_n + 1}.",
                     suggested_correction=f"Renumber Table {next_n} to Table {curr_n + 1} or insert the missing table.",
+                    suggested_fix=f"Renumber to Table {curr_n + 1}.",
                     rule_reference="Engineering Documentation Standard §4.1",
                     priority_score=5.0,
                     evidence=f"Jump from Table {curr_n} to Table {next_n}",
