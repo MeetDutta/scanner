@@ -16,10 +16,13 @@ import cv2
 import numpy as np
 
 from specguard.core.models import (
-    DocumentModel, PageModel, TextBlock, TableData, FigureData, BBox
+    DocumentModel, PageModel, TextBlock, TableData, FigureData, BBox,
+    WordModel, LineModel
 )
 from specguard.core.scanned_pipeline import ScannedDocumentPipeline
 from specguard.core.cv_layout import LayoutAnalyzerCV
+from specguard.core.reading_order import ReadingOrderEngine
+from specguard.core.docx_extractor import DocxExtractor
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +31,12 @@ class DocumentParser:
     """Dispatches document parsing to specialized format handlers."""
 
     @staticmethod
-    def parse_file(file_path: str) -> DocumentModel:
+    def parse_file(
+        file_path: str,
+        progress_callback=None,
+        cancellation_token=None,
+        deep_analysis: bool = False
+    ) -> DocumentModel:
         path = Path(file_path).resolve()
         if not path.exists():
             raise FileNotFoundError(f"Document not found: {file_path}")
@@ -42,9 +50,14 @@ class DocumentParser:
 
         ext = path.suffix.lower()
         if ext == ".pdf":
-            return DocumentParser._parse_pdf(path, file_hash, file_size)
+            return DocumentParser._parse_pdf(
+                path, file_hash, file_size,
+                progress_callback=progress_callback,
+                cancellation_token=cancellation_token,
+                deep_analysis=deep_analysis
+            )
         elif ext == ".docx":
-            return DocumentParser._parse_docx(path, file_hash, file_size)
+            return DocxExtractor.extract(path, file_hash, file_size)
         elif ext in [".xlsx", ".xls"]:
             return DocumentParser._parse_xlsx(path, file_hash, file_size)
         elif ext == ".txt":
@@ -55,25 +68,48 @@ class DocumentParser:
             raise ValueError(f"Unsupported document format: {ext}")
 
     @staticmethod
-    def _parse_pdf(path: Path, file_hash: str, file_size: int) -> DocumentModel:
+    def _parse_pdf(
+        path: Path,
+        file_hash: str,
+        file_size: int,
+        progress_callback=None,
+        cancellation_token=None,
+        deep_analysis: bool = False
+    ) -> DocumentModel:
         doc = pymupdf.open(str(path))
+        total_pages = len(doc)
         pages: List[PageModel] = []
+        reading_engine = ReadingOrderEngine()
 
         for page_idx, fitz_page in enumerate(doc):
+            if cancellation_token and getattr(cancellation_token, "is_cancelled", False):
+                doc.close()
+                raise InterruptedError("Document processing was cancelled by user.")
+
             page_num = page_idx + 1
+            if progress_callback:
+                try:
+                    progress_callback(page_num, total_pages, f"Extracting page {page_num} of {total_pages}")
+                except Exception:
+                    pass
+
             rect = fitz_page.rect
             page_w = float(rect.width)
             page_h = float(rect.height)
+            rotation = fitz_page.rotation
 
-            blocks: List[TextBlock] = []
+            raw_blocks: List[TextBlock] = []
             tables: List[TableData] = []
-            page_text_pieces = []
+            figures: List[FigureData] = []
 
             # Extract detailed text blocks with font and coordinate data
             page_dict = fitz_page.get_text("dict")
             block_id = 0
             for b in page_dict.get("blocks", []):
                 if b.get("type") == 0:  # Text block
+                    block_words: List[WordModel] = []
+                    block_lines: List[LineModel] = []
+
                     for line in b.get("lines", []):
                         line_text_parts = []
                         line_bbox = line.get("bbox", (0, 0, 0, 0))
@@ -81,6 +117,7 @@ class DocumentParser:
                         font_size = 11.0
                         is_bold = False
                         is_italic = False
+                        line_words: List[WordModel] = []
 
                         for span in line.get("spans", []):
                             span_text = span.get("text", "")
@@ -93,24 +130,65 @@ class DocumentParser:
                             if flags & 16 or "bold" in font_name.lower():
                                 is_bold = True
 
+                            # Extract words inside span
+                            s_bbox = span.get("bbox", (0, 0, 0, 0))
+                            for word_str in span_text.split():
+                                if word_str.strip():
+                                    w_model = WordModel(
+                                        text=word_str,
+                                        bbox=BBox(x0=s_bbox[0], y0=s_bbox[1], x1=s_bbox[2], y1=s_bbox[3]),
+                                        font_name=font_name,
+                                        font_size=round(font_size, 1),
+                                        is_bold=is_bold,
+                                        is_italic=is_italic
+                                    )
+                                    line_words.append(w_model)
+                                    block_words.append(w_model)
+
                         full_line_text = "".join(line_text_parts).strip()
                         if full_line_text:
-                            blocks.append(TextBlock(
+                            block_lines.append(LineModel(
+                                words=line_words,
                                 text=full_line_text,
                                 bbox=BBox(x0=line_bbox[0], y0=line_bbox[1], x1=line_bbox[2], y1=line_bbox[3]),
-                                font_name=font_name,
-                                font_size=round(font_size, 1),
-                                is_bold=is_bold,
-                                is_italic=is_italic,
-                                block_id=block_id
+                                font_size=round(font_size, 1)
                             ))
-                            page_text_pieces.append(full_line_text)
-                    block_id += 1
+
+                    if block_lines:
+                        # Compute overall block bbox from lines
+                        bx0 = min(l.bbox.x0 for l in block_lines if l.bbox)
+                        by0 = min(l.bbox.y0 for l in block_lines if l.bbox)
+                        bx1 = max(l.bbox.x1 for l in block_lines if l.bbox)
+                        by1 = max(l.bbox.y1 for l in block_lines if l.bbox)
+                        b_text = "\n".join(l.text for l in block_lines)
+
+                        raw_blocks.append(TextBlock(
+                            text=b_text,
+                            bbox=BBox(x0=bx0, y0=by0, x1=bx1, y1=by1),
+                            font_name=block_lines[0].words[0].font_name if block_words else "Helvetica",
+                            font_size=block_lines[0].font_size,
+                            is_bold=block_words[0].is_bold if block_words else False,
+                            is_italic=block_words[0].is_italic if block_words else False,
+                            block_id=block_id,
+                            words=block_words,
+                            lines=block_lines
+                        ))
+                        block_id += 1
+
+                elif b.get("type") == 1:  # Image block directly from PDF dictionary
+                    img_bbox = b.get("bbox", (0, 0, 0, 0))
+                    figures.append(FigureData(
+                        bbox=BBox(x0=img_bbox[0], y0=img_bbox[1], x1=img_bbox[2], y1=img_bbox[3]),
+                        page_num=page_num,
+                        figure_type="raster",
+                        figure_id=f"fig_p{page_num}_{len(figures) + 1}",
+                        confidence=0.95
+                    ))
 
             # Extract native PDF tables if available via pymupdf
             try:
                 tabs = fitz_page.find_tables()
-                for tab in tabs:
+                for t_idx, tab in enumerate(tabs):
                     tab_df = tab.extract()
                     if tab_df and len(tab_df) > 0:
                         headers = [str(c or "").strip() for c in tab_df[0]]
@@ -120,45 +198,99 @@ class DocumentParser:
                             rows=rows,
                             headers=headers,
                             bbox=BBox(x0=tab_rect[0], y0=tab_rect[1], x1=tab_rect[2], y1=tab_rect[3]),
-                            page_num=page_num
+                            page_num=page_num,
+                            table_id=f"tbl_p{page_num}_{t_idx + 1}"
                         ))
             except Exception as e:
                 logger.debug("Native PDF table extraction fallback for page %d: %s", page_num, e)
 
-            # Render page pixmap to OpenCV for computer vision layout validation
-            figures: List[FigureData] = []
+            # Native vector drawings detection (diagrams, flowcharts, charts)
             try:
-                pix = fitz_page.get_pixmap(dpi=150)
-                img_data = np.frombuffer(pix.samples, dtype=np.uint8).reshape(pix.height, pix.width, pix.n)
-                if pix.n >= 3:
-                    gray = cv2.cvtColor(img_data, cv2.COLOR_BGR2GRAY if pix.n == 3 else cv2.COLOR_RGBA2GRAY)
-                    cv_tables_boxes, _ = LayoutAnalyzerCV.detect_lines_and_tables(gray, page_num)
-                    # Scale factor between image dpi (150) and PDF points (72)
-                    scale_x = page_w / pix.width
-                    scale_y = page_h / pix.height
-                    scaled_table_boxes = [
-                        BBox(x0=b.x0 * scale_x, y0=b.y0 * scale_y, x1=b.x1 * scale_x, y1=b.y1 * scale_y)
-                        for b in cv_tables_boxes
-                    ]
-                    cv_figures = LayoutAnalyzerCV.detect_figures_and_drawings(gray, cv_tables_boxes, page_num)
-                    for fig in cv_figures:
-                        figures.append(FigureData(
-                            bbox=BBox(x0=fig.bbox.x0 * scale_x, y0=fig.bbox.y0 * scale_y,
-                                      x1=fig.bbox.x1 * scale_x, y1=fig.bbox.y1 * scale_y),
-                            page_num=page_num,
-                            figure_type=fig.figure_type
-                        ))
-            except Exception as cv_err:
-                logger.debug("OpenCV layout analysis on page %d skipped: %s", page_num, cv_err)
+                drawings = fitz_page.get_drawings()
+                if drawings:
+                    # Group drawings into clusters if they cover significant area
+                    drawing_rects = [d.get("rect") for d in drawings if d.get("rect")]
+                    if drawing_rects:
+                        min_x = min(r[0] for r in drawing_rects)
+                        min_y = min(r[1] for r in drawing_rects)
+                        max_x = max(r[2] for r in drawing_rects)
+                        max_y = max(r[3] for r in drawing_rects)
+                        dw = max_x - min_x
+                        dh = max_y - min_y
+                        # Only consider as a figure if it spans a meaningful diagram area and isn't a simple underline/rule
+                        if dw > 60.0 and dh > 40.0:
+                            # Avoid duplicate if it overlaps with an existing table or image
+                            is_table_border = any(
+                                t.bbox and (min_y >= t.bbox.y0 - 5.0 and max_y <= t.bbox.y1 + 5.0)
+                                for t in tables
+                            )
+                            if not is_table_border:
+                                figures.append(FigureData(
+                                    bbox=BBox(x0=min_x, y0=min_y, x1=max_x, y1=max_y),
+                                    page_num=page_num,
+                                    figure_type="vector",
+                                    figure_id=f"fig_p{page_num}_{len(figures) + 1}",
+                                    confidence=0.90
+                                ))
+            except Exception as d_err:
+                logger.debug("Vector drawings extraction error on page %d: %s", page_num, d_err)
+
+            # Optional Deep CV analysis: only if deep_analysis is explicitly requested
+            if deep_analysis:
+                try:
+                    pix = fitz_page.get_pixmap(dpi=150)
+                    img_data = np.frombuffer(pix.samples, dtype=np.uint8).reshape(pix.height, pix.width, pix.n)
+                    if pix.n >= 3:
+                        gray = cv2.cvtColor(img_data, cv2.COLOR_BGR2GRAY if pix.n == 3 else cv2.COLOR_RGBA2GRAY)
+                        cv_tables_boxes, _ = LayoutAnalyzerCV.detect_lines_and_tables(gray, page_num)
+                        scale_x = page_w / pix.width
+                        scale_y = page_h / pix.height
+                        cv_figures = LayoutAnalyzerCV.detect_figures_and_drawings(gray, cv_tables_boxes, page_num)
+                        for fig in cv_figures:
+                            figures.append(FigureData(
+                                bbox=BBox(
+                                    x0=fig.bbox.x0 * scale_x, y0=fig.bbox.y0 * scale_y,
+                                    x1=fig.bbox.x1 * scale_x, y1=fig.bbox.y1 * scale_y
+                                ),
+                                page_num=page_num,
+                                figure_type=fig.figure_type,
+                                figure_id=f"fig_p{page_num}_{len(figures) + 1}"
+                            ))
+                    del pix
+                except Exception as cv_err:
+                    logger.debug("Deep CV layout analysis on page %d skipped: %s", page_num, cv_err)
+
+            # Reconstruct human reading order using geometric layout analysis
+            ordered_blocks, reading_order, columns, layout_type = reading_engine.analyze_page_layout(
+                blocks=raw_blocks,
+                page_width=page_w,
+                page_height=page_h,
+                figures=figures,
+                tables=tables
+            )
+
+            # Extract header and footer blocks based on geometric position
+            header_y_max = page_h * 0.08
+            footer_y_min = page_h * 0.92
+            headers = [b for b in ordered_blocks if b.bbox.y1 <= header_y_max]
+            footers = [b for b in ordered_blocks if b.bbox.y0 >= footer_y_min]
+
+            page_text = "\n".join(b.text for b in ordered_blocks)
 
             pages.append(PageModel(
                 page_num=page_num,
                 width=page_w,
                 height=page_h,
-                blocks=blocks,
+                blocks=ordered_blocks,
                 tables=tables,
                 figures=figures,
-                text="\n".join(page_text_pieces)
+                headers=headers,
+                footers=footers,
+                text=page_text,
+                reading_order=reading_order,
+                columns=columns,
+                layout_type=layout_type,
+                rotation=rotation
             ))
 
         doc.close()
@@ -169,96 +301,7 @@ class DocumentParser:
             file_size=file_size,
             page_count=len(pages),
             pages=pages,
-            metadata={"parser": "PyMuPDF+OpenCV"}
-        )
-
-    @staticmethod
-    def _parse_docx(path: Path, file_hash: str, file_size: int) -> DocumentModel:
-        import docx
-        doc = docx.Document(str(path))
-        blocks: List[TextBlock] = []
-        tables: List[TableData] = []
-        full_text_pieces = []
-
-        y_offset = 50.0  # Synthetic point coordinate calculation
-        block_id = 0
-
-        for p in doc.paragraphs:
-            text = p.text.strip()
-            if not text:
-                y_offset += 14.0
-                continue
-
-            # Typography detection from style and runs
-            font_size = 11.0
-            is_bold = False
-            is_italic = False
-            font_name = "Calibri"
-
-            if p.style and p.style.name.startswith("Heading"):
-                is_bold = True
-                font_size = 14.0 if "1" in p.style.name else 12.5
-
-            for r in p.runs:
-                if r.bold:
-                    is_bold = True
-                if r.italic:
-                    is_italic = True
-                if r.font.size:
-                    font_size = r.font.size.pt
-                if r.font.name:
-                    font_name = r.font.name
-
-            h_est = font_size * 1.3
-            bbox = BBox(x0=54.0, y0=y_offset, x1=558.0, y1=y_offset + h_est)
-            blocks.append(TextBlock(
-                text=text,
-                bbox=bbox,
-                font_name=font_name,
-                font_size=round(font_size, 1),
-                is_bold=is_bold,
-                is_italic=is_italic,
-                block_id=block_id
-            ))
-            full_text_pieces.append(text)
-            y_offset += h_est + 6.0
-            block_id += 1
-
-        # Extract docx tables
-        for t in doc.tables:
-            tab_rows = []
-            for row in t.rows:
-                tab_rows.append([c.text.strip() for c in row.cells])
-            if tab_rows:
-                headers = tab_rows[0]
-                rows = tab_rows[1:] if len(tab_rows) > 1 else []
-                tables.append(TableData(
-                    rows=rows,
-                    headers=headers,
-                    bbox=BBox(x0=54.0, y0=y_offset, x1=558.0, y1=y_offset + 100.0),
-                    page_num=1
-                ))
-                y_offset += 110.0
-
-        # Wrap in page model
-        page = PageModel(
-            page_num=1,
-            width=612.0,
-            height=max(792.0, y_offset + 50.0),
-            blocks=blocks,
-            tables=tables,
-            figures=[],
-            text="\n".join(full_text_pieces)
-        )
-
-        return DocumentModel(
-            file_path=str(path),
-            file_type="DOCX",
-            file_hash=file_hash,
-            file_size=file_size,
-            page_count=1,
-            pages=[page],
-            metadata={"parser": "python-docx"}
+            metadata={"parser": "PyMuPDF-Incremental"}
         )
 
     @staticmethod

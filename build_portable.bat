@@ -61,8 +61,12 @@ if not %ERRORLEVEL%==0 (
 echo   Test suite passed successfully.
 
 :: 5. Execute PyInstaller
-echo [5/7] Building PyInstaller onedir distribution (SpecGuard.spec)...
-pyinstaller --clean -y SpecGuard.spec
+echo [5/7] Building PyInstaller onedir distribution (DocReady.spec)...
+if exist "DocReady.spec" (
+    pyinstaller --clean -y DocReady.spec
+) else (
+    pyinstaller --clean -y SpecGuard.spec
+)
 if not %ERRORLEVEL%==0 (
     echo.
     echo [CRITICAL ERROR] PyInstaller build failed!
@@ -72,12 +76,15 @@ if not %ERRORLEVEL%==0 (
 )
 
 :: 6. Verify Executable Generation
-if not exist "dist\SpecGuard\SpecGuard.exe" (
-    echo [CRITICAL ERROR] dist\SpecGuard\SpecGuard.exe was not created!
+if exist "dist\DocReady\DocReady.exe" (
+    echo   DocReady.exe compiled successfully.
+) else if exist "dist\SpecGuard\SpecGuard.exe" (
+    echo   SpecGuard.exe compiled successfully.
+) else (
+    echo [CRITICAL ERROR] dist executable was not created!
     pause
     exit /b 1
 )
-echo   SpecGuard.exe compiled successfully.
 
 :: 7. Assemble Portable Layout & Generate Checksummed ZIP
 echo [6/7] Assembling portable structure and packaging ZIP...

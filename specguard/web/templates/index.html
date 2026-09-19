@@ -4,13 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="light dark" />
-  <title>SpecGuard — Engineering Document Quality & Standards Compliance</title>
-  <meta name="description" content="Offline Hybrid Deep Learning and Computer Vision Engineering Specification Quality and Standards Compliance Framework" />
+  <title>DocReady — Offline Intranet Platform for Template-Aware Document Formatting Analysis and Readiness Verification</title>
+  <meta name="description" content="DocReady: Offline Intranet Platform for Template-Aware Document Formatting Analysis and Readiness Verification" />
 
   <!-- Prevent Theme FOUC -->
   <script>
     (function() {
-      const savedTheme = localStorage.getItem("specguard-theme");
+      const savedTheme = localStorage.getItem("docready-theme") || localStorage.getItem("specguard-theme");
       const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       const theme = savedTheme || (systemDark ? "dark" : "light");
       document.documentElement.setAttribute("data-theme", theme);
@@ -31,10 +31,10 @@
         <div class="brand-emblem" aria-hidden="true">🛡️</div>
         <div class="brand-titles">
           <div class="brand-title">
-            SPEC GUARD
+            DOCREADY
             <span class="version-tag">v1.0.0</span>
           </div>
-          <div class="brand-subtitle">Autonomous Engineering Document Quality & Standards Framework</div>
+          <div class="brand-subtitle">Offline Intranet Platform for Template-Aware Formatting & Readiness Verification</div>
         </div>
       </div>
 
@@ -145,7 +145,7 @@
         <!-- Institutional Bottom Status Bar -->
         <footer class="app-statusbar">
           <div class="statusbar-section">
-            <span>SpecGuard Engineering Framework</span>
+            <span>DocReady Platform</span>
             <span>•</span>
             <span id="statusbar-session-info">Ready for Verification</span>
           </div>

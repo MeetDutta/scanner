@@ -14,7 +14,7 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).resolve().parent
 DIST_DIR = ROOT_DIR / "dist"
 VERSION = "1.0.0"
-PACKAGE_NAME = f"SpecGuard-v{VERSION}-Windows-x64-Portable"
+PACKAGE_NAME = f"DocReady-v{VERSION}-Windows-x64-Portable"
 ZIP_FILENAME = f"{PACKAGE_NAME}.zip"
 SHA_FILENAME = f"{PACKAGE_NAME}.zip.sha256"
 
@@ -50,12 +50,12 @@ def copy_tree_filtered(src: Path, dst: Path, ignore_patterns=None):
 def assemble_portable_directory():
     """Assembles the final portable folder structure."""
     print("=" * 64)
-    print("   SpecGuard Portable Package Assembler & ZIP Generator")
+    print("   DocReady Portable Package Assembler & ZIP Generator")
     print("=" * 64)
 
     DIST_DIR.mkdir(parents=True, exist_ok=True)
     staging_root = DIST_DIR / "staging"
-    target_app_dir = staging_root / "SpecGuard"
+    target_app_dir = staging_root / "DocReady"
 
     if staging_root.exists():
         shutil.rmtree(staging_root)
@@ -64,7 +64,7 @@ def assemble_portable_directory():
     print(f"Staging Directory: {target_app_dir}")
 
     # 1. Copy PyInstaller onedir output if exists
-    pyinstaller_dist = DIST_DIR / "SpecGuard"
+    pyinstaller_dist = DIST_DIR / "DocReady" if (DIST_DIR / "DocReady").exists() else (DIST_DIR / "SpecGuard")
     if pyinstaller_dist.exists():
         print("Copying compiled PyInstaller binary and _internal dependencies...")
         for item in pyinstaller_dist.iterdir():
@@ -73,16 +73,18 @@ def assemble_portable_directory():
                 copy_tree_filtered(item, dest)
             else:
                 shutil.copy2(item, dest)
-        if (target_app_dir / "SpecGuard").exists() and not (target_app_dir / "SpecGuard.exe").exists():
-            shutil.copy2(target_app_dir / "SpecGuard", target_app_dir / "SpecGuard.exe")
+        if (target_app_dir / "DocReady").exists() and not (target_app_dir / "DocReady.exe").exists():
+            shutil.copy2(target_app_dir / "DocReady", target_app_dir / "DocReady.exe")
+        if (target_app_dir / "SpecGuard.exe").exists() and not (target_app_dir / "DocReady.exe").exists():
+            shutil.copy2(target_app_dir / "SpecGuard.exe", target_app_dir / "DocReady.exe")
         shutil.copy2(ROOT_DIR / "portable_launcher.py", target_app_dir / "portable_launcher.py")
     else:
-        print("Note: dist/SpecGuard not compiled yet. Assembling portable layout with launcher...")
+        print("Note: dist/DocReady not compiled yet. Assembling portable layout with launcher...")
         shutil.copy2(ROOT_DIR / "portable_launcher.py", target_app_dir / "portable_launcher.py")
-
 
     # 2. Copy Root User Files
     files_to_copy = [
+        ("Launch_DocReady.bat", "Launch_DocReady.bat"),
         ("Launch_SpecGuard.bat", "Launch_SpecGuard.bat"),
         ("README.txt", "README.txt"),
         ("LICENSE.txt", "LICENSE.txt"),

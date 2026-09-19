@@ -120,6 +120,46 @@ class ApiClient {
     compare: (id1, id2) => this.request(`/models/compare/${encodeURIComponent(id1)}/${encodeURIComponent(id2)}`)
   };
 
+  // Custom Templates & Profile Learning
+  templates = {
+    list: (status = null) => {
+      const qs = status ? `?status=${encodeURIComponent(status)}` : "";
+      return this.request(`/templates/custom${qs}`);
+    },
+    get: (id) => this.request(`/templates/custom/${encodeURIComponent(id)}`),
+    create: (data) => this.request("/templates/custom", { method: "POST", body: JSON.stringify(data) }),
+    delete: (id) => this.request(`/templates/custom/${encodeURIComponent(id)}`, { method: "DELETE" }),
+    listSamples: (id) => this.request(`/templates/custom/${encodeURIComponent(id)}/samples`),
+    uploadSample: (id, file) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      return this.request(`/templates/custom/${encodeURIComponent(id)}/samples`, { method: "POST", body: formData });
+    },
+    deleteSample: (id, sampleId) =>
+      this.request(`/templates/custom/${encodeURIComponent(id)}/samples/${encodeURIComponent(sampleId)}`, { method: "DELETE" }),
+    sampleVariations: (id) => this.request(`/templates/custom/${encodeURIComponent(id)}/sample-variations`),
+    learn: (id) => this.request(`/templates/custom/${encodeURIComponent(id)}/learn`, { method: "POST" }),
+    review: (id) => this.request(`/templates/custom/${encodeURIComponent(id)}/review`),
+    updateProperty: (id, data) =>
+      this.request(`/templates/custom/${encodeURIComponent(id)}/property`, { method: "PUT", body: JSON.stringify(data) }),
+    updateTolerances: (id, data) =>
+      this.request(`/templates/custom/${encodeURIComponent(id)}/tolerances`, { method: "PUT", body: JSON.stringify(data) }),
+    approve: (id, approverName = "Quality Engineer") =>
+      this.request(`/templates/custom/${encodeURIComponent(id)}/approve`, { method: "POST", body: JSON.stringify({ approver_name: approverName }) }),
+    activate: (id) => this.request(`/templates/custom/${encodeURIComponent(id)}/activate`, { method: "POST" }),
+    versions: (id) => this.request(`/templates/custom/${encodeURIComponent(id)}/versions`),
+    rollback: (id, versionTag) =>
+      this.request(`/templates/custom/${encodeURIComponent(id)}/rollback/${encodeURIComponent(versionTag)}`, { method: "POST" }),
+    listAnnotations: (id) => this.request(`/templates/custom/${encodeURIComponent(id)}/annotations`),
+    addAnnotation: (id, data) =>
+      this.request(`/templates/custom/${encodeURIComponent(id)}/annotations`, { method: "POST", body: JSON.stringify(data) }),
+    deleteAnnotation: (id, annotId) =>
+      this.request(`/templates/custom/${encodeURIComponent(id)}/annotations/${encodeURIComponent(annotId)}`, { method: "DELETE" }),
+    datasetSummary: (id) => this.request(`/templates/custom/${encodeURIComponent(id)}/dataset-summary`),
+    trainML: (id, data = {}) =>
+      this.request(`/templates/custom/${encodeURIComponent(id)}/train-ml`, { method: "POST", body: JSON.stringify(data) })
+  };
+
   // Settings & Storage Telemetry
   settings = {
     health: () => this.request("/settings/health"),

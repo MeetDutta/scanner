@@ -43,10 +43,19 @@ ANALYSIS_JOBS: Dict[str, Dict[str, Any]] = {}
 JOBS_LOCK = threading.Lock()
 
 
+class CancellationToken:
+    def __init__(self):
+        self.is_cancelled = False
+
+    def cancel(self):
+        self.is_cancelled = True
+
+
 class AnalysisRequest(BaseModel):
     file_path: Optional[str] = None
     file_hash: Optional[str] = None
     domain: str = "mechanical"
+    profile: Optional[str] = None
     selected_standards: List[str] = []
     enabled_modules: Optional[List[str]] = None
 
@@ -124,6 +133,8 @@ def list_demo_samples() -> List[Dict[str, Any]]:
                     domain = "electrical"
                 elif "chem" in p.name.lower():
                     domain = "chemical"
+                elif "ieee" in p.name.lower() or "paper" in p.name.lower():
+                    domain = "academic"
 
                 samples.append({
                     "filename": p.name,
@@ -135,7 +146,14 @@ def list_demo_samples() -> List[Dict[str, Any]]:
     return samples
 
 
-def _run_pipeline_worker(job_id: str, file_path: str, domain: str, selected_standards: List[str]):
+def _run_pipeline_worker(
+    job_id: str,
+    file_path: str,
+    domain: str,
+    profile: Optional[str],
+    selected_standards: List[str],
+    cancel_token: CancellationToken
+):
     """Background worker executing the real SpecGuard analysis pipeline."""
     with JOBS_LOCK:
         job = ANALYSIS_JOBS.get(job_id)
@@ -149,8 +167,8 @@ def _run_pipeline_worker(job_id: str, file_path: str, domain: str, selected_stan
     def progress_cb(stage_name: str, pct: int):
         with JOBS_LOCK:
             if job_id in ANALYSIS_JOBS:
-                if ANALYSIS_JOBS[job_id].get("cancel_requested"):
-                    raise RuntimeError("Analysis cancelled by user.")
+                if cancel_token.is_cancelled:
+                    raise InterruptedError("Analysis cancelled by user.")
                 ANALYSIS_JOBS[job_id]["stage"] = stage_name
                 ANALYSIS_JOBS[job_id]["percent"] = pct
                 ANALYSIS_JOBS[job_id]["stages_log"].append({
@@ -164,8 +182,10 @@ def _run_pipeline_worker(job_id: str, file_path: str, domain: str, selected_stan
         doc, findings, session_id = pipeline.run_analysis(
             file_path=file_path,
             domain=domain,
+            profile=profile,
             selected_standards=selected_standards,
-            progress_callback=progress_cb
+            progress_callback=progress_cb,
+            cancellation_token=cancel_token
         )
 
         with JOBS_LOCK:
@@ -182,9 +202,19 @@ def _run_pipeline_worker(job_id: str, file_path: str, domain: str, selected_stan
                     "page_count": doc.page_count,
                     "filename": Path(doc.file_path).name,
                     "file_path": doc.file_path,
-                    "domain": domain
+                    "domain": domain,
+                    "profile": profile or domain
                 })
                 logger.info("Job %s completed successfully in %d ms.", job_id, duration_ms)
+    except InterruptedError as ie:
+        logger.info("Job %s was cleanly cancelled: %s", job_id, ie)
+        with JOBS_LOCK:
+            if job_id in ANALYSIS_JOBS:
+                ANALYSIS_JOBS[job_id].update({
+                    "status": "cancelled",
+                    "stage": "Analysis cancelled.",
+                    "percent": 0
+                })
     except Exception as e:
         logger.error("Job %s failed: %s", job_id, e, exc_info=True)
         with JOBS_LOCK:
@@ -205,6 +235,7 @@ def start_analysis(req: AnalysisRequest, bg_tasks: BackgroundTasks) -> Dict[str,
         raise HTTPException(status_code=400, detail="Target document path does not exist.")
 
     job_id = f"JOB-{uuid.uuid4().hex[:8].upper()}"
+    cancel_token = CancellationToken()
 
     with JOBS_LOCK:
         ANALYSIS_JOBS[job_id] = {
@@ -215,9 +246,11 @@ def start_analysis(req: AnalysisRequest, bg_tasks: BackgroundTasks) -> Dict[str,
             "file_path": file_path,
             "filename": Path(file_path).name,
             "domain": req.domain.lower(),
+            "profile": req.profile or req.domain.lower(),
             "selected_standards": req.selected_standards,
             "stages_log": [],
             "start_time": time.time(),
+            "cancel_token": cancel_token,
             "cancel_requested": False,
             "error": None
         }
@@ -227,7 +260,9 @@ def start_analysis(req: AnalysisRequest, bg_tasks: BackgroundTasks) -> Dict[str,
         job_id=job_id,
         file_path=file_path,
         domain=req.domain.lower(),
-        selected_standards=req.selected_standards
+        profile=req.profile,
+        selected_standards=req.selected_standards,
+        cancel_token=cancel_token
     )
 
     return {"job_id": job_id, "status": "queued"}
@@ -240,8 +275,9 @@ def get_job_status(job_id: str) -> Dict[str, Any]:
         job = ANALYSIS_JOBS.get(job_id)
         if not job:
             raise HTTPException(status_code=404, detail="Analysis job not found.")
-        # Return shallow copy
-        return dict(job)
+        # Return shallow copy without unpicklable token
+        res = {k: v for k, v in job.items() if k != "cancel_token"}
+        return res
 
 
 @router.post("/jobs/{job_id}/cancel")
@@ -251,9 +287,11 @@ def cancel_job(job_id: str) -> Dict[str, Any]:
         job = ANALYSIS_JOBS.get(job_id)
         if not job:
             raise HTTPException(status_code=404, detail="Analysis job not found.")
-        if job["status"] in ["completed", "failed"]:
+        if job["status"] in ["completed", "failed", "cancelled"]:
             return {"status": job["status"], "message": "Job already finished."}
         job["cancel_requested"] = True
+        if "cancel_token" in job:
+            job["cancel_token"].cancel()
         job["status"] = "cancelling"
     return {"status": "cancelling", "message": "Cancellation signal sent."}
 

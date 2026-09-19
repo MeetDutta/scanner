@@ -49,8 +49,8 @@ def test_e2e_mechanical_workflow(temp_export_dir):
     # 4. Export HTML
     html_out = str(temp_export_dir / "mechanical_audit.html")
     res_html = ReportGenerator.generate_html_report(doc, findings, session_id, html_out)
-    assert Path(res_html).exists()
-    assert "SpecGuard Engineering Compliance" in Path(res_html).read_text(encoding="utf-8")
+    html_text = Path(res_html).read_text(encoding="utf-8")
+    assert "DocReady" in html_text or "SpecGuard" in html_text
 
     # 5. Export JSON
     json_out = str(temp_export_dir / "mechanical_findings.json")

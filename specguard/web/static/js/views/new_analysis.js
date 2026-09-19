@@ -6,11 +6,13 @@
 window.NewAnalysisView = {
   selectedFile: null,
   selectedDomain: "mechanical",
+  selectedProfile: "mechanical",
   demoSamples: [],
 
   async render(container) {
     this.selectedFile = null;
     this.selectedDomain = window.appState.get("activeDomain") || "mechanical";
+    this.selectedProfile = window.appState.get("activeProfile") || this.selectedDomain;
 
     container.innerHTML = `
       <div class="new-analysis-container">
@@ -77,10 +79,10 @@ window.NewAnalysisView = {
             <div class="card-title">⚙️ Step 2: Select Engineering Domain & Ruleset</div>
           </div>
           <div class="card-body" style="display: flex; flex-direction: column; gap: 16px;">
-            <div class="domain-select-grid">
+            <div class="domain-selection-grid" id="domain-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
               <!-- Mechanical -->
-              <div class="domain-card ${this.selectedDomain === "mechanical" ? "selected" : ""}" data-domain="mechanical">
-                <span class="domain-card-badge">${this.selectedDomain === "mechanical" ? "✓ SELECTED" : "SELECT"}</span>
+              <div class="domain-card ${this.selectedProfile === "mechanical" ? "selected" : ""}" data-domain="mechanical" data-profile="mechanical">
+                <span class="domain-card-badge">${this.selectedProfile === "mechanical" ? "✓ SELECTED" : "SELECT"}</span>
                 <div class="domain-icon">⚙️</div>
                 <div class="domain-name">Mechanical</div>
                 <span class="domain-standard-tag">ASME Y14 / GD&T</span>
@@ -88,8 +90,8 @@ window.NewAnalysisView = {
               </div>
 
               <!-- Electrical -->
-              <div class="domain-card ${this.selectedDomain === "electrical" ? "selected" : ""}" data-domain="electrical">
-                <span class="domain-card-badge">${this.selectedDomain === "electrical" ? "✓ SELECTED" : "SELECT"}</span>
+              <div class="domain-card ${this.selectedProfile === "electrical" ? "selected" : ""}" data-domain="electrical" data-profile="electrical">
+                <span class="domain-card-badge">${this.selectedProfile === "electrical" ? "✓ SELECTED" : "SELECT"}</span>
                 <div class="domain-icon">⚡</div>
                 <div class="domain-name">Electrical</div>
                 <span class="domain-standard-tag">IEC 60364 / Schematics</span>
@@ -97,28 +99,49 @@ window.NewAnalysisView = {
               </div>
 
               <!-- Chemical -->
-              <div class="domain-card ${this.selectedDomain === "chemical" ? "selected" : ""}" data-domain="chemical">
-                <span class="domain-card-badge">${this.selectedDomain === "chemical" ? "✓ SELECTED" : "SELECT"}</span>
+              <div class="domain-card ${this.selectedProfile === "chemical" ? "selected" : ""}" data-domain="chemical" data-profile="chemical">
+                <span class="domain-card-badge">${this.selectedProfile === "chemical" ? "✓ SELECTED" : "SELECT"}</span>
                 <div class="domain-icon">🧪</div>
                 <div class="domain-name">Chemical</div>
                 <span class="domain-standard-tag">Process Safety / P&ID</span>
                 <p class="domain-desc">Flow diagrams, piping specifications, hazardous materials, instrumentation, valve tags.</p>
+              </div>
+
+              <!-- IEEE Research Paper -->
+              <div class="domain-card ${this.selectedProfile === "ieee_research" ? "selected" : ""}" data-domain="academic" data-profile="ieee_research">
+                <span class="domain-card-badge">${this.selectedProfile === "ieee_research" ? "✓ SELECTED" : "SELECT"}</span>
+                <div class="domain-icon">📑</div>
+                <div class="domain-name">IEEE Paper</div>
+                <span class="domain-standard-tag">IEEE Journal & Conf</span>
+                <p class="domain-desc">Two-column grid, Roman headings, abstract & keywords, bracket citations [1], Fig/Table rules.</p>
+              </div>
+
+              <!-- Generic Academic -->
+              <div class="domain-card ${this.selectedProfile === "generic_academic" ? "selected" : ""}" data-domain="academic" data-profile="generic_academic">
+                <span class="domain-card-badge">${this.selectedProfile === "generic_academic" ? "✓ SELECTED" : "SELECT"}</span>
+                <div class="domain-icon">🎓</div>
+                <div class="domain-name">Academic</div>
+                <span class="domain-standard-tag">Theses & Reports</span>
+                <p class="domain-desc">Multi-page structure, abstract, methodology, equations, cross-reference integrity graph.</p>
               </div>
             </div>
 
             <!-- Analysis Scope Options -->
             <div style="background-color: var(--bg-surface-sunken); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px;">
               <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
-                Verification Engines Enabled (All 10 Core Engines Active)
+                Verification Engines Enabled (All 14 Intelligence Engines Active)
               </span>
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin-top: 8px; font-size: 12px; color: var(--text-secondary);">
-                <span>✓ Layout & Typography</span>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; margin-top: 8px; font-size: 12px; color: var(--text-secondary);">
+                <span>✓ Reading Order Engine</span>
                 <span>✓ Structural Hierarchy</span>
                 <span>✓ TOC Cross-Validation</span>
-                <span>✓ Tabular Data & Tables</span>
-                <span>✓ Technical Grammar & Whitelist</span>
+                <span>✓ Tables & Multi-Page Split</span>
+                <span>✓ Figures & Vector Diagrams</span>
+                <span>✓ Mathematical Equations</span>
+                <span>✓ Citation & Cross-Ref Graph</span>
+                <span>✓ IEEE Compliance Mode</span>
+                <span>✓ Technical Grammar</span>
                 <span>✓ Parameter Extraction</span>
-                <span>✓ Fixed Domain Template</span>
                 <span>✓ Logical Contradictions</span>
                 <span>✓ Local Standards KB</span>
                 <span>✓ Severity Prioritization</span>
@@ -139,6 +162,7 @@ window.NewAnalysisView = {
 
     this._bindEvents();
     await this.loadDemoSamples();
+    await this.loadCustomProfiles();
   },
 
   _bindEvents() {
@@ -185,7 +209,9 @@ window.NewAnalysisView = {
         card.classList.add("selected");
         card.querySelector(".domain-card-badge").textContent = "✓ SELECTED";
         this.selectedDomain = card.getAttribute("data-domain");
+        this.selectedProfile = card.getAttribute("data-profile") || this.selectedDomain;
         window.appState.set("activeDomain", this.selectedDomain);
+        window.appState.set("activeProfile", this.selectedProfile);
       };
     });
 
@@ -228,7 +254,7 @@ window.NewAnalysisView = {
 
       container.innerHTML = samples.map((s, idx) => `
         <button class="btn btn-secondary btn-sm" id="btn-sample-${idx}" style="font-size: 11.5px;">
-          ${s.domain === "mechanical" ? "⚙️" : s.domain === "electrical" ? "⚡" : "🧪"}
+          ${s.domain === "mechanical" ? "⚙️" : s.domain === "electrical" ? "⚡" : s.domain === "academic" ? "📑" : "🧪"}
           ${s.filename}
         </button>
       `).join("");
@@ -266,6 +292,7 @@ window.NewAnalysisView = {
       const res = await window.api.analysis.start({
         file_path: this.selectedFile.file_path,
         domain: this.selectedDomain,
+        profile: this.selectedProfile,
         selected_standards: []
       });
 
@@ -282,6 +309,43 @@ window.NewAnalysisView = {
         startBtn.disabled = false;
         startBtn.textContent = "🚀 Start Engineering Verification";
       }
+    }
+  },
+
+  async loadCustomProfiles() {
+    try {
+      const activeTemplates = await window.api.templates.list("ACTIVE");
+      const grid = document.getElementById("domain-cards-grid");
+      if (!grid || !activeTemplates || activeTemplates.length === 0) return;
+
+      activeTemplates.forEach((t) => {
+        const card = document.createElement("div");
+        card.className = `domain-card ${this.selectedProfile === t.template_id ? "selected" : ""}`;
+        card.setAttribute("data-domain", "custom");
+        card.setAttribute("data-profile", t.template_id);
+        card.innerHTML = `
+          <span class="domain-card-badge">${this.selectedProfile === t.template_id ? "✓ SELECTED" : "SELECT"}</span>
+          <div class="domain-icon">📐</div>
+          <div class="domain-name">${t.name}</div>
+          <span class="domain-standard-tag">${t.category || "Custom Specification"}</span>
+          <p class="domain-desc">${t.description || "Custom learned document template."}</p>
+        `;
+        card.onclick = () => {
+          document.querySelectorAll(".domain-card").forEach((c) => {
+            c.classList.remove("selected");
+            c.querySelector(".domain-card-badge").textContent = "SELECT";
+          });
+          card.classList.add("selected");
+          card.querySelector(".domain-card-badge").textContent = "✓ SELECTED";
+          this.selectedDomain = "custom";
+          this.selectedProfile = t.template_id;
+          window.appState.set("activeDomain", this.selectedDomain);
+          window.appState.set("activeProfile", this.selectedProfile);
+        };
+        grid.appendChild(card);
+      });
+    } catch (err) {
+      console.warn("Could not load custom profiles in New Analysis:", err);
     }
   }
 };

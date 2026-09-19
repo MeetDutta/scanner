@@ -166,7 +166,8 @@ def poll_backend_and_launch_browser(url: str, logger: logging.Logger, timeout: f
 
 
 def main():
-    parser = argparse.ArgumentParser(description="SpecGuard Portable Application Launcher")
+    parser = argparse.ArgumentParser(description="DocReady Portable Application Launcher")
+    parser.add_argument("--host", type=str, default="127.0.0.1", help="Server bind host (default: 127.0.0.1; use 0.0.0.0 for intranet)")
     parser.add_argument("--port", type=int, default=None, help="Force specific port (default: auto-detect 8765+)")
     parser.add_argument("--no-browser", action="store_true", help="Start backend without launching web browser")
     parser.add_argument("--gui", action="store_true", help="Launch desktop PySide6 GUI instead of web")
@@ -174,7 +175,7 @@ def main():
     args = parser.parse_args()
 
     if args.version:
-        print(f"SpecGuard v{DEFAULT_CONFIG.version} (100% Offline Framework)")
+        print(f"DocReady v{DEFAULT_CONFIG.version} (100% Offline Intranet Platform)")
         sys.exit(0)
 
     # 1. Setup Logging
@@ -182,8 +183,8 @@ def main():
     logger = setup_portable_logging(log_file)
 
     logger.info("=" * 64)
-    logger.info("   SpecGuard — Engineering Document Quality & Standards System  ")
-    logger.info("                  100%% Offline Portable Edition                 ")
+    logger.info("     DocReady — Document Formatting & Readiness Verification    ")
+    logger.info("                  100%% Offline Intranet Edition                  ")
     logger.info("=" * 64)
     logger.info("Application Root: %s", get_app_dir())
     logger.info("Persistent Data : %s", get_data_dir())
@@ -199,7 +200,7 @@ def main():
             err_summary = "\n".join(f"• {e}" for e in report.errors)
             logger.critical("Pre-flight environment verification failed:\n%s", err_summary)
             show_fatal_error_dialog(
-                "SpecGuard Initialization Error",
+                "DocReady Initialization Error",
                 f"Required system components could not be verified:\n{err_summary}",
                 log_file
             )
@@ -210,7 +211,7 @@ def main():
                 logger.warning("Pre-flight notice: %s", w)
     except Exception as e:
         logger.exception("Unexpected error during pre-flight diagnostics: %s", e)
-        show_fatal_error_dialog("SpecGuard Diagnostic Error", str(e), log_file)
+        show_fatal_error_dialog("DocReady Diagnostic Error", str(e), log_file)
         sys.exit(1)
 
     # 3. Handle GUI flag if requested
@@ -226,20 +227,21 @@ def main():
             sys.exit(1)
 
     # 4. Port Allocation
-    host = "127.0.0.1"
+    host = args.host
+    check_host = "127.0.0.1" if host == "0.0.0.0" else host
     if args.port:
         port = args.port
-        if not is_port_available(host, port):
-            logger.error("Requested port %d is already in use on %s.", port, host)
+        if not is_port_available(check_host, port):
+            logger.error("Requested port %d is already in use on %s.", port, check_host)
             show_fatal_error_dialog("Port Conflict", f"Port {port} is occupied by another application.", log_file)
             sys.exit(1)
     else:
-        port = find_available_port(host, preferred_port=8765)
+        port = find_available_port(check_host, preferred_port=8765)
         if port != 8765:
             logger.warning("Default port 8765 is occupied. Dynamically allocated port %d.", port)
 
-    app_url = f"http://{host}:{port}"
-    logger.info("Binding exclusively to local interface: %s", app_url)
+    app_url = f"http://{'127.0.0.1' if host == '0.0.0.0' else host}:{port}"
+    logger.info("Server binding configured: %s (access at %s)", host, app_url)
 
     # 5. Launch Browser Watcher Thread
     if not args.no_browser:
@@ -269,7 +271,7 @@ def main():
 
     # Clean shutdown handling
     def handle_exit(signum, frame):
-        logger.info("Shutdown signal received (%s). Stopping SpecGuard...", signum)
+        logger.info("Shutdown signal received (%s). Stopping DocReady...", signum)
         server.should_exit = True
 
     signal.signal(signal.SIGINT, handle_exit)
@@ -279,10 +281,10 @@ def main():
         server.run()
     except Exception as e:
         logger.exception("Fatal server runtime error: %s", e)
-        show_fatal_error_dialog("SpecGuard Runtime Error", str(e), log_file)
+        show_fatal_error_dialog("DocReady Runtime Error", str(e), log_file)
         sys.exit(1)
     finally:
-        logger.info("SpecGuard backend stopped cleanly. Log saved to: %s", log_file)
+        logger.info("DocReady backend stopped cleanly. Log saved to: %s", log_file)
 
 
 if __name__ == "__main__":

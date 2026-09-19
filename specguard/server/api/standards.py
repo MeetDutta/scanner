@@ -11,11 +11,18 @@ import logging
 
 from specguard.templates.manager import TemplateManager
 from specguard.analyzers.standards import StandardsKnowledgeBase
+from specguard.core.profiles import ProfileRegistry
 
 logger = logging.getLogger("SpecGuard.API.Standards")
 router = APIRouter(prefix="/standards", tags=["standards"])
 
 DOMAINS = ["mechanical", "electrical", "chemical"]
+
+
+@router.get("/profiles")
+def list_document_profiles() -> List[Dict[str, Any]]:
+    """Returns all supported document compliance profiles (Mechanical, Electrical, Chemical, IEEE, Academic)."""
+    return ProfileRegistry.list_profiles()
 
 
 @router.get("")

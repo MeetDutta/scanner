@@ -69,8 +69,9 @@ def get_data_dir(subdir: str = "") -> Path:
     Returns the persistent writable user data directory.
     Priority:
     1. `<app_dir>/data` (Ideal for portable USB / folder installation)
-    2. `%LOCALAPPDATA%/SpecGuard/data` (Fallback if app_dir is read-only, e.g. Program Files)
-    3. `~/.specguard/data` (Linux/macOS fallback if app_dir is read-only)
+    2. `%LOCALAPPDATA%/DocReady/data` (Fallback if app_dir is read-only, e.g. Program Files)
+    3. `~/.docready/data` (Linux/macOS fallback if app_dir is read-only)
+    4. Automatically migrates/preserves existing data from SpecGuard if present
     """
     app_dir = get_app_dir()
     candidate = app_dir / "data"
@@ -80,10 +81,24 @@ def get_data_dir(subdir: str = "") -> Path:
     else:
         # Fallback to user profile directory
         if sys.platform == "win32":
-            local_appdata = os.environ.get("LOCALAPPDATA", os.path.expanduser("~\\AppData\\Local"))
-            target = Path(local_appdata) / "SpecGuard" / "data"
+            local_appdata = Path(os.environ.get("LOCALAPPDATA", os.path.expanduser("~\\AppData\\Local")))
+            target = local_appdata / "DocReady" / "data"
+            legacy_target = local_appdata / "SpecGuard" / "data"
+            # Migrate legacy if exists and new does not
+            if legacy_target.exists() and not target.exists():
+                try:
+                    shutil.copytree(legacy_target, target)
+                except Exception:
+                    target = legacy_target
         else:
-            target = Path.home() / ".specguard" / "data"
+            home = Path.home()
+            target = home / ".docready" / "data"
+            legacy_target = home / ".specguard" / "data"
+            if legacy_target.exists() and not target.exists():
+                try:
+                    shutil.copytree(legacy_target, target)
+                except Exception:
+                    target = legacy_target
         target.mkdir(parents=True, exist_ok=True)
 
     if subdir:
@@ -125,29 +140,37 @@ def get_resource_dir(resource_name: str) -> Path:
 def get_database_path() -> Path:
     """
     Returns the persistent SQLite database path.
-    Preserves existing data in data/specguard.db or data/database/specguard.db.
+    Preserves existing data in data/database/docready.db, data/docready.db,
+    or legacy data/database/specguard.db, data/specguard.db.
     """
     data_dir = get_data_dir()
     db_folder = data_dir / "database"
-    nested_db = db_folder / "specguard.db"
-    root_db = data_dir / "specguard.db"
+    
+    # Priority order for database resolution
+    candidates = [
+        db_folder / "docready.db",
+        data_dir / "docready.db",
+        db_folder / "specguard.db",
+        data_dir / "specguard.db",
+    ]
+    for c in candidates:
+        if c.exists():
+            return c
 
-    # If nested exists, prefer it
-    if nested_db.exists():
-        return nested_db
-    # If root exists, prefer it
-    if root_db.exists():
-        return root_db
-
-    # For new installations, use data/database/specguard.db
+    # Default for new installations
     db_folder.mkdir(parents=True, exist_ok=True)
-    return nested_db
+    return db_folder / "docready.db"
 
 
 def get_log_file_path() -> Path:
     """Returns the path to the primary runtime log file."""
     logs_dir = get_data_dir("logs")
-    return logs_dir / "specguard.log"
+    # If legacy log exists, prefer it or use docready.log
+    if (logs_dir / "docready.log").exists():
+        return logs_dir / "docready.log"
+    if (logs_dir / "specguard.log").exists():
+        return logs_dir / "specguard.log"
+    return logs_dir / "docready.log"
 
 
 def get_reports_dir() -> Path:

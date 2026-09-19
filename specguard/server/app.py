@@ -26,9 +26,10 @@ from specguard.server.api.history import router as router_history
 from specguard.server.api.reports import router as router_reports
 from specguard.server.api.standards import router as router_standards
 from specguard.server.api.models_api import router as router_models
+from specguard.server.api.templates_api import router as router_templates
 from specguard.server.api.settings_api import router as router_settings
 
-logger = logging.getLogger("SpecGuard.Server")
+logger = logging.getLogger("DocReady.Server")
 
 STATIC_DIR = WEB_DIR / "static"
 TEMPLATES_DIR = WEB_DIR / "templates"
@@ -44,24 +45,24 @@ async def lifespan(app: FastAPI):
     else:
         logger.info("Environment verified: 100% Offline Mode Active.")
     yield
-    logger.info("SpecGuard local server shutting down cleanly.")
+    logger.info("DocReady local server shutting down cleanly.")
 
 
 def create_app() -> FastAPI:
-    """Factory creating and configuring the SpecGuard FastAPI server."""
+    """Factory creating and configuring the DocReady FastAPI server."""
     app = FastAPI(
-        title="SpecGuard Engineering Document Quality Framework",
-        description="100% Offline Deep Learning & Computer Vision Engineering Quality System",
+        title="DocReady — Offline Intranet Platform for Template-Aware Document Formatting Analysis and Readiness Verification",
+        description="DocReady 100% Offline Intranet Document Intelligence & Formatting Readiness System",
         version=DEFAULT_CONFIG.version,
         lifespan=lifespan,
         docs_url="/api/docs",
         redoc_url=None
     )
 
-    # Restrict CORS strictly to localhost on any allocated port
+    # Restrict CORS strictly to localhost and private intranet IP address spaces
     app.add_middleware(
         CORSMiddleware,
-        allow_origin_regex=r"^https?://(127\.0\.0\.1|localhost)(:\d+)?$",
+        allow_origin_regex=r"^https?://(127\.0\.0\.1|localhost|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2[0-9]|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})(:\d+)?$",
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -77,6 +78,7 @@ def create_app() -> FastAPI:
     app.include_router(router_reports, prefix=api_prefix)
     app.include_router(router_standards, prefix=api_prefix)
     app.include_router(router_models, prefix=api_prefix)
+    app.include_router(router_templates, prefix=api_prefix)
     app.include_router(router_settings, prefix=api_prefix)
 
     # Health check

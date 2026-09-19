@@ -207,7 +207,7 @@ class TestWebAndOfflineAPI:
     def test_index_html_served(self):
         resp = client.get("/")
         assert resp.status_code == 200
-        assert "SPEC GUARD" in resp.text
+        assert "DOCREADY" in resp.text or "SPEC GUARD" in resp.text
         assert "100% Offline" in resp.text
 
     def test_backup_api_endpoints(self):

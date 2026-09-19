@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "specguard"
+name = "docready"
 version = "1.0.0"
-description = "SpecGuard: An Offline Hybrid Deep Learning and Computer Vision Framework for Intelligent Engineering Document Quality and Standards Compliance Analysis"
+description = "DocReady — An Offline Intranet Platform for Template-Aware Document Formatting Analysis and Readiness Verification"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
@@ -40,6 +40,7 @@ dev = [
 ]
 
 [project.scripts]
+docready = "app:main"
 specguard = "app:main"
 
 [tool.pytest.ini_options]

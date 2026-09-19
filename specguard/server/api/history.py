@@ -119,12 +119,28 @@ def delete_comparison_record(comparison_id: str) -> Dict[str, Any]:
         raise HTTPException(status_code=500, detail=f"Deletion failed: {e}")
 
 
+from pathlib import Path
+from specguard.core.document_comparator import DocumentComparator
+from specguard.core.document_parser import DocumentParser
+
+
 @router.get("/diff/{id1}/{id2}")
 def compare_comparison_revisions(id1: str, id2: str) -> Dict[str, Any]:
     """Performs structured diff analysis across two comparison revisions."""
     repo = RepositoryManager()
     try:
         diff_result = repo.compare_revisions(id1, id2)
+        rec1 = repo.get_comparison_record(id1)
+        rec2 = repo.get_comparison_record(id2)
+        if rec1 and rec2:
+            doc1_info = repo.get_document(rec1.document_id)
+            doc2_info = repo.get_document(rec2.document_id)
+            if doc1_info and doc2_info and Path(doc1_info.original_path).exists() and Path(doc2_info.original_path).exists():
+                d1 = DocumentParser.parse_file(doc1_info.original_path)
+                d2 = DocumentParser.parse_file(doc2_info.original_path)
+                comparator = DocumentComparator()
+                report = comparator.compare(d1, d2)
+                diff_result["document_diff"] = report.to_dict()
         return diff_result
     except Exception as e:
         logger.error("Failed comparing %s and %s: %s", id1, id2, e)

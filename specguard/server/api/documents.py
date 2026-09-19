@@ -79,6 +79,8 @@ def get_document_info(doc_id: str) -> Dict[str, Any]:
 
     try:
         doc_model = DocumentParser.parse_file(str(doc_path))
+        from dataclasses import asdict
+
         pages_summary = []
         for p in doc_model.pages:
             pages_summary.append({
@@ -89,8 +91,17 @@ def get_document_info(doc_id: str) -> Dict[str, Any]:
                 "text_snippet": p.text[:150] if p.text else "",
                 "blocks_count": len(p.blocks),
                 "tables_count": len(p.tables),
-                "figures_count": len(p.figures)
+                "figures_count": len(p.figures),
+                "layout_type": getattr(p, "layout_type", "single_column"),
+                "reading_order_count": len(getattr(p, "reading_order", []))
             })
+
+        toc_dict = asdict(doc_model.toc) if doc_model.toc else None
+        sections_dict = [asdict(s) for s in doc_model.sections]
+        figures_dict = [asdict(f) for f in doc_model.figures]
+        tables_dict = [asdict(t) for t in doc_model.tables]
+        equations_dict = [asdict(eq) for eq in doc_model.equations]
+        cross_refs_dict = [asdict(xr) for xr in doc_model.cross_references]
 
         return {
             "filename": doc_path.name,
@@ -99,7 +110,15 @@ def get_document_info(doc_id: str) -> Dict[str, Any]:
             "file_size": doc_model.file_size,
             "file_type": doc_model.file_type,
             "page_count": doc_model.page_count,
-            "pages": pages_summary
+            "pages": pages_summary,
+            "sections": sections_dict,
+            "toc": toc_dict,
+            "figures": figures_dict,
+            "tables": tables_dict,
+            "equations": equations_dict,
+            "cross_references": cross_refs_dict,
+            "warnings": doc_model.warnings,
+            "metadata": doc_model.metadata
         }
     except Exception as e:
         logger.error("Failed parsing document info for %s: %s", doc_path, e)
