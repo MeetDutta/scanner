@@ -14,13 +14,11 @@ from typing import Dict, Any, List, Tuple
 import logging
 
 from specguard.core.config import (
-    BASE_DIR, DATA_DIR, MODELS_DIR, STANDARDS_DIR, REPORTS_DIR
+    BASE_DIR, DATA_DIR, MODELS_DIR, STANDARDS_DIR, REPORTS_DIR, REPO_DIR, DATASETS_DIR
 )
 
 logger = logging.getLogger(__name__)
 
-REPO_DIR = BASE_DIR / "repository"
-DATASETS_DIR = BASE_DIR / "datasets"
 
 REQUIRED_PACKAGES = [
     ("PySide6", "PySide6 GUI Framework"),
@@ -113,37 +111,66 @@ def verify_environment() -> StartupReport:
     except Exception as e:
         warnings.append(f"Could not probe PyTorch hardware backend: {e}")
 
+    from specguard.core.config import (
+        BASE_DIR, DATA_DIR, MODELS_DIR, STANDARDS_DIR, REPORTS_DIR, REPO_DIR, DATASETS_DIR, LOGS_DIR, UPLOADS_DIR
+    )
+    from specguard.core.runtime_paths import detect_tesseract, is_frozen
+
     # 4. Storage and Directory Structure
     dir_status: Dict[str, bool] = {}
-    crucial_dirs = [
-        ("Base", BASE_DIR),
+
+    # Writable user-data directories
+    writable_dirs = [
         ("Data", DATA_DIR),
-        ("Models", MODELS_DIR),
-        ("Standards", STANDARDS_DIR),
         ("Reports", REPORTS_DIR),
+        ("Logs", LOGS_DIR),
+        ("Uploads", UPLOADS_DIR),
         ("Repository", REPO_DIR),
-        ("Datasets", DATASETS_DIR),
     ]
 
-    for name, p in crucial_dirs:
+    for name, p in writable_dirs:
         try:
             p.mkdir(parents=True, exist_ok=True)
-            dir_status[name] = p.exists() and os.access(p, os.W_OK)
-            if not dir_status[name]:
-                errors.append(f"Directory {name} ({p}) is not writable.")
+            is_writable = p.exists() and os.access(p, os.W_OK)
+            dir_status[name] = is_writable
+            if not is_writable:
+                errors.append(f"Writable directory {name} ({p}) is not accessible for writing.")
         except Exception as e:
             dir_status[name] = False
-            errors.append(f"Failed to create/access directory {name} ({p}): {e}")
+            errors.append(f"Failed to initialize user directory {name} ({p}): {e}")
 
-    # Check disk space
+    # Read-only bundled resource directories
+    readable_dirs = [
+        ("Base", BASE_DIR),
+        ("Models", MODELS_DIR),
+        ("Standards", STANDARDS_DIR),
+    ]
+
+    for name, p in readable_dirs:
+        is_readable = p.exists() and os.access(p, os.R_OK)
+        dir_status[name] = is_readable
+        if not is_readable:
+            warnings.append(f"Resource directory {name} ({p}) is missing or unreadable.")
+
+    # 5. Local OCR Engine Status
+    tess_path = detect_tesseract()
+    if tess_path:
+        hw_info["ocr_engine"] = f"Tesseract ({tess_path})"
+        hw_info["ocr_mode"] = "Hybrid OpenCV + Tesseract"
+    else:
+        hw_info["ocr_engine"] = "OpenCV Morphological Document Vision Engine (Built-in)"
+        hw_info["ocr_mode"] = "Native Offline CV (Zero Dependencies)"
+
+    # Check disk space on data storage partition
     try:
-        total, used, free = shutil.disk_usage(BASE_DIR)
+        total, used, free = shutil.disk_usage(DATA_DIR)
         free_gb = free / (1024 ** 3)
         hw_info["free_storage_gb"] = round(free_gb, 2)
-        if free_gb < 1.0:
-            warnings.append(f"Low local disk space: {free_gb:.1f} GB remaining.")
+        if free_gb < 0.5:
+            warnings.append(f"Low local disk space: {free_gb:.2f} GB remaining on data drive.")
     except Exception:
         hw_info["free_storage_gb"] = "Unknown"
+
 
     is_ready = len(errors) == 0
 

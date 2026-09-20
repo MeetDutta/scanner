@@ -26,7 +26,7 @@ class DOCXAnnotator:
         doc = docx.Document(original_docx_path)
 
         # Add an executive compliance summary section at the start
-        p = doc.paragraphs[0].insert_paragraph_before("SpecGuard Engineering Compliance Audit Summary")
+        p = doc.paragraphs[0].insert_paragraph_before("DocReady Compliance & Document Readiness Audit Summary")
         p.style = 'Heading 1'
 
         meta_p = p.insert_paragraph_before(f"Audit Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | Offline Analysis Mode")
@@ -90,7 +90,7 @@ class ReportGenerator:
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>SpecGuard Engineering Compliance Report - {Path(doc.file_path).name}</title>
+<title>DocReady Document Readiness & Compliance Report - {Path(doc.file_path).name}</title>
 <style>
     body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 40px; }}
     .container {{ max-width: 1200px; margin: 0 auto; background: #1e293b; border-radius: 12px; padding: 32px; border: 1px solid #334155; }}
@@ -115,7 +115,7 @@ class ReportGenerator:
 </head>
 <body>
 <div class="container">
-    <h1>SpecGuard Engineering Compliance & Quality Audit Report</h1>
+    <h1>DocReady Document Readiness & Quality Audit Report</h1>
     <div class="meta-bar">
         <div><strong>Document:</strong> {Path(doc.file_path).name}</div>
         <div><strong>Session ID:</strong> {session_id}</div>

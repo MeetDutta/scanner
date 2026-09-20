@@ -1,0 +1,5 @@
+# SpecGuard Windows Portable Build Requirements
+pyinstaller>=6.5.0
+pyinstaller-hooks-contrib>=2024.0
+setuptools>=61.0
+wheel>=0.40.0

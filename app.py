@@ -27,13 +27,15 @@ logging.basicConfig(
 logger = logging.getLogger("SpecGuard")
 
 
-def main():
-    logger.info("Initializing SpecGuard Offline Desktop Application...")
+def launch_gui():
+    """Launches legacy PySide6 desktop GUI."""
+    from PySide6.QtWidgets import QApplication, QMessageBox
+    from PySide6.QtCore import Qt
+    from specguard.gui.main_window import MainWindow
 
-    # Pre-flight startup verification
+    logger.info("Initializing SpecGuard PySide6 Desktop GUI...")
     report = verify_environment()
 
-    # Configure High-DPI attributes
     QApplication.setHighDpiScaleFactorRoundingPolicy(
         Qt.HighDpiScaleFactorRoundingPolicy.PassThrough
     )
@@ -51,9 +53,18 @@ def main():
     window = MainWindow()
     window.show()
 
-    logger.info("SpecGuard main window launched successfully.")
+    logger.info("SpecGuard PySide6 window launched successfully.")
     sys.exit(app.exec())
+
+
+def main():
+    if "--gui" in sys.argv or "--pyside" in sys.argv:
+        launch_gui()
+    else:
+        import portable_launcher
+        portable_launcher.main()
 
 
 if __name__ == "__main__":
     main()
+

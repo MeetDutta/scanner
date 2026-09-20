@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <title>DocReady — Offline Intranet Platform for Template-Aware Document Formatting Analysis and Readiness Verification</title>
+  <meta name="description" content="DocReady: Offline Intranet Platform for Template-Aware Document Formatting Analysis and Readiness Verification" />
+
+  <!-- Prevent Theme FOUC -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem("docready-theme") || localStorage.getItem("specguard-theme");
+      const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const theme = savedTheme || (systemDark ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+
+  <!-- Local Offline CSS Stylesheets -->
+  <link rel="stylesheet" href="/static/css/base.css" />
+  <link rel="stylesheet" href="/static/css/layout.css" />
+  <link rel="stylesheet" href="/static/css/components.css" />
+  <link rel="stylesheet" href="/static/css/views.css" />
+</head>
+<body>
+  <div id="app-root">
+    <!-- 1. Institutional Top Header -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="brand-emblem" aria-hidden="true">🛡️</div>
+        <div class="brand-titles">
+          <div class="brand-title">
+            DOCREADY
+            <span class="version-tag">v1.0.0</span>
+          </div>
+          <div class="brand-subtitle">Offline Intranet Platform for Template-Aware Formatting & Readiness Verification</div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div class="status-indicator-pill" title="Strictly bound to 127.0.0.1. Zero telemetry. Zero external calls.">
+          <span class="status-dot"></span>
+          <span>100% Offline (Local)</span>
+        </div>
+
+        <button class="btn btn-secondary btn-icon" id="header-theme-toggle" onclick="window.app.toggleTheme()" title="Toggle Dark/Light Theme">
+          🌙
+        </button>
+
+        <button class="btn btn-primary btn-sm" onclick="window.router.navigate('new_analysis')">
+          + New Verification
+        </button>
+      </div>
+    </header>
+
+    <!-- 2. Application Body -->
+    <div class="app-body">
+      <!-- Collapsible Sidebar -->
+      <aside class="app-sidebar" id="app-sidebar">
+        <div class="sidebar-toggle-row">
+          <button class="btn btn-outline btn-icon btn-sm" id="sidebar-collapse-btn" title="Toggle Sidebar Collapse">
+            ◀
+          </button>
+        </div>
+
+        <nav class="sidebar-nav">
+          <span class="nav-section-title">Core Operations</span>
+          <a class="nav-item active" data-route="dashboard" onclick="window.router.navigate('dashboard')" title="Dashboard (D)">
+            <span class="nav-icon">📊</span>
+            <span class="nav-label">Dashboard</span>
+          </a>
+          <a class="nav-item" data-route="new_analysis" onclick="window.router.navigate('new_analysis')" title="New Verification (N)">
+            <span class="nav-icon">⚡</span>
+            <span class="nav-label">New Verification</span>
+          </a>
+          <a class="nav-item" data-route="workspace" onclick="window.router.navigate('workspace')" title="Active Analysis Workspace">
+            <span class="nav-icon">⚙️</span>
+            <span class="nav-label">Workspace</span>
+          </a>
+
+          <span class="nav-section-title">Verification Output</span>
+          <a class="nav-item" data-route="results" onclick="window.router.navigate('results')" title="Analysis Results">
+            <span class="nav-icon">📈</span>
+            <span class="nav-label">Results Summary</span>
+          </a>
+          <a class="nav-item" data-route="viewer" onclick="window.router.navigate('viewer')" title="Document Canvas Viewer (V)">
+            <span class="nav-icon">👁️</span>
+            <span class="nav-label">Document Viewer</span>
+          </a>
+          <a class="nav-item" data-route="findings" onclick="window.router.navigate('findings')" title="Findings Management (F)">
+            <span class="nav-icon">📋</span>
+            <span class="nav-label">Findings Records</span>
+          </a>
+          <a class="nav-item" data-route="history" onclick="window.router.navigate('history')" title="Document History (H)">
+            <span class="nav-icon">📁</span>
+            <span class="nav-label">History & Revisions</span>
+          </a>
+          <a class="nav-item" data-route="reports" onclick="window.router.navigate('reports')" title="Export Reports">
+            <span class="nav-icon">📑</span>
+            <span class="nav-label">Export Reports</span>
+          </a>
+
+          <span class="nav-section-title">Knowledge & Diagnostics</span>
+          <a class="nav-item" data-route="standards" onclick="window.router.navigate('standards')" title="Standards & Templates">
+            <span class="nav-icon">⚖️</span>
+            <span class="nav-label">Standards & Rules</span>
+          </a>
+          <a class="nav-item" data-route="training" onclick="window.router.navigate('training')" title="Machine Learning & Models">
+            <span class="nav-icon">🤖</span>
+            <span class="nav-label">ML & Model Registry</span>
+          </a>
+          <a class="nav-item" data-route="settings" onclick="window.router.navigate('settings')" title="Settings & Diagnostics">
+            <span class="nav-icon">🛠️</span>
+            <span class="nav-label">Settings & Health</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div>SpecGuard Offline Engine</div>
+          <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Localhost Binding • 10 Engines</div>
+        </div>
+      </aside>
+
+      <!-- Main Viewport Area -->
+      <main class="main-viewport">
+        <!-- Breadcrumbs Navigation Strip -->
+        <div class="breadcrumb-strip">
+          <div class="breadcrumb-trail">
+            <span style="cursor: pointer;" onclick="window.router.navigate('dashboard')">SpecGuard</span>
+            <span class="breadcrumb-sep">›</span>
+            <span class="breadcrumb-current" id="breadcrumb-current-label">Dashboard</span>
+          </div>
+
+          <div class="breadcrumb-actions" id="breadcrumb-actions-slot">
+            <!-- Contextual action buttons injected dynamically -->
+          </div>
+        </div>
+
+        <!-- Dynamic View Content Container -->
+        <div class="view-container" id="main-view-container">
+          <!-- Views mounted here -->
+        </div>
+
+        <!-- Institutional Bottom Status Bar -->
+        <footer class="app-statusbar">
+          <div class="statusbar-section">
+            <span>DocReady Platform</span>
+            <span>•</span>
+            <span id="statusbar-session-info">Ready for Verification</span>
+          </div>
+          <div class="statusbar-section">
+            <span style="font-size: 10.5px; color: var(--text-muted);">Shortcuts: [D]ash, [N]ew, [V]iewer, [F]indings, [H]istory</span>
+            <span>•</span>
+            <span id="statusbar-host">Host: 127.0.0.1:8765</span>
+          </div>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <!-- Toast Notification Root -->
+  <div id="toast-root"></div>
+
+  <!-- Vanilla JavaScript Modules (Strictly Local) -->
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/state.js"></script>
+  <script src="/static/js/components/toast.js"></script>
+  <script src="/static/js/components/modal.js"></script>
+  <script src="/static/js/components/document_viewer.js"></script>
+
+  <script src="/static/js/views/dashboard.js"></script>
+  <script src="/static/js/views/new_analysis.js"></script>
+  <script src="/static/js/views/workspace.js"></script>
+  <script src="/static/js/views/results.js"></script>
+  <script src="/static/js/views/viewer.js"></script>
+  <script src="/static/js/views/findings.js"></script>
+  <script src="/static/js/views/history.js"></script>
+  <script src="/static/js/views/reports.js"></script>
+  <script src="/static/js/views/standards.js"></script>
+  <script src="/static/js/views/training.js"></script>
+  <script src="/static/js/views/settings.js"></script>
+
+  <script src="/static/js/router.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

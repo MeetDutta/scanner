@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "specguard"
+name = "docready"
 version = "1.0.0"
-description = "SpecGuard: An Offline Hybrid Deep Learning and Computer Vision Framework for Intelligent Engineering Document Quality and Standards Compliance Analysis"
+description = "DocReady — An Offline Intranet Platform for Template-Aware Document Formatting Analysis and Readiness Verification"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
@@ -16,7 +16,10 @@ dependencies = [
     "openpyxl>=3.1.0",
     "numpy>=1.24.0",
     "pandas>=2.0.0",
-    "pyyaml>=6.0"
+    "pyyaml>=6.0",
+    "fastapi>=0.100.0",
+    "uvicorn>=0.22.0",
+    "python-multipart>=0.0.6"
 ]
 
 [project.optional-dependencies]
@@ -37,6 +40,7 @@ dev = [
 ]
 
 [project.scripts]
+docready = "app:main"
 specguard = "app:main"
 
 [tool.pytest.ini_options]

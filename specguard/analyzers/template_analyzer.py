@@ -34,7 +34,13 @@ class TemplateAnalyzer(BaseAnalyzer):
     def analyze(self, doc: DocumentModel, context: Dict[str, Any] = None) -> List[Finding]:
         findings: List[Finding] = []
         domain = (context or {}).get("domain", "mechanical").lower()
+        if domain in ["academic", "ieee_research", "generic_academic"]:
+            return findings
+
         template: DomainTemplate = (context or {}).get("template") or TemplateManager.get_template(domain)
+        if not template.sections and not template.parameters:
+            return findings
+
         parameters: List[EngineeringParameter] = (context or {}).get("parameters", [])
 
         full_doc_text = doc.full_text.lower()

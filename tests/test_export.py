@@ -34,7 +34,7 @@ def test_html_and_json_reports(tmp_path):
     ReportGenerator.generate_html_report(doc, findings, session_id, str(html_out))
     assert html_out.exists()
     content = html_out.read_text()
-    assert "SpecGuard Engineering Compliance" in content
+    assert ("DocReady" in content or "SpecGuard" in content)
     assert "Critical" in content
 
     ReportGenerator.generate_json_report(doc, findings, session_id, str(json_out))
