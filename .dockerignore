@@ -1,0 +1,17 @@
+.git
+.gitignore
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+build/
+dist/
+*.spec
+.DS_Store
+data/logs/*
+data/reports/*
+data/uploads/*
+data/database/*.db-journal
+tests/

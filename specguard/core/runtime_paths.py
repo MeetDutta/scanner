@@ -68,11 +68,22 @@ def get_data_dir(subdir: str = "") -> Path:
     """
     Returns the persistent writable user data directory.
     Priority:
-    1. `<app_dir>/data` (Ideal for portable USB / folder installation)
-    2. `%LOCALAPPDATA%/DocReady/data` (Fallback if app_dir is read-only, e.g. Program Files)
-    3. `~/.docready/data` (Linux/macOS fallback if app_dir is read-only)
-    4. Automatically migrates/preserves existing data from SpecGuard if present
+    1. `DOCREADY_DATA_DIR` environment variable (if specified for Render/Docker persistent mounts)
+    2. `<app_dir>/data` (Ideal for portable USB / folder installation)
+    3. `%LOCALAPPDATA%/DocReady/data` (Fallback if app_dir is read-only, e.g. Program Files)
+    4. `~/.docready/data` (Linux/macOS fallback if app_dir is read-only)
+    5. Automatically migrates/preserves existing data from SpecGuard if present
     """
+    env_data_dir = os.environ.get("DOCREADY_DATA_DIR")
+    if env_data_dir:
+        target = Path(env_data_dir).resolve()
+        target.mkdir(parents=True, exist_ok=True)
+        if subdir:
+            sub = target / subdir
+            sub.mkdir(parents=True, exist_ok=True)
+            return sub
+        return target
+
     app_dir = get_app_dir()
     candidate = app_dir / "data"
 

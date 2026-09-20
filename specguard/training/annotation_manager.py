@@ -49,6 +49,7 @@ class DocumentAnnotation:
     classification_label: str = "GENERAL"
     logical_label: Optional[str] = None
     statement_b: Optional[str] = None  # Second sentence for pair contradiction labeling
+    family_id: Optional[str] = None
     error_category: Optional[str] = None
     severity: Optional[str] = None
     annotated_by: str = "engineer"
@@ -81,6 +82,7 @@ class AnnotationManager:
         data = {
             "annotation_id": annot.annotation_id,
             "document_id": annot.document_id,
+            "family_id": annot.family_id,
             "domain": annot.domain,
             "page": annot.page,
             "text": annot.text,
@@ -103,7 +105,12 @@ class AnnotationManager:
 
     def list_annotations(self, domain: Optional[str] = None) -> List[Dict[str, Any]]:
         """Retrieves all annotations across or within a specific domain."""
-        domains = [domain.lower()] if domain else ["mechanical", "chemical", "electrical"]
+        if domain and domain.lower() in ["cross_domain", "all", "cross"]:
+            domains = ["mechanical", "chemical", "electrical"]
+        elif domain:
+            domains = [domain.lower()]
+        else:
+            domains = ["mechanical", "chemical", "electrical"]
         results = []
 
         for dom in domains:

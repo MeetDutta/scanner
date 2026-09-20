@@ -59,14 +59,37 @@ def create_app() -> FastAPI:
         redoc_url=None
     )
 
-    # Restrict CORS strictly to localhost and private intranet IP address spaces
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origin_regex=r"^https?://(127\.0\.0\.1|localhost|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2[0-9]|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})(:\d+)?$",
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    import os
+    env_mode = os.environ.get("DOCREADY_ENV", "local").lower()
+    custom_cors = os.environ.get("DOCREADY_CORS_ORIGINS")
+
+    if custom_cors:
+        origins = [orig.strip() for orig in custom_cors.split(",") if orig.strip()]
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=origins,
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
+    elif env_mode in ["render_demo", "render", "web"]:
+        # In Render testing mode, allow *.onrender.com alongside localhost/intranet
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origin_regex=r"^https?://(127\.0\.0\.1|localhost|([a-zA-Z0-9-]+\.)*onrender\.com|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2[0-9]|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})(:\d+)?$",
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
+    else:
+        # Default local offline mode: restrict strictly to localhost and intranet
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origin_regex=r"^https?://(127\.0\.0\.1|localhost|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2[0-9]|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})(:\d+)?$",
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
 
     # Register API Routers
     api_prefix = "/api"
@@ -81,13 +104,25 @@ def create_app() -> FastAPI:
     app.include_router(router_templates, prefix=api_prefix)
     app.include_router(router_settings, prefix=api_prefix)
 
-    # Health check
-    @app.get("/api/health")
+    # Health check endpoints:
+    # 1. Top-level /health for Render load balancers and container monitors
+    @app.get("/health")
     def health_check():
+        return {
+            "status": "ok",
+            "service": "docready",
+            "environment": env_mode
+        }
+
+    # 2. Backward-compatible /api/health for internal clients and test suites
+    @app.get("/api/health")
+    def api_health_check():
         return {
             "status": "online",
             "mode": "offline",
             "name": "SpecGuard",
+            "service": "docready",
+            "environment": env_mode,
             "version": DEFAULT_CONFIG.version
         }
 

@@ -1,0 +1,38 @@
+# ==============================================================================
+# DocReady — Render Infrastructure as Code (Blueprint)
+# ==============================================================================
+# Deploy to Render via Blueprint (Native Python or Docker container)
+# ==============================================================================
+
+services:
+  - type: web
+    name: docready-demo
+    runtime: python
+    region: oregon
+    plan: free
+    branch: web-interface-migration
+    buildCommand: pip install --upgrade pip && pip install -r requirements-render.txt
+    startCommand: uvicorn specguard.server.app:create_app --factory --host 0.0.0.0 --port $PORT --workers 1
+    healthCheckPath: /health
+    autoDeploy: false
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.10
+      - key: DOCREADY_ENV
+        value: render_demo
+      - key: DOCREADY_WEB_MODE
+        value: "1"
+      - key: DOCREADY_HOST
+        value: 0.0.0.0
+      - key: LOG_LEVEL
+        value: INFO
+
+# Optional Persistent Disk configuration (Render Starter/Team plan):
+# Note: Uncomment disk section if using a paid tier for permanent upload/report retention:
+#    disk:
+#      name: docready-data
+#      mountPath: /var/data/docready
+#      sizeGB: 10
+#    envVars:
+#      - key: DOCREADY_DATA_DIR
+#        value: /var/data/docready
