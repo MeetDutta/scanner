@@ -192,9 +192,9 @@ class LogicalTrainer:
         pairs: List[Tuple[str, str, int]] = []
         texts: List[str] = []
         for s in samples:
-            t1 = s.get("text", "").strip()
-            t2 = s.get("statement_b", "").strip()
-            lbl_str = s.get("logical_label", "CONSISTENT").upper()
+            t1 = (s.get("text") or "").strip()
+            t2 = (s.get("statement_b") or "").strip()
+            lbl_str = (s.get("logical_label") or "CONSISTENT").upper()
             label = 1 if lbl_str == "CONTRADICTORY" else 0
             if t1 and t2:
                 pairs.append((t1, t2, label))

@@ -67,8 +67,25 @@ def verify_environment() -> StartupReport:
     if sys.version_info < (3, 9):
         errors.append(f"Python 3.9+ required. Detected version: {py_ver}")
 
+    # Check if running in headless web or cloud deployment environment
+    is_web_mode = (
+        os.environ.get("DOCREADY_WEB_MODE", "0") == "1"
+        or os.environ.get("DOCREADY_ENV", "local").lower() in ["render_demo", "web", "render"]
+    )
+
     # 2. Package Verification
     for mod_name, desc in REQUIRED_PACKAGES:
+        # In web deployment mode, PySide6 desktop GUI is not required
+        if is_web_mode and mod_name == "PySide6":
+            try:
+                mod = importlib.import_module(mod_name)
+                ver = getattr(mod, "__version__", "Installed")
+                pkg_status[mod_name] = {"installed": True, "version": ver, "description": desc}
+            except ImportError:
+                pkg_status[mod_name] = {"installed": False, "version": None, "description": desc}
+                warnings.append("Desktop GUI (PySide6) is not installed; running in headless web-only mode.")
+            continue
+
         try:
             mod = importlib.import_module(mod_name)
             ver = getattr(mod, "__version__", "Installed")

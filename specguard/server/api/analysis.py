@@ -231,8 +231,20 @@ def _run_pipeline_worker(
 def start_analysis(req: AnalysisRequest, bg_tasks: BackgroundTasks) -> Dict[str, Any]:
     """Starts asynchronous document analysis."""
     file_path = req.file_path
-    if not file_path or not Path(file_path).exists():
-        raise HTTPException(status_code=400, detail="Target document path does not exist.")
+    if not file_path:
+        raise HTTPException(status_code=400, detail="Target document path is required.")
+
+    target = Path(file_path).resolve()
+    # Path traversal protection: Ensure target is within legitimate data or resource directories
+    allowed_roots = [
+        UPLOADS_DIR.resolve(),
+        DEMO_SAMPLES_DIR.resolve(),
+        DATA_DIR.resolve(),
+    ]
+    if not any(root == target or root in target.parents for root in allowed_roots) or not target.exists():
+        raise HTTPException(status_code=400, detail="Target document path is invalid or does not exist.")
+
+    file_path = str(target)
 
     job_id = f"JOB-{uuid.uuid4().hex[:8].upper()}"
     cancel_token = CancellationToken()

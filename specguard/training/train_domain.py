@@ -64,14 +64,18 @@ class DomainClassifierTrainer:
         device = HardwareManager.get_torch_device(device_str)
         logger.info("Starting Domain Classifier training on device: %s", device)
 
+        def _extract_label(s: Dict[str, Any]) -> int:
+            lbl = s.get("classification_label") or s.get("domain") or "general"
+            return DOMAIN_MAP.get(str(lbl).lower(), 3)
+
         train_texts = [s.get("text", "") for s in train_samples if s.get("text")]
-        train_labels = [DOMAIN_MAP.get(s.get("domain", "general").lower(), 3) for s in train_samples if s.get("text")]
+        train_labels = [_extract_label(s) for s in train_samples if s.get("text")]
 
         val_texts = [s.get("text", "") for s in val_samples if s.get("text")]
-        val_labels = [DOMAIN_MAP.get(s.get("domain", "general").lower(), 3) for s in val_samples if s.get("text")]
+        val_labels = [_extract_label(s) for s in val_samples if s.get("text")]
 
         test_texts = [s.get("text", "") for s in (test_samples or []) if s.get("text")]
-        test_labels = [DOMAIN_MAP.get(s.get("domain", "general").lower(), 3) for s in (test_samples or []) if s.get("text")]
+        test_labels = [_extract_label(s) for s in (test_samples or []) if s.get("text")]
 
         if not train_texts:
             raise ValueError("Insufficient training data: No text samples provided in training split.")
