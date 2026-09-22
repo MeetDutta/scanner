@@ -1,0 +1,543 @@
+{
+  "document_id": "MEC_3e51d457",
+  "filename": "SG_TEST_004_TOC_AND_FIGURE_REGISTER.pdf",
+  "domain": "mechanical",
+  "sha256": "3e51d45791e0f530f4f3c3d8bcd9da4f5db586187a09d89b28a0bb1419b9ded4",
+  "page_count": 2,
+  "file_size": 5103,
+  "imported_at": "2026-09-22T23:35:42.393944",
+  "pages": [
+    {
+      "page_num": 1,
+      "width": 595.2755737304688,
+      "height": 841.8897705078125,
+      "text": "<b>QP No.</b><br/>QP-\nMECH-004\n<b>Issue\nDate</b><br/>15-09-2026\n<b>Revision\nNo.</b><br/>A\n<b>Date</b><br/>18-09\n-2026\n<b>Name</b><br/>A. Kulkarni\nCOSO\nPUMP SHAFT INSPECTION PROCEDURE\n<b>Document Code:</b> MECH-004 &nbsp;&nbsp; <b>Discipline:</b> Mechanical &nbsp;&nbsp; <b>Classification:</b> Training / Test\nTABLE OF CONTENTS\nSection\nExpected Page\n1 Scope\n1\n2 Equipment Description\n1\n3 Inspection Procedure\n2\n4 Acceptance Criteria\n3\n5 Appendix A \u2014 Figure Register\n4\n6 Approval\n5\n1. Scope\nThis document defines the inspection procedure for a pump shaft assembly.\n2. Equipment Description\nThe assembly includes shaft, coupling, bearing seats, keyway and protective sleeve.\n3. Inspection Procedure\nClean the component, verify instrument calibration, measure each controlled dimension, and record results against the applicable\ndrawing.\n4. Acceptance Criteria\nAll dimensions shall comply with their stated nominal values and tolerances.\n5. Appendix A \u2014 Figure Register\nFigure ID\nCaption\nExpected File Name\nFigure 1\nPump Shaft Assembly\nFIG-001_Pump_Shaft_Assembly.png\nFigure 2\nBearing Seat Detail\nFIG-002_Bearing_Seat_Detail.png\nFigure 3\nKeyway Detail\nFIG-003_Keyway_Detail.png\n6. Approval\nControlled release requires preparation, checking and approval signatures.\nSpecGuard Training/Test Document | MECH-004\nPage 1",
+      "blocks": [
+        {
+          "text": "<b>QP No.</b><br/>QP-\nMECH-004",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 57.58917236328125,
+            "x1": 123.345703125,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Issue\nDate</b><br/>15-09-2026",
+          "bbox": {
+            "x0": 136.2283477783203,
+            "y0": 57.58917236328125,
+            "x1": 217.1693572998047,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Revision\nNo.</b><br/>A",
+          "bbox": {
+            "x0": 226.93698120117188,
+            "y0": 57.58917236328125,
+            "x1": 272.85699462890625,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Date</b><br/>18-09\n-2026\n<b>Name</b><br/>A. Kulkarni",
+          "bbox": {
+            "x0": 311.97637939453125,
+            "y0": 57.58917236328125,
+            "x1": 491.9567565917969,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "COSO",
+          "bbox": {
+            "x0": 386.2669982910156,
+            "y0": 101.96316528320312,
+            "x1": 421.60699462890625,
+            "y1": 118.4871597290039
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 12.0,
+          "is_bold": true
+        },
+        {
+          "text": "PUMP SHAFT INSPECTION PROCEDURE",
+          "bbox": {
+            "x0": 150.96029663085938,
+            "y0": 146.6822967529297,
+            "x1": 444.3152770996094,
+            "y1": 167.33729553222656
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 15.0,
+          "is_bold": true
+        },
+        {
+          "text": "<b>Document Code:</b> MECH-004 &nbsp;&nbsp; <b>Discipline:</b> Mechanical &nbsp;&nbsp; <b>Classification:</b> Training / Test",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 171.20730590820312,
+            "x1": 469.89178466796875,
+            "y1": 180.82530212402344
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "TABLE OF CONTENTS",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 194.0012664794922,
+            "x1": 161.68869018554688,
+            "y1": 208.4597625732422
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "Section\nExpected Page",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 214.26026916503906,
+            "x1": 349.0129699707031,
+            "y1": 223.62387084960938
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 6.8,
+          "is_bold": true
+        },
+        {
+          "text": "1 Scope\n1",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 228.2262725830078,
+            "x1": 304.4185791015625,
+            "y1": 237.56947326660156
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "2 Equipment Description\n1",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 242.2262725830078,
+            "x1": 304.4185791015625,
+            "y1": 251.56947326660156
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "3 Inspection Procedure\n2",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 256.22625732421875,
+            "x1": 304.4185791015625,
+            "y1": 265.5694580078125
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "4 Acceptance Criteria\n3",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 270.22625732421875,
+            "x1": 304.4185791015625,
+            "y1": 279.5694580078125
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "5 Appendix A \u2014 Figure Register\n4",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 284.22625732421875,
+            "x1": 304.4185791015625,
+            "y1": 293.5694580078125
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "6 Approval\n5",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 298.22625732421875,
+            "x1": 304.4185791015625,
+            "y1": 307.5694580078125
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "1. Scope",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 320.67047119140625,
+            "x1": 91.70619201660156,
+            "y1": 335.12896728515625
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "This document defines the inspection procedure for a pump shaft assembly.",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 339.79046630859375,
+            "x1": 323.8020324707031,
+            "y1": 351.0572814941406
+          },
+          "font_name": "Helvetica",
+          "font_size": 8.2,
+          "is_bold": false
+        },
+        {
+          "text": "2. Equipment Description",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 359.57208251953125,
+            "x1": 175.12867736816406,
+            "y1": 374.03057861328125
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "The assembly includes shaft, coupling, bearing seats, keyway and protective sleeve.",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 378.69207763671875,
+            "x1": 354.7898864746094,
+            "y1": 389.9588928222656
+          },
+          "font_name": "Helvetica",
+          "font_size": 8.2,
+          "is_bold": false
+        },
+        {
+          "text": "3. Inspection Procedure",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 398.47369384765625,
+            "x1": 167.5581817626953,
+            "y1": 412.93218994140625
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "Clean the component, verify instrument calibration, measure each controlled dimension, and record results against the applicable\ndrawing.",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 417.59368896484375,
+            "x1": 516.5759887695312,
+            "y1": 439.3605041503906
+          },
+          "font_name": "Helvetica",
+          "font_size": 8.2,
+          "is_bold": false
+        },
+        {
+          "text": "4. Acceptance Criteria",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 447.875244140625,
+            "x1": 158.8116912841797,
+            "y1": 462.3337707519531
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "All dimensions shall comply with their stated nominal values and tolerances.",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 466.9952697753906,
+            "x1": 323.7774353027344,
+            "y1": 478.2620849609375
+          },
+          "font_name": "Helvetica",
+          "font_size": 8.2,
+          "is_bold": false
+        },
+        {
+          "text": "5. Appendix A \u2014 Figure Register",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 486.77679443359375,
+            "x1": 211.88919067382812,
+            "y1": 501.23529052734375
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "Figure ID\nCaption\nExpected File Name",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 507.0357666015625,
+            "x1": 449.923583984375,
+            "y1": 516.3993530273438
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 6.8,
+          "is_bold": true
+        },
+        {
+          "text": "Figure 1\nPump Shaft Assembly\nFIG-001_Pump_Shaft_Assembly.png",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 521.0017700195312,
+            "x1": 498.3055725097656,
+            "y1": 530.344970703125
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Figure 2\nBearing Seat Detail\nFIG-002_Bearing_Seat_Detail.png",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 535.0017700195312,
+            "x1": 489.9960021972656,
+            "y1": 544.344970703125
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Figure 3\nKeyway Detail\nFIG-003_Keyway_Detail.png",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 549.0017700195312,
+            "x1": 472.6015930175781,
+            "y1": 558.344970703125
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "6. Approval",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 571.446044921875,
+            "x1": 105.70269012451172,
+            "y1": 585.904541015625
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "Controlled release requires preparation, checking and approval signatures.",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 590.5661010742188,
+            "x1": 319.6938171386719,
+            "y1": 601.8328857421875
+          },
+          "font_name": "Helvetica",
+          "font_size": 8.2,
+          "is_bold": false
+        },
+        {
+          "text": "SpecGuard Training/Test Document | MECH-004\nPage 1",
+          "bbox": {
+            "x0": 42.519691467285156,
+            "y0": 811.6875610351562,
+            "x1": 552.7559814453125,
+            "y1": 821.3056030273438
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        }
+      ]
+    },
+    {
+      "page_num": 2,
+      "width": 595.2755737304688,
+      "height": 841.8897705078125,
+      "text": "<b>QP No.</b><br/>QP-\nMECH-004\n<b>Issue\nDate</b><br/>15-09-2026\n<b>Revision\nNo.</b><br/>A\n<b>Date</b><br/>18-09\n-2026\n<b>Name</b><br/>A. Kulkarni\nCOSO\nSIGNATURE & APPROVAL RECORD\nRole\nName\nSignature\nDate\nPrepared By\nA. Kulkarni\nChecked By\nQuality Engineer\nApproved By\nEngineering Manager\n<b>Document control statement:</b> This page records preparation, checking and approval of the controlled training/test document.\nSpecGuard Training/Test Document | MECH-004\nPage 2",
+      "blocks": [
+        {
+          "text": "<b>QP No.</b><br/>QP-\nMECH-004",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 57.58917236328125,
+            "x1": 123.345703125,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Issue\nDate</b><br/>15-09-2026",
+          "bbox": {
+            "x0": 136.2283477783203,
+            "y0": 57.58917236328125,
+            "x1": 217.1693572998047,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Revision\nNo.</b><br/>A",
+          "bbox": {
+            "x0": 226.93698120117188,
+            "y0": 57.58917236328125,
+            "x1": 272.85699462890625,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Date</b><br/>18-09\n-2026\n<b>Name</b><br/>A. Kulkarni",
+          "bbox": {
+            "x0": 311.97637939453125,
+            "y0": 57.58917236328125,
+            "x1": 491.9567565917969,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "COSO",
+          "bbox": {
+            "x0": 386.2669982910156,
+            "y0": 101.96316528320312,
+            "x1": 421.60699462890625,
+            "y1": 118.4871597290039
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 12.0,
+          "is_bold": true
+        },
+        {
+          "text": "SIGNATURE & APPROVAL RECORD",
+          "bbox": {
+            "x0": 167.63278198242188,
+            "y0": 146.6822967529297,
+            "x1": 427.64276123046875,
+            "y1": 167.33729553222656
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 15.0,
+          "is_bold": true
+        },
+        {
+          "text": "Role\nName\nSignature\nDate",
+          "bbox": {
+            "x0": 69.77952575683594,
+            "y0": 180.01217651367188,
+            "x1": 461.5230407714844,
+            "y1": 189.3757781982422
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 6.8,
+          "is_bold": true
+        },
+        {
+          "text": "Prepared By\nA. Kulkarni",
+          "bbox": {
+            "x0": 69.77952575683594,
+            "y0": 218.24588012695312,
+            "x1": 210.37403869628906,
+            "y1": 227.58908081054688
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Checked By\nQuality Engineer",
+          "bbox": {
+            "x0": 69.77952575683594,
+            "y0": 269.26953125,
+            "x1": 227.7616424560547,
+            "y1": 278.61273193359375
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Approved By\nEngineering Manager",
+          "bbox": {
+            "x0": 69.77952575683594,
+            "y0": 320.29315185546875,
+            "x1": 242.50404357910156,
+            "y1": 329.6363525390625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Document control statement:</b> This page records preparation, checking and approval of the controlled training/test document.",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 375.54248046875,
+            "x1": 528.0068359375,
+            "y1": 386.8092956542969
+          },
+          "font_name": "Helvetica",
+          "font_size": 8.2,
+          "is_bold": false
+        },
+        {
+          "text": "SpecGuard Training/Test Document | MECH-004\nPage 2",
+          "bbox": {
+            "x0": 42.519691467285156,
+            "y0": 811.6875610351562,
+            "x1": 552.7559814453125,
+            "y1": 821.3056030273438
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        }
+      ]
+    }
+  ]
+}

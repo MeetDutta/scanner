@@ -16,7 +16,6 @@ __pycache__/
 # Local databases & runtime logs
 data/
 /repository/
-/datasets/
 models/
 *.db
 *.sqlite3

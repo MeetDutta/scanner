@@ -1,0 +1,423 @@
+{
+  "document_id": "MEC_c105b93b",
+  "filename": "SG_TEST_003_FORMATTING_ERRORS.pdf",
+  "domain": "mechanical",
+  "sha256": "c105b93b65adfe3189a45fb348851dc463978ea166843c13c8dac0fd8f04918f",
+  "page_count": 2,
+  "file_size": 4788,
+  "imported_at": "2026-09-22T23:35:42.363022",
+  "pages": [
+    {
+      "page_num": 1,
+      "width": 595.2755737304688,
+      "height": 841.8897705078125,
+      "text": "<b>QP No.</b><br/>QP-\nMECH-003\n<b>Issue\nDate</b><br/>15-09-2026\n<b>Revision\nNo.</b><br/>A\n<b>Date</b><br/>17-09\n-2026\n<b>Name</b><br/>A. Kulkarni\nCOSO\nMECHANICAL SPECIFICATION \u2014 INTENTIONAL FORMATTING\nERRORS\n<b>Document Code:</b> MECH-003 &nbsp;&nbsp; <b>Discipline:</b> Mechanical &nbsp;&nbsp; <b>Classification:</b> Training / Test\n1. scope\nTHIS DOCUMENT CONTAINS INTENTIONAL FORMATTING AND CONTENT ERRORS FOR SPECGUARD TESTING.\n2 System Requirements\nParameter\nRequirement\nUnit\nJournal Diameter\n75.00 +/- 0.03\nmm\nSurface Finish\nRa 1.6 maximum\num\nPressure\n10 bar\nbar\nTemperature\n80.0 C\ndeg C\n3 Manufacturing Tolerances\nThe maximum operating temperature = 80\u00b0C under continuous rated load.\nVerify that maintenance schedules are strictly followed.\nThe assembly must withstand maximum operating pressure = 10 bar without leakage.\n4. Controlled Terms\nINTENTIONAL ERRORS: inconsistent heading capitalization, missing degree symbol, unit spelling variation, and inconsistent tolerance\nnotation.\nSpecGuard Training/Test Document | MECH-003\nPage 1",
+      "blocks": [
+        {
+          "text": "<b>QP No.</b><br/>QP-\nMECH-003",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 57.58917236328125,
+            "x1": 123.345703125,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Issue\nDate</b><br/>15-09-2026",
+          "bbox": {
+            "x0": 136.2283477783203,
+            "y0": 57.58917236328125,
+            "x1": 217.1693572998047,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Revision\nNo.</b><br/>A",
+          "bbox": {
+            "x0": 226.93698120117188,
+            "y0": 57.58917236328125,
+            "x1": 272.85699462890625,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Date</b><br/>17-09\n-2026\n<b>Name</b><br/>A. Kulkarni",
+          "bbox": {
+            "x0": 311.97637939453125,
+            "y0": 57.58917236328125,
+            "x1": 491.9567565917969,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "COSO",
+          "bbox": {
+            "x0": 386.2669982910156,
+            "y0": 101.96316528320312,
+            "x1": 421.60699462890625,
+            "y1": 118.4871597290039
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 12.0,
+          "is_bold": true
+        },
+        {
+          "text": "MECHANICAL SPECIFICATION \u2014 INTENTIONAL FORMATTING",
+          "bbox": {
+            "x0": 73.05780029296875,
+            "y0": 146.6822967529297,
+            "x1": 522.2178344726562,
+            "y1": 167.33729553222656
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 15.0,
+          "is_bold": true
+        },
+        {
+          "text": "ERRORS",
+          "bbox": {
+            "x0": 265.55279541015625,
+            "y0": 164.6822967529297,
+            "x1": 329.7228088378906,
+            "y1": 185.33729553222656
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 15.0,
+          "is_bold": true
+        },
+        {
+          "text": "<b>Document Code:</b> MECH-003 &nbsp;&nbsp; <b>Discipline:</b> Mechanical &nbsp;&nbsp; <b>Classification:</b> Training / Test",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 189.20730590820312,
+            "x1": 469.89178466796875,
+            "y1": 198.82530212402344
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "1. scope",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 212.0012664794922,
+            "x1": 90.54069519042969,
+            "y1": 226.4597625732422
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "THIS DOCUMENT CONTAINS INTENTIONAL FORMATTING AND CONTENT ERRORS FOR SPECGUARD TESTING.",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 231.1212615966797,
+            "x1": 487.25250244140625,
+            "y1": 242.3880615234375
+          },
+          "font_name": "Helvetica",
+          "font_size": 8.2,
+          "is_bold": false
+        },
+        {
+          "text": "2 System Requirements",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 250.9027557373047,
+            "x1": 167.5581817626953,
+            "y1": 265.36126708984375
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "Parameter\nRequirement\nUnit",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 271.1617431640625,
+            "x1": 398.8963928222656,
+            "y1": 280.52532958984375
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 6.8,
+          "is_bold": true
+        },
+        {
+          "text": "Journal Diameter\n75.00 +/- 0.03\nmm",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 285.12774658203125,
+            "x1": 397.0059814453125,
+            "y1": 294.470947265625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Surface Finish\nRa 1.6 maximum\num",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 299.12774658203125,
+            "x1": 395.12237548828125,
+            "y1": 308.470947265625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Pressure\n10 bar\nbar",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 313.12774658203125,
+            "x1": 395.5032043457031,
+            "y1": 322.470947265625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Temperature\n80.0 C\ndeg C",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 327.12774658203125,
+            "x1": 403.819580078125,
+            "y1": 336.470947265625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "3 Manufacturing Tolerances",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 349.57208251953125,
+            "x1": 187.9701690673828,
+            "y1": 364.03057861328125
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "The maximum operating temperature = 80\u00b0C under continuous rated load.\nVerify that maintenance schedules are strictly followed.\nThe assembly must withstand maximum operating pressure = 10 bar without leakage.",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 368.69207763671875,
+            "x1": 359.1030578613281,
+            "y1": 400.9588928222656
+          },
+          "font_name": "Helvetica",
+          "font_size": 8.2,
+          "is_bold": false
+        },
+        {
+          "text": "4. Controlled Terms",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 409.47369384765625,
+            "x1": 147.1251983642578,
+            "y1": 423.93218994140625
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "INTENTIONAL ERRORS: inconsistent heading capitalization, missing degree symbol, unit spelling variation, and inconsistent tolerance\nnotation.",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 428.59368896484375,
+            "x1": 538.4290161132812,
+            "y1": 450.3605041503906
+          },
+          "font_name": "Helvetica",
+          "font_size": 8.2,
+          "is_bold": false
+        },
+        {
+          "text": "SpecGuard Training/Test Document | MECH-003\nPage 1",
+          "bbox": {
+            "x0": 42.519691467285156,
+            "y0": 811.6875610351562,
+            "x1": 552.7559814453125,
+            "y1": 821.3056030273438
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        }
+      ]
+    },
+    {
+      "page_num": 2,
+      "width": 595.2755737304688,
+      "height": 841.8897705078125,
+      "text": "<b>QP No.</b><br/>QP-\nMECH-003\n<b>Issue\nDate</b><br/>15-09-2026\n<b>Revision\nNo.</b><br/>A\n<b>Date</b><br/>17-09\n-2026\n<b>Name</b><br/>A. Kulkarni\nCOSO\nSIGNATURE & APPROVAL RECORD\nRole\nName\nSignature\nDate\nPrepared By\nA. Kulkarni\nChecked By\nQuality Engineer\nApproved By\nEngineering Manager\n<b>Document control statement:</b> This page records preparation, checking and approval of the controlled training/test document.\nSpecGuard Training/Test Document | MECH-003\nPage 2",
+      "blocks": [
+        {
+          "text": "<b>QP No.</b><br/>QP-\nMECH-003",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 57.58917236328125,
+            "x1": 123.345703125,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Issue\nDate</b><br/>15-09-2026",
+          "bbox": {
+            "x0": 136.2283477783203,
+            "y0": 57.58917236328125,
+            "x1": 217.1693572998047,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Revision\nNo.</b><br/>A",
+          "bbox": {
+            "x0": 226.93698120117188,
+            "y0": 57.58917236328125,
+            "x1": 272.85699462890625,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Date</b><br/>17-09\n-2026\n<b>Name</b><br/>A. Kulkarni",
+          "bbox": {
+            "x0": 311.97637939453125,
+            "y0": 57.58917236328125,
+            "x1": 491.9567565917969,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "COSO",
+          "bbox": {
+            "x0": 386.2669982910156,
+            "y0": 101.96316528320312,
+            "x1": 421.60699462890625,
+            "y1": 118.4871597290039
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 12.0,
+          "is_bold": true
+        },
+        {
+          "text": "SIGNATURE & APPROVAL RECORD",
+          "bbox": {
+            "x0": 167.63278198242188,
+            "y0": 146.6822967529297,
+            "x1": 427.64276123046875,
+            "y1": 167.33729553222656
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 15.0,
+          "is_bold": true
+        },
+        {
+          "text": "Role\nName\nSignature\nDate",
+          "bbox": {
+            "x0": 69.77952575683594,
+            "y0": 180.01217651367188,
+            "x1": 461.5230407714844,
+            "y1": 189.3757781982422
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 6.8,
+          "is_bold": true
+        },
+        {
+          "text": "Prepared By\nA. Kulkarni",
+          "bbox": {
+            "x0": 69.77952575683594,
+            "y0": 218.24588012695312,
+            "x1": 210.37403869628906,
+            "y1": 227.58908081054688
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Checked By\nQuality Engineer",
+          "bbox": {
+            "x0": 69.77952575683594,
+            "y0": 269.26953125,
+            "x1": 227.7616424560547,
+            "y1": 278.61273193359375
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Approved By\nEngineering Manager",
+          "bbox": {
+            "x0": 69.77952575683594,
+            "y0": 320.29315185546875,
+            "x1": 242.50404357910156,
+            "y1": 329.6363525390625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Document control statement:</b> This page records preparation, checking and approval of the controlled training/test document.",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 375.54248046875,
+            "x1": 528.0068359375,
+            "y1": 386.8092956542969
+          },
+          "font_name": "Helvetica",
+          "font_size": 8.2,
+          "is_bold": false
+        },
+        {
+          "text": "SpecGuard Training/Test Document | MECH-003\nPage 2",
+          "bbox": {
+            "x0": 42.519691467285156,
+            "y0": 811.6875610351562,
+            "x1": 552.7559814453125,
+            "y1": 821.3056030273438
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        }
+      ]
+    }
+  ]
+}

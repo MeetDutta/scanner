@@ -1,0 +1,435 @@
+{
+  "document_id": "MEC_54c63c1b",
+  "filename": "SG_TEST_006_LIVE_RECTIFICATION.pdf",
+  "domain": "mechanical",
+  "sha256": "54c63c1ba373d17e2c941f438165c337b0ff40d5f6323a36395309ff284f69aa",
+  "page_count": 2,
+  "file_size": 4963,
+  "imported_at": "2026-09-22T23:35:42.446716",
+  "pages": [
+    {
+      "page_num": 1,
+      "width": 595.2755737304688,
+      "height": 841.8897705078125,
+      "text": "<b>QP No.</b><br/>QP-\nMECH-006\n<b>Issue\nDate</b><br/>15-09-2026\n<b>Revision\nNo.</b><br/>A\n<b>Date</b><br/>20-09\n-2026\n<b>Name</b><br/>A. Kulkarni\nCOSO\nSPECGUARD LIVE RECTIFICATION TRAINING DOCUMENT\n<b>Document Code:</b> MECH-006 &nbsp;&nbsp; <b>Discipline:</b> Mechanical &nbsp;&nbsp; <b>Classification:</b> Training / Test\n1. Scope\nTraining document for live rectification, autosave, revision history and report extraction.\n2. Findings Seed Data\nFinding ID\nPage\nIssue\nCurrent\nSuggested\nFMT-SIZE-001\n1\nBody font size\n9 pt\n11 pt\nTXT-TERM-002\n2\nMisspelled term\nequipmnt\nequipment\nUNIT-003\n2\nUnit formatting\n80 C\n80 \u00b0C\nTOL-004\n3\nMeasured diameter\n75.08 mm\n75.02 mm\n3. Rectification Rules\nThe user may apply a suggested correction or manually edit the working document. Every actual modification must be autosaved and\nrecorded with a unique change ID.\n4. Expected Audit Trail\nThe report shall distinguish suggested corrections from corrections actually applied. The original document must remain unchanged.\n5. Verification\nAfter editing, close and reopen the analysis instance. The corrected working copy and change history must persist.\nSpecGuard Training/Test Document | MECH-006\nPage 1",
+      "blocks": [
+        {
+          "text": "<b>QP No.</b><br/>QP-\nMECH-006",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 57.58917236328125,
+            "x1": 123.345703125,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Issue\nDate</b><br/>15-09-2026",
+          "bbox": {
+            "x0": 136.2283477783203,
+            "y0": 57.58917236328125,
+            "x1": 217.1693572998047,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Revision\nNo.</b><br/>A",
+          "bbox": {
+            "x0": 226.93698120117188,
+            "y0": 57.58917236328125,
+            "x1": 272.85699462890625,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Date</b><br/>20-09\n-2026\n<b>Name</b><br/>A. Kulkarni",
+          "bbox": {
+            "x0": 311.97637939453125,
+            "y0": 57.58917236328125,
+            "x1": 491.9567565917969,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "COSO",
+          "bbox": {
+            "x0": 386.2669982910156,
+            "y0": 101.96316528320312,
+            "x1": 421.60699462890625,
+            "y1": 118.4871597290039
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 12.0,
+          "is_bold": true
+        },
+        {
+          "text": "SPECGUARD LIVE RECTIFICATION TRAINING DOCUMENT",
+          "bbox": {
+            "x0": 87.21780395507812,
+            "y0": 146.6822967529297,
+            "x1": 508.05780029296875,
+            "y1": 167.33729553222656
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 15.0,
+          "is_bold": true
+        },
+        {
+          "text": "<b>Document Code:</b> MECH-006 &nbsp;&nbsp; <b>Discipline:</b> Mechanical &nbsp;&nbsp; <b>Classification:</b> Training / Test",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 171.20730590820312,
+            "x1": 469.89178466796875,
+            "y1": 180.82530212402344
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "1. Scope",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 194.0012664794922,
+            "x1": 91.70619201660156,
+            "y1": 208.4597625732422
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "Training document for live rectification, autosave, revision history and report extraction.",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 213.1212615966797,
+            "x1": 363.43267822265625,
+            "y1": 224.3880615234375
+          },
+          "font_name": "Helvetica",
+          "font_size": 8.2,
+          "is_bold": false
+        },
+        {
+          "text": "2. Findings Seed Data",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 232.9027557373047,
+            "x1": 157.63568115234375,
+            "y1": 247.3612518310547
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "Finding ID\nPage\nIssue\nCurrent\nSuggested",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 253.1617431640625,
+            "x1": 488.47027587890625,
+            "y1": 262.52532958984375
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 6.8,
+          "is_bold": true
+        },
+        {
+          "text": "FMT-SIZE-001\n1\nBody font size\n9 pt\n11 pt",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 267.12774658203125,
+            "x1": 468.8318786621094,
+            "y1": 276.470947265625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "TXT-TERM-002\n2\nMisspelled term\nequipmnt\nequipment",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 281.12774658203125,
+            "x1": 485.4578857421875,
+            "y1": 290.470947265625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "UNIT-003\n2\nUnit formatting\n80 C\n80 \u00b0C",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 295.12774658203125,
+            "x1": 470.790283203125,
+            "y1": 304.470947265625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "TOL-004\n3\nMeasured diameter\n75.08 mm\n75.02 mm",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 309.12774658203125,
+            "x1": 483.94146728515625,
+            "y1": 318.470947265625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "3. Rectification Rules",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 331.57208251953125,
+            "x1": 154.7166748046875,
+            "y1": 346.03057861328125
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "The user may apply a suggested correction or manually edit the working document. Every actual modification must be autosaved and\nrecorded with a unique change ID.",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 350.69207763671875,
+            "x1": 531.6229858398438,
+            "y1": 372.4588928222656
+          },
+          "font_name": "Helvetica",
+          "font_size": 8.2,
+          "is_bold": false
+        },
+        {
+          "text": "4. Expected Audit Trail",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 380.97369384765625,
+            "x1": 161.72018432617188,
+            "y1": 395.43218994140625
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "The report shall distinguish suggested corrections from corrections actually applied. The original document must remain unchanged.",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 400.09368896484375,
+            "x1": 527.0474243164062,
+            "y1": 411.3605041503906
+          },
+          "font_name": "Helvetica",
+          "font_size": 8.2,
+          "is_bold": false
+        },
+        {
+          "text": "5. Verification",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 419.875244140625,
+            "x1": 117.37869262695312,
+            "y1": 434.3337707519531
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "After editing, close and reopen the analysis instance. The corrected working copy and change history must persist.",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 438.9952697753906,
+            "x1": 463.7187805175781,
+            "y1": 450.2620849609375
+          },
+          "font_name": "Helvetica",
+          "font_size": 8.2,
+          "is_bold": false
+        },
+        {
+          "text": "SpecGuard Training/Test Document | MECH-006\nPage 1",
+          "bbox": {
+            "x0": 42.519691467285156,
+            "y0": 811.6875610351562,
+            "x1": 552.7559814453125,
+            "y1": 821.3056030273438
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        }
+      ]
+    },
+    {
+      "page_num": 2,
+      "width": 595.2755737304688,
+      "height": 841.8897705078125,
+      "text": "<b>QP No.</b><br/>QP-\nMECH-006\n<b>Issue\nDate</b><br/>15-09-2026\n<b>Revision\nNo.</b><br/>A\n<b>Date</b><br/>20-09\n-2026\n<b>Name</b><br/>A. Kulkarni\nCOSO\nSIGNATURE & APPROVAL RECORD\nRole\nName\nSignature\nDate\nPrepared By\nA. Kulkarni\nChecked By\nQuality Engineer\nApproved By\nEngineering Manager\n<b>Document control statement:</b> This page records preparation, checking and approval of the controlled training/test document.\nSpecGuard Training/Test Document | MECH-006\nPage 2",
+      "blocks": [
+        {
+          "text": "<b>QP No.</b><br/>QP-\nMECH-006",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 57.58917236328125,
+            "x1": 123.345703125,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Issue\nDate</b><br/>15-09-2026",
+          "bbox": {
+            "x0": 136.2283477783203,
+            "y0": 57.58917236328125,
+            "x1": 217.1693572998047,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Revision\nNo.</b><br/>A",
+          "bbox": {
+            "x0": 226.93698120117188,
+            "y0": 57.58917236328125,
+            "x1": 272.85699462890625,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Date</b><br/>20-09\n-2026\n<b>Name</b><br/>A. Kulkarni",
+          "bbox": {
+            "x0": 311.97637939453125,
+            "y0": 57.58917236328125,
+            "x1": 491.9567565917969,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "COSO",
+          "bbox": {
+            "x0": 386.2669982910156,
+            "y0": 101.96316528320312,
+            "x1": 421.60699462890625,
+            "y1": 118.4871597290039
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 12.0,
+          "is_bold": true
+        },
+        {
+          "text": "SIGNATURE & APPROVAL RECORD",
+          "bbox": {
+            "x0": 167.63278198242188,
+            "y0": 146.6822967529297,
+            "x1": 427.64276123046875,
+            "y1": 167.33729553222656
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 15.0,
+          "is_bold": true
+        },
+        {
+          "text": "Role\nName\nSignature\nDate",
+          "bbox": {
+            "x0": 69.77952575683594,
+            "y0": 180.01217651367188,
+            "x1": 461.5230407714844,
+            "y1": 189.3757781982422
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 6.8,
+          "is_bold": true
+        },
+        {
+          "text": "Prepared By\nA. Kulkarni",
+          "bbox": {
+            "x0": 69.77952575683594,
+            "y0": 218.24588012695312,
+            "x1": 210.37403869628906,
+            "y1": 227.58908081054688
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Checked By\nQuality Engineer",
+          "bbox": {
+            "x0": 69.77952575683594,
+            "y0": 269.26953125,
+            "x1": 227.7616424560547,
+            "y1": 278.61273193359375
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Approved By\nEngineering Manager",
+          "bbox": {
+            "x0": 69.77952575683594,
+            "y0": 320.29315185546875,
+            "x1": 242.50404357910156,
+            "y1": 329.6363525390625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Document control statement:</b> This page records preparation, checking and approval of the controlled training/test document.",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 375.54248046875,
+            "x1": 528.0068359375,
+            "y1": 386.8092956542969
+          },
+          "font_name": "Helvetica",
+          "font_size": 8.2,
+          "is_bold": false
+        },
+        {
+          "text": "SpecGuard Training/Test Document | MECH-006\nPage 2",
+          "bbox": {
+            "x0": 42.519691467285156,
+            "y0": 811.6875610351562,
+            "x1": 552.7559814453125,
+            "y1": 821.3056030273438
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,447 @@
+{
+  "document_id": "MEC_8c352ebf",
+  "filename": "SG_TRAIN_002_TOLERANCE_INDEX_TEST.pdf",
+  "domain": "mechanical",
+  "sha256": "8c352ebf1170aad56ce5b72786fe8ab93437c9fd18db9b82c1598edbed79e973",
+  "page_count": 2,
+  "file_size": 5152,
+  "imported_at": "2026-09-22T23:35:42.272696",
+  "pages": [
+    {
+      "page_num": 1,
+      "width": 595.2755737304688,
+      "height": 841.8897705078125,
+      "text": "<b>QP No.</b><br/>QP-\nMECH-002\n<b>Issue\nDate</b><br/>15-09-2026\n<b>Revision\nNo.</b><br/>B\n<b>Date</b><br/>16-09\n-2026\n<b>Name</b><br/>A. Kulkarni\nCOSO\nMECHANICAL TOLERANCE INDEX TEST SPECIFICATION\n<b>Document Code:</b> MECH-002 &nbsp;&nbsp; <b>Discipline:</b> Mechanical &nbsp;&nbsp; <b>Classification:</b> Training / Test\n1. Scope\nControlled test document containing varied dimensional data for Tolerance Index testing.\n2. Dimensional Control\nParameter\nNominal\nTolerance\nMeasured\nUnit\nShaft Diameter\n75.00\n\u00b10.03\n75.01\nmm\nShaft Length\n850.00\n\u00b10.50\n850.44\nmm\nKeyway Width\n18.00\n\u00b10.05\n18.07\nmm\nBearing Seat\n95.00\n+0.02 / -0.01\n95.015\nmm\nHousing Pressure\n10.00\n\u00b10.20\n9.85\nbar\nOperating Temperature\n60.0\n\u00b11.0\n60.8\n\u00b0C\nRunout\n0.00\n\u22640.05\n0.04\nmm\n3. Expected Tolerance Index Cases\nThis document is designed to exercise nominal, near-limit, at-limit and out-of-tolerance states. The software must calculate each result\nfrom the displayed values and must not infer missing measurements.\n4. Test Notes\nDo not modify the original uploaded document. Any correction must be applied to a working copy and recorded in the change history.\nSpecGuard Training/Test Document | MECH-002\nPage 1",
+      "blocks": [
+        {
+          "text": "<b>QP No.</b><br/>QP-\nMECH-002",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 57.58917236328125,
+            "x1": 123.345703125,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Issue\nDate</b><br/>15-09-2026",
+          "bbox": {
+            "x0": 136.2283477783203,
+            "y0": 57.58917236328125,
+            "x1": 217.1693572998047,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Revision\nNo.</b><br/>B",
+          "bbox": {
+            "x0": 226.93698120117188,
+            "y0": 57.58917236328125,
+            "x1": 272.85699462890625,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Date</b><br/>16-09\n-2026\n<b>Name</b><br/>A. Kulkarni",
+          "bbox": {
+            "x0": 311.97637939453125,
+            "y0": 57.58917236328125,
+            "x1": 491.9567565917969,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "COSO",
+          "bbox": {
+            "x0": 386.2669982910156,
+            "y0": 101.96316528320312,
+            "x1": 421.60699462890625,
+            "y1": 118.4871597290039
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 12.0,
+          "is_bold": true
+        },
+        {
+          "text": "MECHANICAL TOLERANCE INDEX TEST SPECIFICATION",
+          "bbox": {
+            "x0": 92.21279907226562,
+            "y0": 146.6822967529297,
+            "x1": 503.0628662109375,
+            "y1": 167.33729553222656
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 15.0,
+          "is_bold": true
+        },
+        {
+          "text": "<b>Document Code:</b> MECH-002 &nbsp;&nbsp; <b>Discipline:</b> Mechanical &nbsp;&nbsp; <b>Classification:</b> Training / Test",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 171.20730590820312,
+            "x1": 469.89178466796875,
+            "y1": 180.82530212402344
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "1. Scope",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 194.0012664794922,
+            "x1": 91.70619201660156,
+            "y1": 208.4597625732422
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "Controlled test document containing varied dimensional data for Tolerance Index testing.",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 213.1212615966797,
+            "x1": 369.8368835449219,
+            "y1": 224.3880615234375
+          },
+          "font_name": "Helvetica",
+          "font_size": 8.2,
+          "is_bold": false
+        },
+        {
+          "text": "2. Dimensional Control",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 232.9027557373047,
+            "x1": 162.87518310546875,
+            "y1": 247.3612518310547
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "Parameter\nNominal\nTolerance\nMeasured\nUnit",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 253.1617431640625,
+            "x1": 466.9278869628906,
+            "y1": 262.52532958984375
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 6.8,
+          "is_bold": true
+        },
+        {
+          "text": "Shaft Diameter\n75.00\n\u00b10.03\n75.01\nmm",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 267.12774658203125,
+            "x1": 465.0374755859375,
+            "y1": 276.470947265625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Shaft Length\n850.00\n\u00b10.50\n850.44\nmm",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 281.12774658203125,
+            "x1": 465.0374755859375,
+            "y1": 290.470947265625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Keyway Width\n18.00\n\u00b10.05\n18.07\nmm",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 295.12774658203125,
+            "x1": 465.0374755859375,
+            "y1": 304.470947265625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Bearing Seat\n95.00\n+0.02 / -0.01\n95.015\nmm",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 309.12774658203125,
+            "x1": 465.0374755859375,
+            "y1": 318.470947265625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Housing Pressure\n10.00\n\u00b10.20\n9.85\nbar",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 323.12774658203125,
+            "x1": 463.5346984863281,
+            "y1": 332.470947265625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Operating Temperature\n60.0\n\u00b11.0\n60.8\n\u00b0C",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 337.12774658203125,
+            "x1": 461.3382873535156,
+            "y1": 346.470947265625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Runout\n0.00\n\u22640.05\n0.04\nmm",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 351.12774658203125,
+            "x1": 465.0374755859375,
+            "y1": 360.470947265625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "3. Expected Tolerance Index Cases",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 373.57208251953125,
+            "x1": 223.59666442871094,
+            "y1": 388.03057861328125
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "This document is designed to exercise nominal, near-limit, at-limit and out-of-tolerance states. The software must calculate each result\nfrom the displayed values and must not infer missing measurements.",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 392.69207763671875,
+            "x1": 534.780029296875,
+            "y1": 414.4588928222656
+          },
+          "font_name": "Helvetica",
+          "font_size": 8.2,
+          "is_bold": false
+        },
+        {
+          "text": "4. Test Notes",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 422.97369384765625,
+            "x1": 113.87168884277344,
+            "y1": 437.43218994140625
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "Do not modify the original uploaded document. Any correction must be applied to a working copy and recorded in the change history.",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 442.09368896484375,
+            "x1": 529.8190307617188,
+            "y1": 453.3605041503906
+          },
+          "font_name": "Helvetica",
+          "font_size": 8.2,
+          "is_bold": false
+        },
+        {
+          "text": "SpecGuard Training/Test Document | MECH-002\nPage 1",
+          "bbox": {
+            "x0": 42.519691467285156,
+            "y0": 811.6875610351562,
+            "x1": 552.7559814453125,
+            "y1": 821.3056030273438
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        }
+      ]
+    },
+    {
+      "page_num": 2,
+      "width": 595.2755737304688,
+      "height": 841.8897705078125,
+      "text": "<b>QP No.</b><br/>QP-\nMECH-002\n<b>Issue\nDate</b><br/>15-09-2026\n<b>Revision\nNo.</b><br/>B\n<b>Date</b><br/>16-09\n-2026\n<b>Name</b><br/>A. Kulkarni\nCOSO\nSIGNATURE & APPROVAL RECORD\nRole\nName\nSignature\nDate\nPrepared By\nA. Kulkarni\nChecked By\nQuality Engineer\nApproved By\nEngineering Manager\n<b>Document control statement:</b> This page records preparation, checking and approval of the controlled training/test document.\nSpecGuard Training/Test Document | MECH-002\nPage 2",
+      "blocks": [
+        {
+          "text": "<b>QP No.</b><br/>QP-\nMECH-002",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 57.58917236328125,
+            "x1": 123.345703125,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Issue\nDate</b><br/>15-09-2026",
+          "bbox": {
+            "x0": 136.2283477783203,
+            "y0": 57.58917236328125,
+            "x1": 217.1693572998047,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Revision\nNo.</b><br/>B",
+          "bbox": {
+            "x0": 226.93698120117188,
+            "y0": 57.58917236328125,
+            "x1": 272.85699462890625,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Date</b><br/>16-09\n-2026\n<b>Name</b><br/>A. Kulkarni",
+          "bbox": {
+            "x0": 311.97637939453125,
+            "y0": 57.58917236328125,
+            "x1": 491.9567565917969,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "COSO",
+          "bbox": {
+            "x0": 386.2669982910156,
+            "y0": 101.96316528320312,
+            "x1": 421.60699462890625,
+            "y1": 118.4871597290039
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 12.0,
+          "is_bold": true
+        },
+        {
+          "text": "SIGNATURE & APPROVAL RECORD",
+          "bbox": {
+            "x0": 167.63278198242188,
+            "y0": 146.6822967529297,
+            "x1": 427.64276123046875,
+            "y1": 167.33729553222656
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 15.0,
+          "is_bold": true
+        },
+        {
+          "text": "Role\nName\nSignature\nDate",
+          "bbox": {
+            "x0": 69.77952575683594,
+            "y0": 180.01217651367188,
+            "x1": 461.5230407714844,
+            "y1": 189.3757781982422
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 6.8,
+          "is_bold": true
+        },
+        {
+          "text": "Prepared By\nA. Kulkarni",
+          "bbox": {
+            "x0": 69.77952575683594,
+            "y0": 218.24588012695312,
+            "x1": 210.37403869628906,
+            "y1": 227.58908081054688
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Checked By\nQuality Engineer",
+          "bbox": {
+            "x0": 69.77952575683594,
+            "y0": 269.26953125,
+            "x1": 227.7616424560547,
+            "y1": 278.61273193359375
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Approved By\nEngineering Manager",
+          "bbox": {
+            "x0": 69.77952575683594,
+            "y0": 320.29315185546875,
+            "x1": 242.50404357910156,
+            "y1": 329.6363525390625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Document control statement:</b> This page records preparation, checking and approval of the controlled training/test document.",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 375.54248046875,
+            "x1": 528.0068359375,
+            "y1": 386.8092956542969
+          },
+          "font_name": "Helvetica",
+          "font_size": 8.2,
+          "is_bold": false
+        },
+        {
+          "text": "SpecGuard Training/Test Document | MECH-002\nPage 2",
+          "bbox": {
+            "x0": 42.519691467285156,
+            "y0": 811.6875610351562,
+            "x1": 552.7559814453125,
+            "y1": 821.3056030273438
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        }
+      ]
+    }
+  ]
+}

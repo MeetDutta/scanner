@@ -1,0 +1,423 @@
+{
+  "document_id": "CHE_f73a4b11",
+  "filename": "SG_TRAIN_007_CHEMICAL_TOLERANCE.pdf",
+  "domain": "chemical",
+  "sha256": "f73a4b113e71e4bbfe41acb95a256348fe58dfa1c97bcf474ca9d06bafd16313",
+  "page_count": 2,
+  "file_size": 4790,
+  "imported_at": "2026-09-22T23:35:42.296985",
+  "pages": [
+    {
+      "page_num": 1,
+      "width": 595.2755737304688,
+      "height": 841.8897705078125,
+      "text": "<b>QP No.</b><br/>QP-\nCHEM-001\n<b>Issue\nDate</b><br/>20-09-2026\n<b>Revision\nNo.</b><br/>A\n<b>Date</b><br/>20-09\n-2026\n<b>Name</b><br/>R. Patil\nCOSO\nCHEMICAL PROCESS VESSEL CONTROL SPECIFICATION\n<b>Document Code:</b> CHEM-001 &nbsp;&nbsp; <b>Discipline:</b> Chemical &nbsp;&nbsp; <b>Classification:</b> Training / Test\n1. Scope\nThis specification defines controlled operating and inspection parameters for a chemical process vessel.\n2. Process Parameters\nParameter\nNominal\nTolerance\nMeasured\nUnit\npH\n7.00\n\u00b10.10\n6.94\npH\nPressure\n5.00\n\u00b10.10\n5.08\nbar\nTemperature\n65.0\n\u00b11.5\n66.2\n\u00b0C\nFlow Rate\n120.0\n\u00b13.0\n118.5\nL/min\nConductivity\n1.50\n\u00b10.10\n1.61\nmS/cm\n3. Safety Requirements\nPressure shall remain within the specified operating range. Temperature alarms shall be verified before production release.\n4. Records\nAll measurements shall be traceable to calibrated instruments and recorded with timestamp and operator identification.\nSpecGuard Training/Test Document | CHEM-001\nPage 1",
+      "blocks": [
+        {
+          "text": "<b>QP No.</b><br/>QP-\nCHEM-001",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 57.58917236328125,
+            "x1": 123.345703125,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Issue\nDate</b><br/>20-09-2026",
+          "bbox": {
+            "x0": 136.2283477783203,
+            "y0": 57.58917236328125,
+            "x1": 217.1693572998047,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Revision\nNo.</b><br/>A",
+          "bbox": {
+            "x0": 226.93698120117188,
+            "y0": 57.58917236328125,
+            "x1": 272.85699462890625,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Date</b><br/>20-09\n-2026\n<b>Name</b><br/>R. Patil",
+          "bbox": {
+            "x0": 311.97637939453125,
+            "y0": 57.58917236328125,
+            "x1": 480.6727600097656,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "COSO",
+          "bbox": {
+            "x0": 386.2669982910156,
+            "y0": 101.96316528320312,
+            "x1": 421.60699462890625,
+            "y1": 118.4871597290039
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 12.0,
+          "is_bold": true
+        },
+        {
+          "text": "CHEMICAL PROCESS VESSEL CONTROL SPECIFICATION",
+          "bbox": {
+            "x0": 88.44779968261719,
+            "y0": 146.6822967529297,
+            "x1": 506.8279113769531,
+            "y1": 167.33729553222656
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 15.0,
+          "is_bold": true
+        },
+        {
+          "text": "<b>Document Code:</b> CHEM-001 &nbsp;&nbsp; <b>Discipline:</b> Chemical &nbsp;&nbsp; <b>Classification:</b> Training / Test",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 171.20730590820312,
+            "x1": 463.6617736816406,
+            "y1": 180.82530212402344
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "1. Scope",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 194.0012664794922,
+            "x1": 91.70619201660156,
+            "y1": 208.4597625732422
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "This specification defines controlled operating and inspection parameters for a chemical process vessel.",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 213.1212615966797,
+            "x1": 425.41650390625,
+            "y1": 224.3880615234375
+          },
+          "font_name": "Helvetica",
+          "font_size": 8.2,
+          "is_bold": false
+        },
+        {
+          "text": "2. Process Parameters",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 232.9027557373047,
+            "x1": 161.1636962890625,
+            "y1": 247.3612518310547
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "Parameter\nNominal\nTolerance\nMeasured\nUnit",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 253.1617431640625,
+            "x1": 466.9278869628906,
+            "y1": 262.52532958984375
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 6.8,
+          "is_bold": true
+        },
+        {
+          "text": "pH\n7.00\n\u00b10.10\n6.94\npH",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 267.12774658203125,
+            "x1": 462.3990783691406,
+            "y1": 276.470947265625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Pressure\n5.00\n\u00b10.10\n5.08\nbar",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 281.12774658203125,
+            "x1": 463.5346984863281,
+            "y1": 290.470947265625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Temperature\n65.0\n\u00b11.5\n66.2\n\u00b0C",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 295.12774658203125,
+            "x1": 461.3382873535156,
+            "y1": 304.470947265625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Flow Rate\n120.0\n\u00b13.0\n118.5\nL/min",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 309.12774658203125,
+            "x1": 470.3346862792969,
+            "y1": 318.470947265625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Conductivity\n1.50\n\u00b10.10\n1.61\nmS/cm",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 323.12774658203125,
+            "x1": 474.86346435546875,
+            "y1": 332.470947265625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "3. Safety Requirements",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 345.57208251953125,
+            "x1": 164.63917541503906,
+            "y1": 360.03057861328125
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "Pressure shall remain within the specified operating range. Temperature alarms shall be verified before production release.",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 364.69207763671875,
+            "x1": 494.2309265136719,
+            "y1": 375.9588928222656
+          },
+          "font_name": "Helvetica",
+          "font_size": 8.2,
+          "is_bold": false
+        },
+        {
+          "text": "4. Records",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 384.47369384765625,
+            "x1": 102.20619201660156,
+            "y1": 398.93218994140625
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 10.5,
+          "is_bold": true
+        },
+        {
+          "text": "All measurements shall be traceable to calibrated instruments and recorded with timestamp and operator identification.",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 403.59368896484375,
+            "x1": 478.74114990234375,
+            "y1": 414.8605041503906
+          },
+          "font_name": "Helvetica",
+          "font_size": 8.2,
+          "is_bold": false
+        },
+        {
+          "text": "SpecGuard Training/Test Document | CHEM-001\nPage 1",
+          "bbox": {
+            "x0": 42.519691467285156,
+            "y0": 811.6875610351562,
+            "x1": 552.7559814453125,
+            "y1": 821.3056030273438
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        }
+      ]
+    },
+    {
+      "page_num": 2,
+      "width": 595.2755737304688,
+      "height": 841.8897705078125,
+      "text": "<b>QP No.</b><br/>QP-\nCHEM-001\n<b>Issue\nDate</b><br/>20-09-2026\n<b>Revision\nNo.</b><br/>A\n<b>Date</b><br/>20-09\n-2026\n<b>Name</b><br/>R. Patil\nCOSO\nSIGNATURE & APPROVAL RECORD\nRole\nName\nSignature\nDate\nPrepared By\nR. Patil\nChecked By\nQuality Engineer\nApproved By\nEngineering Manager\n<b>Document control statement:</b> This page records preparation, checking and approval of the controlled training/test document.\nSpecGuard Training/Test Document | CHEM-001\nPage 2",
+      "blocks": [
+        {
+          "text": "<b>QP No.</b><br/>QP-\nCHEM-001",
+          "bbox": {
+            "x0": 45.519691467285156,
+            "y0": 57.58917236328125,
+            "x1": 123.345703125,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Issue\nDate</b><br/>20-09-2026",
+          "bbox": {
+            "x0": 136.2283477783203,
+            "y0": 57.58917236328125,
+            "x1": 217.1693572998047,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Revision\nNo.</b><br/>A",
+          "bbox": {
+            "x0": 226.93698120117188,
+            "y0": 57.58917236328125,
+            "x1": 272.85699462890625,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Date</b><br/>20-09\n-2026\n<b>Name</b><br/>R. Patil",
+          "bbox": {
+            "x0": 311.97637939453125,
+            "y0": 57.58917236328125,
+            "x1": 480.6727600097656,
+            "y1": 75.7071762084961
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        },
+        {
+          "text": "COSO",
+          "bbox": {
+            "x0": 386.2669982910156,
+            "y0": 101.96316528320312,
+            "x1": 421.60699462890625,
+            "y1": 118.4871597290039
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 12.0,
+          "is_bold": true
+        },
+        {
+          "text": "SIGNATURE & APPROVAL RECORD",
+          "bbox": {
+            "x0": 167.63278198242188,
+            "y0": 146.6822967529297,
+            "x1": 427.64276123046875,
+            "y1": 167.33729553222656
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 15.0,
+          "is_bold": true
+        },
+        {
+          "text": "Role\nName\nSignature\nDate",
+          "bbox": {
+            "x0": 69.77952575683594,
+            "y0": 180.01217651367188,
+            "x1": 461.5230407714844,
+            "y1": 189.3757781982422
+          },
+          "font_name": "Helvetica-Bold",
+          "font_size": 6.8,
+          "is_bold": true
+        },
+        {
+          "text": "Prepared By\nR. Patil",
+          "bbox": {
+            "x0": 69.77952575683594,
+            "y0": 218.24588012695312,
+            "x1": 199.4124298095703,
+            "y1": 227.58908081054688
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Checked By\nQuality Engineer",
+          "bbox": {
+            "x0": 69.77952575683594,
+            "y0": 269.26953125,
+            "x1": 227.7616424560547,
+            "y1": 278.61273193359375
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "Approved By\nEngineering Manager",
+          "bbox": {
+            "x0": 69.77952575683594,
+            "y0": 320.29315185546875,
+            "x1": 242.50404357910156,
+            "y1": 329.6363525390625
+          },
+          "font_name": "Helvetica",
+          "font_size": 6.8,
+          "is_bold": false
+        },
+        {
+          "text": "<b>Document control statement:</b> This page records preparation, checking and approval of the controlled training/test document.",
+          "bbox": {
+            "x0": 48.519691467285156,
+            "y0": 375.54248046875,
+            "x1": 528.0068359375,
+            "y1": 386.8092956542969
+          },
+          "font_name": "Helvetica",
+          "font_size": 8.2,
+          "is_bold": false
+        },
+        {
+          "text": "SpecGuard Training/Test Document | CHEM-001\nPage 2",
+          "bbox": {
+            "x0": 42.519691467285156,
+            "y0": 811.6875610351562,
+            "x1": 552.7559814453125,
+            "y1": 821.3056030273438
+          },
+          "font_name": "Helvetica",
+          "font_size": 7.0,
+          "is_bold": false
+        }
+      ]
+    }
+  ]
+}
