@@ -7,8 +7,11 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  width: 100vw;
-  overflow: hidden;
+  height: 100dvh;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 /* 1. Institutional Top Header */
@@ -23,6 +26,9 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 50;
   flex-shrink: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .header-brand {
@@ -107,6 +113,10 @@
 .app-body {
   display: flex;
   flex: 1;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  max-width: 100%;
   overflow: hidden;
   position: relative;
 }
@@ -247,6 +257,10 @@
 /* 4. Main Viewport & Workflow Strip */
 .main-viewport {
   flex: 1;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -262,6 +276,10 @@
   border-bottom: 1px solid var(--border-default);
   min-height: 48px;
   flex-shrink: 0;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .breadcrumb-trail {
@@ -291,9 +309,23 @@
 /* 5. View Content Container */
 .view-container {
   flex: 1;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  max-width: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 24px;
   position: relative;
+  box-sizing: border-box;
+}
+
+/* Dedicated modifier for the interactive document viewer workstation */
+.view-container.viewer-container {
+  padding: 8px 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* 6. Institutional Bottom Status Bar */

@@ -15,7 +15,8 @@ from pydantic import BaseModel
 from specguard.core.config import REPORTS_DIR
 from specguard.storage.database import DatabaseManager
 from specguard.repository.manager import RepositoryManager
-from specguard.export.report_generator import ReportGenerator, DOCXAnnotator
+from specguard.export.report_generator import ReportGenerator, DOCXAnnotator, generate_change_report_html, generate_change_report_json
+from specguard.core.rectification import RectificationManager, RectificationError
 from specguard.export.pdf_annotator import PDFAnnotator
 from specguard.core.document_parser import DocumentParser
 
@@ -86,10 +87,23 @@ def generate_report(req: ReportRequest) -> Dict[str, Any]:
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
     clean_stem = Path(doc_model.file_path).stem
 
+    # Live rectification state is session-scoped and is included in audit exports.
+    try:
+        manager = RectificationManager(session_id)
+        change_report = manager.change_report()
+    except Exception:
+        change_report = {"session_id": session_id, "document": clean_stem, "revision": 0, "changes": []}
+
+    change_report["total_findings"] = len(findings)
+    if rec:
+        change_report["document_id"] = getattr(rec, "document_id", "DOC-001")
+        change_report["comparison_mode"] = getattr(rec, "domain", "Mechanical")
+        change_report["created_at"] = getattr(rec, "analysis_started_at", "")
+
     if fmt == "html":
         out_filename = f"{clean_stem}_{session_id}_Audit.html"
         out_path = REPORTS_DIR / out_filename
-        ReportGenerator.generate_html_report(doc_model, findings, session_id, str(out_path))
+        ReportGenerator.generate_html_report(doc_model, findings, session_id, str(out_path), change_report)
     elif fmt == "json":
         out_filename = f"{clean_stem}_{session_id}_Findings.json"
         out_path = REPORTS_DIR / out_filename
@@ -103,7 +117,7 @@ def generate_report(req: ReportRequest) -> Dict[str, Any]:
             # Fallback to HTML report if original document is not PDF
             out_filename = f"{clean_stem}_{session_id}_Audit.html"
             out_path = REPORTS_DIR / out_filename
-            ReportGenerator.generate_html_report(doc_model, findings, session_id, str(out_path))
+            ReportGenerator.generate_html_report(doc_model, findings, session_id, str(out_path), change_report)
     elif fmt == "docx":
         out_filename = f"{clean_stem}_{session_id}_Annotated.docx"
         out_path = REPORTS_DIR / out_filename
@@ -113,9 +127,17 @@ def generate_report(req: ReportRequest) -> Dict[str, Any]:
             # Fallback to HTML report if original is non-DOCX
             out_filename = f"{clean_stem}_{session_id}_Audit.html"
             out_path = REPORTS_DIR / out_filename
-            ReportGenerator.generate_html_report(doc_model, findings, session_id, str(out_path))
+            ReportGenerator.generate_html_report(doc_model, findings, session_id, str(out_path), change_report)
+    elif fmt == "changes":
+        out_filename = f"{clean_stem}_{session_id}_Rectification_Changes.html"
+        out_path = REPORTS_DIR / out_filename
+        generate_change_report_html(change_report, str(out_path))
+    elif fmt == "changes_json":
+        out_filename = f"{clean_stem}_{session_id}_Rectification_Changes.json"
+        out_path = REPORTS_DIR / out_filename
+        generate_change_report_json(change_report, str(out_path))
     else:
-        raise HTTPException(status_code=400, detail=f"Unsupported format '{fmt}'. Choose html, json, pdf, or docx.")
+        raise HTTPException(status_code=400, detail=f"Unsupported format '{fmt}'. Choose html, json, pdf, docx, changes, or changes_json.")
 
     return {
         "status": "success",

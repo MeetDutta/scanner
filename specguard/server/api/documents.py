@@ -10,6 +10,8 @@ from typing import Dict, Any, List, Optional
 import logging
 
 from fastapi import APIRouter, HTTPException, Query, Response
+from pydantic import BaseModel
+from fastapi.responses import JSONResponse
 from fastapi.responses import FileResponse, Response
 import pymupdf
 
@@ -18,6 +20,7 @@ from specguard.core.models import DocumentModel
 from specguard.core.document_parser import DocumentParser
 from specguard.repository.manager import RepositoryManager
 from specguard.core.config import DEMO_SAMPLES_DIR, DATA_DIR
+from specguard.core.rectification import RectificationManager, RectificationError
 
 logger = logging.getLogger("SpecGuard.API.Documents")
 router = APIRouter(prefix="/documents", tags=["documents"])
@@ -67,7 +70,137 @@ def _find_document_path(doc_identifier: str) -> Optional[Path]:
     if archived_file.exists():
         return archived_file
 
+    # Scan uploads directory by content sha256 hash or filename prefix
+    uploads_dir = DATA_DIR / "uploads"
+    if uploads_dir.exists():
+        for p in uploads_dir.iterdir():
+            if p.is_file() and not p.name.startswith("."):
+                if doc_identifier in p.name:
+                    return p
+                if len(doc_identifier) == 64:
+                    import hashlib
+                    try:
+                        h = hashlib.sha256(p.read_bytes()).hexdigest()
+                        if h == doc_identifier:
+                            return p
+                    except Exception:
+                        pass
+
     return None
+
+
+
+class RectificationRequest(BaseModel):
+    finding_id: str
+    operation: str = "suggested"
+    field: str = "auto"
+    value: Any = None
+    note: str = ""
+
+
+@router.get("/editor/{session_id}")
+def rectification_status(session_id: str) -> Dict[str, Any]:
+    """Return the session-scoped live editing state and change log."""
+    try:
+        return RectificationManager(session_id).status()
+    except RectificationError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.post("/editor/{session_id}/apply")
+def apply_rectification(session_id: str, req: RectificationRequest) -> Dict[str, Any]:
+    """Apply one live correction and persist it immediately to the session working copy."""
+    try:
+        return RectificationManager(session_id).apply(
+            finding_id=req.finding_id,
+            operation=req.operation,
+            field=req.field,
+            value=req.value,
+            note=req.note,
+        )
+    except RectificationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.exception("Live rectification failed")
+        raise HTTPException(status_code=500, detail=f"Rectification failed: {e}")
+
+
+@router.post("/editor/{session_id}/undo")
+def undo_rectification(session_id: str) -> Dict[str, Any]:
+    """Reverts the latest applied modification from the session working copy."""
+    try:
+        return RectificationManager(session_id).undo()
+    except RectificationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.exception("Undo rectification failed")
+        raise HTTPException(status_code=500, detail=f"Undo failed: {e}")
+
+
+@router.post("/editor/{session_id}/redo")
+def redo_rectification(session_id: str) -> Dict[str, Any]:
+    """Reapplies the most recently undone modification to the session working copy."""
+    try:
+        return RectificationManager(session_id).redo()
+    except RectificationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.exception("Redo rectification failed")
+        raise HTTPException(status_code=500, detail=f"Redo failed: {e}")
+
+
+@router.get("/editor/{session_id}/pages/{page_num}/image")
+def get_rectified_page_image(
+    session_id: str,
+    page_num: int,
+    zoom: float = Query(1.5, ge=0.5, le=3.0),
+):
+    """Render the current session working copy, not the immutable original."""
+    try:
+        manager = RectificationManager(session_id)
+        pdf_path = manager.preview_pdf_path()
+        pdf_doc = pymupdf.open(str(pdf_path))
+        try:
+            if page_num < 1 or page_num > len(pdf_doc):
+                raise HTTPException(status_code=400, detail=f"Invalid page number {page_num}.")
+            page = pdf_doc[page_num - 1]
+            pix = page.get_pixmap(matrix=pymupdf.Matrix(zoom, zoom), alpha=False)
+            return Response(content=pix.tobytes("png"), media_type="image/png", headers={"Cache-Control": "no-store"})
+        finally:
+            pdf_doc.close()
+    except HTTPException:
+        raise
+    except RectificationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.exception("Failed rendering rectified page")
+        raise HTTPException(status_code=500, detail=f"Rectified preview failed: {e}")
+
+
+@router.get("/editor/{session_id}/file")
+def download_rectified_file(session_id: str):
+    """Download the current session working document."""
+    try:
+        manager = RectificationManager(session_id)
+        path = manager.working_path()
+        clean_stem = path.stem.replace("working", "").strip("_") or "document"
+        dl_name = f"{clean_stem}_rectified{path.suffix.lower()}"
+        return FileResponse(
+            path=str(path),
+            filename=dl_name,
+            media_type="application/octet-stream",
+            headers={"Content-Disposition": f'attachment; filename="{dl_name}"'}
+        )
+    except RectificationError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.get("/editor/{session_id}/changes")
+def rectification_changes(session_id: str) -> Dict[str, Any]:
+    try:
+        return RectificationManager(session_id).change_report()
+    except RectificationError as e:
+        raise HTTPException(status_code=404, detail=str(e))
 
 
 @router.get("/{doc_id}")

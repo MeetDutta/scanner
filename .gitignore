@@ -22,6 +22,7 @@ models/
 *.sqlite3
 reports/
 *.log
+scratch/
 
 # Operating System
 .DS_Store

@@ -93,7 +93,23 @@ window.ReportsView = {
             </div>
           </div>
 
-          <!-- 4. Findings JSON Data -->
+          <!-- 4. Rectification Change Report -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📝 Rectification Change Report</div>
+            </div>
+            <div class="card-body" style="display:flex; flex-direction:column; gap:10px;">
+              <p style="font-size:12.5px; color:var(--text-secondary); line-height:1.4;">
+                Documents every live correction with change ID, finding, page, field, before/after values, and timestamp.
+              </p>
+              <div style="margin-top:auto; display:flex; gap:8px;">
+                <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="window.ReportsView.generateReport('${sessionId}', 'changes')">📥 HTML</button>
+                <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="window.ReportsView.generateReport('${sessionId}', 'changes_json')">JSON</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Findings JSON Data -->
           <div class="card">
             <div class="card-header">
               <div class="card-title">💾 Structured JSON Data</div>

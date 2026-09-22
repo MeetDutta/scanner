@@ -62,6 +62,18 @@ class ApiClient {
       `${this.baseUrl}/documents/${encodeURIComponent(docId)}/file`
   };
 
+  // Live Rectification / Session Editor
+  editor = {
+    status: (sessionId) => this.request(`/documents/editor/${encodeURIComponent(sessionId)}`),
+    apply: (sessionId, data) => this.request(`/documents/editor/${encodeURIComponent(sessionId)}/apply`, { method: "POST", body: JSON.stringify(data) }),
+    undo: (sessionId) => this.request(`/documents/editor/${encodeURIComponent(sessionId)}/undo`, { method: "POST" }),
+    redo: (sessionId) => this.request(`/documents/editor/${encodeURIComponent(sessionId)}/redo`, { method: "POST" }),
+    changes: (sessionId) => this.request(`/documents/editor/${encodeURIComponent(sessionId)}/changes`),
+    pageImageUrl: (sessionId, pageNum, zoom = 1.5) =>
+      `${this.baseUrl}/documents/editor/${encodeURIComponent(sessionId)}/pages/${pageNum}/image?zoom=${zoom}&t=${Date.now()}`,
+    fileUrl: (sessionId) => `${this.baseUrl}/documents/editor/${encodeURIComponent(sessionId)}/file`
+  };
+
   // Findings
   findings = {
     list: (params = {}) => {
@@ -94,6 +106,7 @@ class ApiClient {
   // Reports
   reports = {
     generate: (data) => this.request("/reports/generate", { method: "POST", body: JSON.stringify(data) }),
+    generateChanges: (sessionId, format = "changes") => this.request("/reports/generate", { method: "POST", body: JSON.stringify({ session_id: sessionId, format }) }),
     previewUrl: (sessionId) => `${this.baseUrl}/reports/preview/${encodeURIComponent(sessionId)}`
   };
 
