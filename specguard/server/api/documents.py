@@ -21,6 +21,8 @@ from specguard.core.document_parser import DocumentParser
 from specguard.repository.manager import RepositoryManager
 from specguard.core.config import DEMO_SAMPLES_DIR, DATA_DIR
 from specguard.core.rectification import RectificationManager, RectificationError
+from specguard.export.pdf_annotator import PDFAnnotator
+from specguard.export.docx_annotator import DOCXAnnotator
 
 logger = logging.getLogger("SpecGuard.API.Documents")
 router = APIRouter(prefix="/documents", tags=["documents"])
@@ -177,9 +179,59 @@ def get_rectified_page_image(
         raise HTTPException(status_code=500, detail=f"Rectified preview failed: {e}")
 
 
+@router.get("/editor/{session_id}/annotated")
+def download_annotated_document(session_id: str):
+    """Generates and downloads the session document with all error highlights and callouts embedded."""
+    try:
+        manager = RectificationManager(session_id)
+        repo = RepositoryManager()
+        findings = repo.get_comparison_findings(session_id)
+        if not findings:
+            db = DatabaseManager()
+            from specguard.storage.repositories import SessionRepository
+            findings = SessionRepository(db).get_findings_for_session(session_id)
+
+        working_path = manager.working_path()
+        preview_pdf = manager.preview_pdf_path()
+        clean_stem = working_path.stem.replace("working", "").strip("_") or "document"
+
+        if working_path.suffix.lower() == ".docx":
+            out_path = manager.session_dir / f"{clean_stem}_annotated_errors.docx"
+            DOCXAnnotator.create_annotated_docx(str(working_path), str(out_path), findings)
+            dl_name = f"{clean_stem}_annotated_errors.docx"
+            return FileResponse(
+                path=str(out_path),
+                filename=dl_name,
+                media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                headers={"Content-Disposition": f'attachment; filename="{dl_name}"'}
+            )
+        else:
+            src_pdf = preview_pdf if preview_pdf.exists() else working_path
+            out_path = manager.session_dir / f"{clean_stem}_annotated_errors.pdf"
+            PDFAnnotator.create_annotated_pdf(str(src_pdf), str(out_path), findings)
+            dl_name = f"{clean_stem}_annotated_errors.pdf"
+            return FileResponse(
+                path=str(out_path),
+                filename=dl_name,
+                media_type="application/pdf",
+                headers={"Content-Disposition": f'attachment; filename="{dl_name}"'}
+            )
+    except RectificationError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        logger.exception("Failed generating annotated document")
+        raise HTTPException(status_code=500, detail=f"Annotated export failed: {e}")
+
+
 @router.get("/editor/{session_id}/file")
-def download_rectified_file(session_id: str):
-    """Download the current session working document."""
+def download_rectified_file(
+    session_id: str,
+    annotated: bool = Query(False, description="Whether to include embedded visual error highlights")
+):
+    """Download the current session working document, optionally with error highlights."""
+    if annotated:
+        return download_annotated_document(session_id)
+
     try:
         manager = RectificationManager(session_id)
         path = manager.working_path()
@@ -193,6 +245,7 @@ def download_rectified_file(session_id: str):
         )
     except RectificationError as e:
         raise HTTPException(status_code=404, detail=str(e))
+
 
 
 @router.get("/editor/{session_id}/changes")

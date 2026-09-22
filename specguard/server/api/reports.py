@@ -111,8 +111,17 @@ def generate_report(req: ReportRequest) -> Dict[str, Any]:
     elif fmt == "pdf":
         out_filename = f"{clean_stem}_{session_id}_Annotated.pdf"
         out_path = REPORTS_DIR / out_filename
-        if Path(doc_model.file_path).suffix.lower() == ".pdf":
-            PDFAnnotator.create_annotated_pdf(doc_model.file_path, str(out_path), findings)
+        src_pdf_path = doc_model.file_path
+        try:
+            mgr = RectificationManager(session_id)
+            preview_pdf = mgr.preview_pdf_path()
+            if preview_pdf.exists():
+                src_pdf_path = str(preview_pdf)
+        except Exception:
+            pass
+
+        if Path(src_pdf_path).suffix.lower() == ".pdf":
+            PDFAnnotator.create_annotated_pdf(src_pdf_path, str(out_path), findings)
         else:
             # Fallback to HTML report if original document is not PDF
             out_filename = f"{clean_stem}_{session_id}_Audit.html"
@@ -121,13 +130,23 @@ def generate_report(req: ReportRequest) -> Dict[str, Any]:
     elif fmt == "docx":
         out_filename = f"{clean_stem}_{session_id}_Annotated.docx"
         out_path = REPORTS_DIR / out_filename
-        if Path(doc_model.file_path).suffix.lower() == ".docx":
-            DOCXAnnotator.create_annotated_docx(doc_model.file_path, str(out_path), findings)
+        src_docx_path = doc_model.file_path
+        try:
+            mgr = RectificationManager(session_id)
+            w_path = mgr.working_path()
+            if w_path.exists() and w_path.suffix.lower() == ".docx":
+                src_docx_path = str(w_path)
+        except Exception:
+            pass
+
+        if Path(src_docx_path).suffix.lower() == ".docx":
+            DOCXAnnotator.create_annotated_docx(src_docx_path, str(out_path), findings)
         else:
             # Fallback to HTML report if original is non-DOCX
             out_filename = f"{clean_stem}_{session_id}_Audit.html"
             out_path = REPORTS_DIR / out_filename
             ReportGenerator.generate_html_report(doc_model, findings, session_id, str(out_path), change_report)
+
     elif fmt == "changes":
         out_filename = f"{clean_stem}_{session_id}_Rectification_Changes.html"
         out_path = REPORTS_DIR / out_filename

@@ -71,8 +71,10 @@ class ApiClient {
     changes: (sessionId) => this.request(`/documents/editor/${encodeURIComponent(sessionId)}/changes`),
     pageImageUrl: (sessionId, pageNum, zoom = 1.5) =>
       `${this.baseUrl}/documents/editor/${encodeURIComponent(sessionId)}/pages/${pageNum}/image?zoom=${zoom}&t=${Date.now()}`,
-    fileUrl: (sessionId) => `${this.baseUrl}/documents/editor/${encodeURIComponent(sessionId)}/file`
+    fileUrl: (sessionId, annotated = false) => `${this.baseUrl}/documents/editor/${encodeURIComponent(sessionId)}/file${annotated ? '?annotated=true' : ''}`,
+    annotatedFileUrl: (sessionId) => `${this.baseUrl}/documents/editor/${encodeURIComponent(sessionId)}/annotated`
   };
+
 
   // Findings
   findings = {

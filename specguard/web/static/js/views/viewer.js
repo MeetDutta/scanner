@@ -26,12 +26,23 @@ window.ViewerView = {
     }
   },
 
+  downloadAnnotated() {
+    const sessionId = window.appState.get("activeSessionId");
+    if (!sessionId) {
+      window.toast.error("No active analysis session found.");
+      return;
+    }
+    window.toast.info("Downloading document with embedded error highlights...");
+    window.open(window.api.editor.annotatedFileUrl(sessionId), "_blank");
+  },
+
   downloadEdited() {
     const sessionId = window.appState.get("activeSessionId");
     if (!sessionId) {
       window.toast.error("No active analysis session found.");
       return;
     }
+    window.toast.info("Downloading clean working copy...");
     window.open(window.api.editor.fileUrl(sessionId), "_blank");
   },
 
@@ -67,17 +78,21 @@ window.ViewerView = {
           </div>
 
           <div style="display: flex; gap: 6px; align-items: center; flex-shrink: 0;">
-            <button class="btn btn-secondary btn-sm" onclick="window.ViewerView.downloadEdited()" title="Download current saved working copy">
-              💾 Download
+            <button class="btn btn-primary btn-sm" onclick="window.ViewerView.downloadAnnotated()" title="Download document with all error highlights, bounding boxes, and correction popups">
+              📥 Download with Highlights
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="window.ViewerView.downloadEdited()" title="Download clean rectified document without error highlights">
+              💾 Clean Copy
             </button>
             <button class="btn btn-secondary btn-sm" onclick="window.ViewerView.openChangeReport()" title="Generate & View Certified Rectification Change Report">
               📝 Change Report
             </button>
-            <button class="btn btn-primary btn-sm" onclick="window.router.navigate('reports')" title="Export certified PDF/HTML audit report">
+            <button class="btn btn-secondary btn-sm" onclick="window.router.navigate('reports')" title="Export certified PDF/HTML audit report">
               📄 Export Audit
             </button>
           </div>
         </div>
+
 
         <!-- Document Viewer Mount Point -->
         <div id="viewer-mount-point" style="flex: 1; min-height: 0; min-width: 0; width: 100%; max-width: 100%; position: relative; overflow: hidden; box-sizing: border-box;"></div>
