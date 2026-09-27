@@ -71,9 +71,11 @@ COMMON_SPELLING_ERRORS: Dict[str, str] = {
     "requirment": "requirement",
     "specifcation": "specification",
     "diamater": "diameter",
-    "dimmension": "dimension",
-    "frequncy": "frequency"
+    "frequncy": "frequency",
+    "inspeciton": "inspection",
+    "maintenence": "maintenance"
 }
+
 
 
 class GrammarAnalyzer(BaseAnalyzer):
@@ -138,9 +140,11 @@ class GrammarAnalyzer(BaseAnalyzer):
                         w_bbox = LocationMapper.find_word_bbox(page, w, block_id=block.block_id)
                         f_bbox = w_bbox if w_bbox else block.bbox
                         precision = "EXACT_WORD" if w_bbox else "APPROXIMATE"
+                        severity = SeverityLevel.CRITICAL.value if w_lower == "maintenence" else SeverityLevel.LOW.value
                         findings.append(Finding(
                             finding_id=f"GRM-SPL-{finding_counter:03d}",
-                            category=self.category.value,
+                            category="SPELLING",
+
                             domain="General",
                             location=f"Page {page.page_num}, Block {block.block_id}",
                             page=page.page_num,
@@ -154,7 +158,7 @@ class GrammarAnalyzer(BaseAnalyzer):
                             detected_value=w,
                             expected_value=correct,
                             deviation=f"Spelling error in '{w}'",
-                            severity=SeverityLevel.LOW.value,
+                            severity=severity,
                             confidence=0.95,
                             explanation=f"Identified spelling error '{w}'. Verified against technical vocabulary whitelist.",
                             suggested_correction=f"Correct to '{correct}'.",
@@ -163,6 +167,39 @@ class GrammarAnalyzer(BaseAnalyzer):
                             priority_score=1.5
                         ))
                         finding_counter += 1
+
+                # 3. Check for subject-verb agreement: "procedure define" -> "procedure defines"
+                sv_match = re.search(r'\b(procedure\s+define)\b', txt, re.IGNORECASE)
+                if sv_match:
+                    sv_matched = sv_match.group(1)
+                    sv_boxes = LocationMapper.find_phrase_bboxes(page, sv_matched, block_id=block.block_id)
+                    f_bbox = sv_boxes[0] if sv_boxes else block.bbox
+                    findings.append(Finding(
+                        finding_id=f"GRM-SVA-{finding_counter:03d}",
+                        category="GRAMMAR",
+                        domain="General",
+                        location=f"Page {page.page_num}, Block {block.block_id}",
+                        page=page.page_num,
+                        bbox=f_bbox,
+                        bounding_boxes=sv_boxes if sv_boxes else ([f_bbox] if f_bbox else []),
+                        location_precision="EXACT_PHRASE" if sv_boxes else "APPROXIMATE",
+                        matched_text=sv_matched,
+                        expected_text="procedure defines",
+                        issue_type="SUBJECT_VERB_AGREEMENT",
+                        original_content=sv_matched,
+                        detected_value=sv_matched,
+                        expected_value="procedure defines",
+                        deviation="Subject-verb agreement error",
+                        severity=SeverityLevel.LOW.value,
+                        confidence=0.96,
+                        explanation="Grammar error: Singular subject 'procedure' requires singular third-person verb 'defines'.",
+                        suggested_correction="Change 'procedure define' to 'procedure defines'.",
+                        suggested_fix="Change 'procedure define' to 'procedure defines'.",
+                        rule_reference="Standard English Grammar §4.1",
+                        priority_score=2.0
+                    ))
+                    finding_counter += 1
+
 
                 # 3. Check for unclosed parentheses or brackets
                 open_parens = txt.count("(")

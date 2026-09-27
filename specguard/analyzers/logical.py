@@ -59,16 +59,21 @@ class LogicalAnalyzer(BaseAnalyzer):
                 if relative_diff > 0.01:
                     findings.append(Finding(
                         finding_id=f"LOG-CTR-{finding_counter:03d}",
-                        category=self.category.value,
+                        category="CONTRADICTION",
                         domain="General",
                         location=f"Page {base_p.page} vs Page {comp_p.page}",
                         page=comp_p.page,
                         bbox=comp_p.bbox,
+                        bounding_boxes=[comp_p.bbox] if comp_p.bbox else [],
+                        location_precision="EXACT_PHRASE",
+                        matched_text=comp_p.raw_value,
+                        expected_text=f"{base_p.raw_value} (Section {base_p.page} acceptance table)",
+                        issue_type="LOGICAL_CONTRADICTION",
                         original_content=f"Page {base_p.page}: '{base_p.raw_value}' vs Page {comp_p.page}: '{comp_p.raw_value}'",
-                        detected_value=f"{comp_p.raw_value} (Page {comp_p.page})",
-                        expected_value=f"Consistent value matching Page {base_p.page} ({base_p.raw_value})",
+                        detected_value=comp_p.raw_value,
+                        expected_value=f"{base_p.raw_value} (Section {base_p.page} acceptance table)",
                         deviation=f"Cross-document discrepancy of {diff:.2f} {base_p.normalized_unit}",
-                        severity=SeverityLevel.CRITICAL.value,
+                        severity=SeverityLevel.HIGH.value,
                         confidence=0.98,
                         explanation=(
                             f"Logical contradiction detected across document sections. "
@@ -82,6 +87,7 @@ class LogicalAnalyzer(BaseAnalyzer):
                         priority_score=9.5
                     ))
                     finding_counter += 1
+
 
         # 2. Check Min > Max contradictions
         min_params = [p for p in parameters if "min" in p.source_sentence.lower()]

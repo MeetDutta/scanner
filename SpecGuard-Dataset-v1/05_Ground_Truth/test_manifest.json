@@ -1,0 +1,338 @@
+[
+  {
+    "id": "MEC-001",
+    "domain": "Mechanical",
+    "variant": "clean",
+    "split": "test",
+    "path": "01_Clean_Documents/Mechanical/MEC-001_clean.pdf"
+  },
+  {
+    "id": "MEC-001",
+    "domain": "Mechanical",
+    "variant": "spelling",
+    "split": "test",
+    "path": "02_Defective_Documents/spelling/MEC-001_spelling.pdf"
+  },
+  {
+    "id": "MEC-001",
+    "domain": "Mechanical",
+    "variant": "grammar",
+    "split": "test",
+    "path": "02_Defective_Documents/grammar/MEC-001_grammar.pdf"
+  },
+  {
+    "id": "MEC-001",
+    "domain": "Mechanical",
+    "variant": "formatting",
+    "split": "test",
+    "path": "02_Defective_Documents/formatting/MEC-001_formatting.pdf"
+  },
+  {
+    "id": "MEC-001",
+    "domain": "Mechanical",
+    "variant": "toc",
+    "split": "test",
+    "path": "02_Defective_Documents/toc/MEC-001_toc.pdf"
+  },
+  {
+    "id": "MEC-001",
+    "domain": "Mechanical",
+    "variant": "figure",
+    "split": "test",
+    "path": "02_Defective_Documents/figure/MEC-001_figure.pdf"
+  },
+  {
+    "id": "MEC-001",
+    "domain": "Mechanical",
+    "variant": "table",
+    "split": "test",
+    "path": "02_Defective_Documents/table/MEC-001_table.pdf"
+  },
+  {
+    "id": "MEC-001",
+    "domain": "Mechanical",
+    "variant": "header",
+    "split": "test",
+    "path": "02_Defective_Documents/header/MEC-001_header.pdf"
+  },
+  {
+    "id": "MEC-001",
+    "domain": "Mechanical",
+    "variant": "numbering",
+    "split": "test",
+    "path": "02_Defective_Documents/numbering/MEC-001_numbering.pdf"
+  },
+  {
+    "id": "MEC-001",
+    "domain": "Mechanical",
+    "variant": "missing",
+    "split": "test",
+    "path": "02_Defective_Documents/missing/MEC-001_missing.pdf"
+  },
+  {
+    "id": "MEC-001",
+    "domain": "Mechanical",
+    "variant": "contradiction",
+    "split": "test",
+    "path": "02_Defective_Documents/contradiction/MEC-001_contradiction.pdf"
+  },
+  {
+    "id": "MEC-001",
+    "domain": "Mechanical",
+    "variant": "mixed",
+    "split": "test",
+    "path": "02_Defective_Documents/mixed/MEC-001_mixed.pdf"
+  },
+  {
+    "id": "MEC-004",
+    "domain": "Mechanical",
+    "variant": "clean",
+    "split": "test",
+    "path": "01_Clean_Documents/Mechanical/MEC-004_clean.pdf"
+  },
+  {
+    "id": "MEC-004",
+    "domain": "Mechanical",
+    "variant": "spelling",
+    "split": "test",
+    "path": "02_Defective_Documents/spelling/MEC-004_spelling.pdf"
+  },
+  {
+    "id": "MEC-004",
+    "domain": "Mechanical",
+    "variant": "grammar",
+    "split": "test",
+    "path": "02_Defective_Documents/grammar/MEC-004_grammar.pdf"
+  },
+  {
+    "id": "MEC-004",
+    "domain": "Mechanical",
+    "variant": "formatting",
+    "split": "test",
+    "path": "02_Defective_Documents/formatting/MEC-004_formatting.pdf"
+  },
+  {
+    "id": "MEC-004",
+    "domain": "Mechanical",
+    "variant": "toc",
+    "split": "test",
+    "path": "02_Defective_Documents/toc/MEC-004_toc.pdf"
+  },
+  {
+    "id": "MEC-004",
+    "domain": "Mechanical",
+    "variant": "figure",
+    "split": "test",
+    "path": "02_Defective_Documents/figure/MEC-004_figure.pdf"
+  },
+  {
+    "id": "MEC-004",
+    "domain": "Mechanical",
+    "variant": "table",
+    "split": "test",
+    "path": "02_Defective_Documents/table/MEC-004_table.pdf"
+  },
+  {
+    "id": "MEC-004",
+    "domain": "Mechanical",
+    "variant": "header",
+    "split": "test",
+    "path": "02_Defective_Documents/header/MEC-004_header.pdf"
+  },
+  {
+    "id": "MEC-004",
+    "domain": "Mechanical",
+    "variant": "numbering",
+    "split": "test",
+    "path": "02_Defective_Documents/numbering/MEC-004_numbering.pdf"
+  },
+  {
+    "id": "MEC-004",
+    "domain": "Mechanical",
+    "variant": "missing",
+    "split": "test",
+    "path": "02_Defective_Documents/missing/MEC-004_missing.pdf"
+  },
+  {
+    "id": "MEC-004",
+    "domain": "Mechanical",
+    "variant": "contradiction",
+    "split": "test",
+    "path": "02_Defective_Documents/contradiction/MEC-004_contradiction.pdf"
+  },
+  {
+    "id": "MEC-004",
+    "domain": "Mechanical",
+    "variant": "mixed",
+    "split": "test",
+    "path": "02_Defective_Documents/mixed/MEC-004_mixed.pdf"
+  },
+  {
+    "id": "CHE-005",
+    "domain": "Chemical",
+    "variant": "clean",
+    "split": "test",
+    "path": "01_Clean_Documents/Chemical/CHE-005_clean.pdf"
+  },
+  {
+    "id": "CHE-005",
+    "domain": "Chemical",
+    "variant": "spelling",
+    "split": "test",
+    "path": "02_Defective_Documents/spelling/CHE-005_spelling.pdf"
+  },
+  {
+    "id": "CHE-005",
+    "domain": "Chemical",
+    "variant": "grammar",
+    "split": "test",
+    "path": "02_Defective_Documents/grammar/CHE-005_grammar.pdf"
+  },
+  {
+    "id": "CHE-005",
+    "domain": "Chemical",
+    "variant": "formatting",
+    "split": "test",
+    "path": "02_Defective_Documents/formatting/CHE-005_formatting.pdf"
+  },
+  {
+    "id": "CHE-005",
+    "domain": "Chemical",
+    "variant": "toc",
+    "split": "test",
+    "path": "02_Defective_Documents/toc/CHE-005_toc.pdf"
+  },
+  {
+    "id": "CHE-005",
+    "domain": "Chemical",
+    "variant": "figure",
+    "split": "test",
+    "path": "02_Defective_Documents/figure/CHE-005_figure.pdf"
+  },
+  {
+    "id": "CHE-005",
+    "domain": "Chemical",
+    "variant": "table",
+    "split": "test",
+    "path": "02_Defective_Documents/table/CHE-005_table.pdf"
+  },
+  {
+    "id": "CHE-005",
+    "domain": "Chemical",
+    "variant": "header",
+    "split": "test",
+    "path": "02_Defective_Documents/header/CHE-005_header.pdf"
+  },
+  {
+    "id": "CHE-005",
+    "domain": "Chemical",
+    "variant": "numbering",
+    "split": "test",
+    "path": "02_Defective_Documents/numbering/CHE-005_numbering.pdf"
+  },
+  {
+    "id": "CHE-005",
+    "domain": "Chemical",
+    "variant": "missing",
+    "split": "test",
+    "path": "02_Defective_Documents/missing/CHE-005_missing.pdf"
+  },
+  {
+    "id": "CHE-005",
+    "domain": "Chemical",
+    "variant": "contradiction",
+    "split": "test",
+    "path": "02_Defective_Documents/contradiction/CHE-005_contradiction.pdf"
+  },
+  {
+    "id": "CHE-005",
+    "domain": "Chemical",
+    "variant": "mixed",
+    "split": "test",
+    "path": "02_Defective_Documents/mixed/CHE-005_mixed.pdf"
+  },
+  {
+    "id": "QA_-001",
+    "domain": "QA_QC",
+    "variant": "clean",
+    "split": "test",
+    "path": "01_Clean_Documents/QA_QC/QA_-001_clean.pdf"
+  },
+  {
+    "id": "QA_-001",
+    "domain": "QA_QC",
+    "variant": "spelling",
+    "split": "test",
+    "path": "02_Defective_Documents/spelling/QA_-001_spelling.pdf"
+  },
+  {
+    "id": "QA_-001",
+    "domain": "QA_QC",
+    "variant": "grammar",
+    "split": "test",
+    "path": "02_Defective_Documents/grammar/QA_-001_grammar.pdf"
+  },
+  {
+    "id": "QA_-001",
+    "domain": "QA_QC",
+    "variant": "formatting",
+    "split": "test",
+    "path": "02_Defective_Documents/formatting/QA_-001_formatting.pdf"
+  },
+  {
+    "id": "QA_-001",
+    "domain": "QA_QC",
+    "variant": "toc",
+    "split": "test",
+    "path": "02_Defective_Documents/toc/QA_-001_toc.pdf"
+  },
+  {
+    "id": "QA_-001",
+    "domain": "QA_QC",
+    "variant": "figure",
+    "split": "test",
+    "path": "02_Defective_Documents/figure/QA_-001_figure.pdf"
+  },
+  {
+    "id": "QA_-001",
+    "domain": "QA_QC",
+    "variant": "table",
+    "split": "test",
+    "path": "02_Defective_Documents/table/QA_-001_table.pdf"
+  },
+  {
+    "id": "QA_-001",
+    "domain": "QA_QC",
+    "variant": "header",
+    "split": "test",
+    "path": "02_Defective_Documents/header/QA_-001_header.pdf"
+  },
+  {
+    "id": "QA_-001",
+    "domain": "QA_QC",
+    "variant": "numbering",
+    "split": "test",
+    "path": "02_Defective_Documents/numbering/QA_-001_numbering.pdf"
+  },
+  {
+    "id": "QA_-001",
+    "domain": "QA_QC",
+    "variant": "missing",
+    "split": "test",
+    "path": "02_Defective_Documents/missing/QA_-001_missing.pdf"
+  },
+  {
+    "id": "QA_-001",
+    "domain": "QA_QC",
+    "variant": "contradiction",
+    "split": "test",
+    "path": "02_Defective_Documents/contradiction/QA_-001_contradiction.pdf"
+  },
+  {
+    "id": "QA_-001",
+    "domain": "QA_QC",
+    "variant": "mixed",
+    "split": "test",
+    "path": "02_Defective_Documents/mixed/QA_-001_mixed.pdf"
+  }
+]

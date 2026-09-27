@@ -1,0 +1,1766 @@
+[
+  {
+    "id": "MEC-002",
+    "domain": "Mechanical",
+    "variant": "clean",
+    "split": "train",
+    "path": "01_Clean_Documents/Mechanical/MEC-002_clean.pdf"
+  },
+  {
+    "id": "MEC-002",
+    "domain": "Mechanical",
+    "variant": "spelling",
+    "split": "train",
+    "path": "02_Defective_Documents/spelling/MEC-002_spelling.pdf"
+  },
+  {
+    "id": "MEC-002",
+    "domain": "Mechanical",
+    "variant": "grammar",
+    "split": "train",
+    "path": "02_Defective_Documents/grammar/MEC-002_grammar.pdf"
+  },
+  {
+    "id": "MEC-002",
+    "domain": "Mechanical",
+    "variant": "formatting",
+    "split": "train",
+    "path": "02_Defective_Documents/formatting/MEC-002_formatting.pdf"
+  },
+  {
+    "id": "MEC-002",
+    "domain": "Mechanical",
+    "variant": "toc",
+    "split": "train",
+    "path": "02_Defective_Documents/toc/MEC-002_toc.pdf"
+  },
+  {
+    "id": "MEC-002",
+    "domain": "Mechanical",
+    "variant": "figure",
+    "split": "train",
+    "path": "02_Defective_Documents/figure/MEC-002_figure.pdf"
+  },
+  {
+    "id": "MEC-002",
+    "domain": "Mechanical",
+    "variant": "table",
+    "split": "train",
+    "path": "02_Defective_Documents/table/MEC-002_table.pdf"
+  },
+  {
+    "id": "MEC-002",
+    "domain": "Mechanical",
+    "variant": "header",
+    "split": "train",
+    "path": "02_Defective_Documents/header/MEC-002_header.pdf"
+  },
+  {
+    "id": "MEC-002",
+    "domain": "Mechanical",
+    "variant": "numbering",
+    "split": "train",
+    "path": "02_Defective_Documents/numbering/MEC-002_numbering.pdf"
+  },
+  {
+    "id": "MEC-002",
+    "domain": "Mechanical",
+    "variant": "missing",
+    "split": "train",
+    "path": "02_Defective_Documents/missing/MEC-002_missing.pdf"
+  },
+  {
+    "id": "MEC-002",
+    "domain": "Mechanical",
+    "variant": "contradiction",
+    "split": "train",
+    "path": "02_Defective_Documents/contradiction/MEC-002_contradiction.pdf"
+  },
+  {
+    "id": "MEC-002",
+    "domain": "Mechanical",
+    "variant": "mixed",
+    "split": "train",
+    "path": "02_Defective_Documents/mixed/MEC-002_mixed.pdf"
+  },
+  {
+    "id": "MEC-003",
+    "domain": "Mechanical",
+    "variant": "clean",
+    "split": "train",
+    "path": "01_Clean_Documents/Mechanical/MEC-003_clean.pdf"
+  },
+  {
+    "id": "MEC-003",
+    "domain": "Mechanical",
+    "variant": "spelling",
+    "split": "train",
+    "path": "02_Defective_Documents/spelling/MEC-003_spelling.pdf"
+  },
+  {
+    "id": "MEC-003",
+    "domain": "Mechanical",
+    "variant": "grammar",
+    "split": "train",
+    "path": "02_Defective_Documents/grammar/MEC-003_grammar.pdf"
+  },
+  {
+    "id": "MEC-003",
+    "domain": "Mechanical",
+    "variant": "formatting",
+    "split": "train",
+    "path": "02_Defective_Documents/formatting/MEC-003_formatting.pdf"
+  },
+  {
+    "id": "MEC-003",
+    "domain": "Mechanical",
+    "variant": "toc",
+    "split": "train",
+    "path": "02_Defective_Documents/toc/MEC-003_toc.pdf"
+  },
+  {
+    "id": "MEC-003",
+    "domain": "Mechanical",
+    "variant": "figure",
+    "split": "train",
+    "path": "02_Defective_Documents/figure/MEC-003_figure.pdf"
+  },
+  {
+    "id": "MEC-003",
+    "domain": "Mechanical",
+    "variant": "table",
+    "split": "train",
+    "path": "02_Defective_Documents/table/MEC-003_table.pdf"
+  },
+  {
+    "id": "MEC-003",
+    "domain": "Mechanical",
+    "variant": "header",
+    "split": "train",
+    "path": "02_Defective_Documents/header/MEC-003_header.pdf"
+  },
+  {
+    "id": "MEC-003",
+    "domain": "Mechanical",
+    "variant": "numbering",
+    "split": "train",
+    "path": "02_Defective_Documents/numbering/MEC-003_numbering.pdf"
+  },
+  {
+    "id": "MEC-003",
+    "domain": "Mechanical",
+    "variant": "missing",
+    "split": "train",
+    "path": "02_Defective_Documents/missing/MEC-003_missing.pdf"
+  },
+  {
+    "id": "MEC-003",
+    "domain": "Mechanical",
+    "variant": "contradiction",
+    "split": "train",
+    "path": "02_Defective_Documents/contradiction/MEC-003_contradiction.pdf"
+  },
+  {
+    "id": "MEC-003",
+    "domain": "Mechanical",
+    "variant": "mixed",
+    "split": "train",
+    "path": "02_Defective_Documents/mixed/MEC-003_mixed.pdf"
+  },
+  {
+    "id": "MEC-006",
+    "domain": "Mechanical",
+    "variant": "clean",
+    "split": "train",
+    "path": "01_Clean_Documents/Mechanical/MEC-006_clean.pdf"
+  },
+  {
+    "id": "MEC-006",
+    "domain": "Mechanical",
+    "variant": "spelling",
+    "split": "train",
+    "path": "02_Defective_Documents/spelling/MEC-006_spelling.pdf"
+  },
+  {
+    "id": "MEC-006",
+    "domain": "Mechanical",
+    "variant": "grammar",
+    "split": "train",
+    "path": "02_Defective_Documents/grammar/MEC-006_grammar.pdf"
+  },
+  {
+    "id": "MEC-006",
+    "domain": "Mechanical",
+    "variant": "formatting",
+    "split": "train",
+    "path": "02_Defective_Documents/formatting/MEC-006_formatting.pdf"
+  },
+  {
+    "id": "MEC-006",
+    "domain": "Mechanical",
+    "variant": "toc",
+    "split": "train",
+    "path": "02_Defective_Documents/toc/MEC-006_toc.pdf"
+  },
+  {
+    "id": "MEC-006",
+    "domain": "Mechanical",
+    "variant": "figure",
+    "split": "train",
+    "path": "02_Defective_Documents/figure/MEC-006_figure.pdf"
+  },
+  {
+    "id": "MEC-006",
+    "domain": "Mechanical",
+    "variant": "table",
+    "split": "train",
+    "path": "02_Defective_Documents/table/MEC-006_table.pdf"
+  },
+  {
+    "id": "MEC-006",
+    "domain": "Mechanical",
+    "variant": "header",
+    "split": "train",
+    "path": "02_Defective_Documents/header/MEC-006_header.pdf"
+  },
+  {
+    "id": "MEC-006",
+    "domain": "Mechanical",
+    "variant": "numbering",
+    "split": "train",
+    "path": "02_Defective_Documents/numbering/MEC-006_numbering.pdf"
+  },
+  {
+    "id": "MEC-006",
+    "domain": "Mechanical",
+    "variant": "missing",
+    "split": "train",
+    "path": "02_Defective_Documents/missing/MEC-006_missing.pdf"
+  },
+  {
+    "id": "MEC-006",
+    "domain": "Mechanical",
+    "variant": "contradiction",
+    "split": "train",
+    "path": "02_Defective_Documents/contradiction/MEC-006_contradiction.pdf"
+  },
+  {
+    "id": "MEC-006",
+    "domain": "Mechanical",
+    "variant": "mixed",
+    "split": "train",
+    "path": "02_Defective_Documents/mixed/MEC-006_mixed.pdf"
+  },
+  {
+    "id": "MEC-007",
+    "domain": "Mechanical",
+    "variant": "clean",
+    "split": "train",
+    "path": "01_Clean_Documents/Mechanical/MEC-007_clean.pdf"
+  },
+  {
+    "id": "MEC-007",
+    "domain": "Mechanical",
+    "variant": "spelling",
+    "split": "train",
+    "path": "02_Defective_Documents/spelling/MEC-007_spelling.pdf"
+  },
+  {
+    "id": "MEC-007",
+    "domain": "Mechanical",
+    "variant": "grammar",
+    "split": "train",
+    "path": "02_Defective_Documents/grammar/MEC-007_grammar.pdf"
+  },
+  {
+    "id": "MEC-007",
+    "domain": "Mechanical",
+    "variant": "formatting",
+    "split": "train",
+    "path": "02_Defective_Documents/formatting/MEC-007_formatting.pdf"
+  },
+  {
+    "id": "MEC-007",
+    "domain": "Mechanical",
+    "variant": "toc",
+    "split": "train",
+    "path": "02_Defective_Documents/toc/MEC-007_toc.pdf"
+  },
+  {
+    "id": "MEC-007",
+    "domain": "Mechanical",
+    "variant": "figure",
+    "split": "train",
+    "path": "02_Defective_Documents/figure/MEC-007_figure.pdf"
+  },
+  {
+    "id": "MEC-007",
+    "domain": "Mechanical",
+    "variant": "table",
+    "split": "train",
+    "path": "02_Defective_Documents/table/MEC-007_table.pdf"
+  },
+  {
+    "id": "MEC-007",
+    "domain": "Mechanical",
+    "variant": "header",
+    "split": "train",
+    "path": "02_Defective_Documents/header/MEC-007_header.pdf"
+  },
+  {
+    "id": "MEC-007",
+    "domain": "Mechanical",
+    "variant": "numbering",
+    "split": "train",
+    "path": "02_Defective_Documents/numbering/MEC-007_numbering.pdf"
+  },
+  {
+    "id": "MEC-007",
+    "domain": "Mechanical",
+    "variant": "missing",
+    "split": "train",
+    "path": "02_Defective_Documents/missing/MEC-007_missing.pdf"
+  },
+  {
+    "id": "MEC-007",
+    "domain": "Mechanical",
+    "variant": "contradiction",
+    "split": "train",
+    "path": "02_Defective_Documents/contradiction/MEC-007_contradiction.pdf"
+  },
+  {
+    "id": "MEC-007",
+    "domain": "Mechanical",
+    "variant": "mixed",
+    "split": "train",
+    "path": "02_Defective_Documents/mixed/MEC-007_mixed.pdf"
+  },
+  {
+    "id": "ELE-002",
+    "domain": "Electrical",
+    "variant": "clean",
+    "split": "train",
+    "path": "01_Clean_Documents/Electrical/ELE-002_clean.pdf"
+  },
+  {
+    "id": "ELE-002",
+    "domain": "Electrical",
+    "variant": "spelling",
+    "split": "train",
+    "path": "02_Defective_Documents/spelling/ELE-002_spelling.pdf"
+  },
+  {
+    "id": "ELE-002",
+    "domain": "Electrical",
+    "variant": "grammar",
+    "split": "train",
+    "path": "02_Defective_Documents/grammar/ELE-002_grammar.pdf"
+  },
+  {
+    "id": "ELE-002",
+    "domain": "Electrical",
+    "variant": "formatting",
+    "split": "train",
+    "path": "02_Defective_Documents/formatting/ELE-002_formatting.pdf"
+  },
+  {
+    "id": "ELE-002",
+    "domain": "Electrical",
+    "variant": "toc",
+    "split": "train",
+    "path": "02_Defective_Documents/toc/ELE-002_toc.pdf"
+  },
+  {
+    "id": "ELE-002",
+    "domain": "Electrical",
+    "variant": "figure",
+    "split": "train",
+    "path": "02_Defective_Documents/figure/ELE-002_figure.pdf"
+  },
+  {
+    "id": "ELE-002",
+    "domain": "Electrical",
+    "variant": "table",
+    "split": "train",
+    "path": "02_Defective_Documents/table/ELE-002_table.pdf"
+  },
+  {
+    "id": "ELE-002",
+    "domain": "Electrical",
+    "variant": "header",
+    "split": "train",
+    "path": "02_Defective_Documents/header/ELE-002_header.pdf"
+  },
+  {
+    "id": "ELE-002",
+    "domain": "Electrical",
+    "variant": "numbering",
+    "split": "train",
+    "path": "02_Defective_Documents/numbering/ELE-002_numbering.pdf"
+  },
+  {
+    "id": "ELE-002",
+    "domain": "Electrical",
+    "variant": "missing",
+    "split": "train",
+    "path": "02_Defective_Documents/missing/ELE-002_missing.pdf"
+  },
+  {
+    "id": "ELE-002",
+    "domain": "Electrical",
+    "variant": "contradiction",
+    "split": "train",
+    "path": "02_Defective_Documents/contradiction/ELE-002_contradiction.pdf"
+  },
+  {
+    "id": "ELE-002",
+    "domain": "Electrical",
+    "variant": "mixed",
+    "split": "train",
+    "path": "02_Defective_Documents/mixed/ELE-002_mixed.pdf"
+  },
+  {
+    "id": "ELE-003",
+    "domain": "Electrical",
+    "variant": "clean",
+    "split": "train",
+    "path": "01_Clean_Documents/Electrical/ELE-003_clean.pdf"
+  },
+  {
+    "id": "ELE-003",
+    "domain": "Electrical",
+    "variant": "spelling",
+    "split": "train",
+    "path": "02_Defective_Documents/spelling/ELE-003_spelling.pdf"
+  },
+  {
+    "id": "ELE-003",
+    "domain": "Electrical",
+    "variant": "grammar",
+    "split": "train",
+    "path": "02_Defective_Documents/grammar/ELE-003_grammar.pdf"
+  },
+  {
+    "id": "ELE-003",
+    "domain": "Electrical",
+    "variant": "formatting",
+    "split": "train",
+    "path": "02_Defective_Documents/formatting/ELE-003_formatting.pdf"
+  },
+  {
+    "id": "ELE-003",
+    "domain": "Electrical",
+    "variant": "toc",
+    "split": "train",
+    "path": "02_Defective_Documents/toc/ELE-003_toc.pdf"
+  },
+  {
+    "id": "ELE-003",
+    "domain": "Electrical",
+    "variant": "figure",
+    "split": "train",
+    "path": "02_Defective_Documents/figure/ELE-003_figure.pdf"
+  },
+  {
+    "id": "ELE-003",
+    "domain": "Electrical",
+    "variant": "table",
+    "split": "train",
+    "path": "02_Defective_Documents/table/ELE-003_table.pdf"
+  },
+  {
+    "id": "ELE-003",
+    "domain": "Electrical",
+    "variant": "header",
+    "split": "train",
+    "path": "02_Defective_Documents/header/ELE-003_header.pdf"
+  },
+  {
+    "id": "ELE-003",
+    "domain": "Electrical",
+    "variant": "numbering",
+    "split": "train",
+    "path": "02_Defective_Documents/numbering/ELE-003_numbering.pdf"
+  },
+  {
+    "id": "ELE-003",
+    "domain": "Electrical",
+    "variant": "missing",
+    "split": "train",
+    "path": "02_Defective_Documents/missing/ELE-003_missing.pdf"
+  },
+  {
+    "id": "ELE-003",
+    "domain": "Electrical",
+    "variant": "contradiction",
+    "split": "train",
+    "path": "02_Defective_Documents/contradiction/ELE-003_contradiction.pdf"
+  },
+  {
+    "id": "ELE-003",
+    "domain": "Electrical",
+    "variant": "mixed",
+    "split": "train",
+    "path": "02_Defective_Documents/mixed/ELE-003_mixed.pdf"
+  },
+  {
+    "id": "ELE-004",
+    "domain": "Electrical",
+    "variant": "clean",
+    "split": "train",
+    "path": "01_Clean_Documents/Electrical/ELE-004_clean.pdf"
+  },
+  {
+    "id": "ELE-004",
+    "domain": "Electrical",
+    "variant": "spelling",
+    "split": "train",
+    "path": "02_Defective_Documents/spelling/ELE-004_spelling.pdf"
+  },
+  {
+    "id": "ELE-004",
+    "domain": "Electrical",
+    "variant": "grammar",
+    "split": "train",
+    "path": "02_Defective_Documents/grammar/ELE-004_grammar.pdf"
+  },
+  {
+    "id": "ELE-004",
+    "domain": "Electrical",
+    "variant": "formatting",
+    "split": "train",
+    "path": "02_Defective_Documents/formatting/ELE-004_formatting.pdf"
+  },
+  {
+    "id": "ELE-004",
+    "domain": "Electrical",
+    "variant": "toc",
+    "split": "train",
+    "path": "02_Defective_Documents/toc/ELE-004_toc.pdf"
+  },
+  {
+    "id": "ELE-004",
+    "domain": "Electrical",
+    "variant": "figure",
+    "split": "train",
+    "path": "02_Defective_Documents/figure/ELE-004_figure.pdf"
+  },
+  {
+    "id": "ELE-004",
+    "domain": "Electrical",
+    "variant": "table",
+    "split": "train",
+    "path": "02_Defective_Documents/table/ELE-004_table.pdf"
+  },
+  {
+    "id": "ELE-004",
+    "domain": "Electrical",
+    "variant": "header",
+    "split": "train",
+    "path": "02_Defective_Documents/header/ELE-004_header.pdf"
+  },
+  {
+    "id": "ELE-004",
+    "domain": "Electrical",
+    "variant": "numbering",
+    "split": "train",
+    "path": "02_Defective_Documents/numbering/ELE-004_numbering.pdf"
+  },
+  {
+    "id": "ELE-004",
+    "domain": "Electrical",
+    "variant": "missing",
+    "split": "train",
+    "path": "02_Defective_Documents/missing/ELE-004_missing.pdf"
+  },
+  {
+    "id": "ELE-004",
+    "domain": "Electrical",
+    "variant": "contradiction",
+    "split": "train",
+    "path": "02_Defective_Documents/contradiction/ELE-004_contradiction.pdf"
+  },
+  {
+    "id": "ELE-004",
+    "domain": "Electrical",
+    "variant": "mixed",
+    "split": "train",
+    "path": "02_Defective_Documents/mixed/ELE-004_mixed.pdf"
+  },
+  {
+    "id": "ELE-005",
+    "domain": "Electrical",
+    "variant": "clean",
+    "split": "train",
+    "path": "01_Clean_Documents/Electrical/ELE-005_clean.pdf"
+  },
+  {
+    "id": "ELE-005",
+    "domain": "Electrical",
+    "variant": "spelling",
+    "split": "train",
+    "path": "02_Defective_Documents/spelling/ELE-005_spelling.pdf"
+  },
+  {
+    "id": "ELE-005",
+    "domain": "Electrical",
+    "variant": "grammar",
+    "split": "train",
+    "path": "02_Defective_Documents/grammar/ELE-005_grammar.pdf"
+  },
+  {
+    "id": "ELE-005",
+    "domain": "Electrical",
+    "variant": "formatting",
+    "split": "train",
+    "path": "02_Defective_Documents/formatting/ELE-005_formatting.pdf"
+  },
+  {
+    "id": "ELE-005",
+    "domain": "Electrical",
+    "variant": "toc",
+    "split": "train",
+    "path": "02_Defective_Documents/toc/ELE-005_toc.pdf"
+  },
+  {
+    "id": "ELE-005",
+    "domain": "Electrical",
+    "variant": "figure",
+    "split": "train",
+    "path": "02_Defective_Documents/figure/ELE-005_figure.pdf"
+  },
+  {
+    "id": "ELE-005",
+    "domain": "Electrical",
+    "variant": "table",
+    "split": "train",
+    "path": "02_Defective_Documents/table/ELE-005_table.pdf"
+  },
+  {
+    "id": "ELE-005",
+    "domain": "Electrical",
+    "variant": "header",
+    "split": "train",
+    "path": "02_Defective_Documents/header/ELE-005_header.pdf"
+  },
+  {
+    "id": "ELE-005",
+    "domain": "Electrical",
+    "variant": "numbering",
+    "split": "train",
+    "path": "02_Defective_Documents/numbering/ELE-005_numbering.pdf"
+  },
+  {
+    "id": "ELE-005",
+    "domain": "Electrical",
+    "variant": "missing",
+    "split": "train",
+    "path": "02_Defective_Documents/missing/ELE-005_missing.pdf"
+  },
+  {
+    "id": "ELE-005",
+    "domain": "Electrical",
+    "variant": "contradiction",
+    "split": "train",
+    "path": "02_Defective_Documents/contradiction/ELE-005_contradiction.pdf"
+  },
+  {
+    "id": "ELE-005",
+    "domain": "Electrical",
+    "variant": "mixed",
+    "split": "train",
+    "path": "02_Defective_Documents/mixed/ELE-005_mixed.pdf"
+  },
+  {
+    "id": "ELE-006",
+    "domain": "Electrical",
+    "variant": "clean",
+    "split": "train",
+    "path": "01_Clean_Documents/Electrical/ELE-006_clean.pdf"
+  },
+  {
+    "id": "ELE-006",
+    "domain": "Electrical",
+    "variant": "spelling",
+    "split": "train",
+    "path": "02_Defective_Documents/spelling/ELE-006_spelling.pdf"
+  },
+  {
+    "id": "ELE-006",
+    "domain": "Electrical",
+    "variant": "grammar",
+    "split": "train",
+    "path": "02_Defective_Documents/grammar/ELE-006_grammar.pdf"
+  },
+  {
+    "id": "ELE-006",
+    "domain": "Electrical",
+    "variant": "formatting",
+    "split": "train",
+    "path": "02_Defective_Documents/formatting/ELE-006_formatting.pdf"
+  },
+  {
+    "id": "ELE-006",
+    "domain": "Electrical",
+    "variant": "toc",
+    "split": "train",
+    "path": "02_Defective_Documents/toc/ELE-006_toc.pdf"
+  },
+  {
+    "id": "ELE-006",
+    "domain": "Electrical",
+    "variant": "figure",
+    "split": "train",
+    "path": "02_Defective_Documents/figure/ELE-006_figure.pdf"
+  },
+  {
+    "id": "ELE-006",
+    "domain": "Electrical",
+    "variant": "table",
+    "split": "train",
+    "path": "02_Defective_Documents/table/ELE-006_table.pdf"
+  },
+  {
+    "id": "ELE-006",
+    "domain": "Electrical",
+    "variant": "header",
+    "split": "train",
+    "path": "02_Defective_Documents/header/ELE-006_header.pdf"
+  },
+  {
+    "id": "ELE-006",
+    "domain": "Electrical",
+    "variant": "numbering",
+    "split": "train",
+    "path": "02_Defective_Documents/numbering/ELE-006_numbering.pdf"
+  },
+  {
+    "id": "ELE-006",
+    "domain": "Electrical",
+    "variant": "missing",
+    "split": "train",
+    "path": "02_Defective_Documents/missing/ELE-006_missing.pdf"
+  },
+  {
+    "id": "ELE-006",
+    "domain": "Electrical",
+    "variant": "contradiction",
+    "split": "train",
+    "path": "02_Defective_Documents/contradiction/ELE-006_contradiction.pdf"
+  },
+  {
+    "id": "ELE-006",
+    "domain": "Electrical",
+    "variant": "mixed",
+    "split": "train",
+    "path": "02_Defective_Documents/mixed/ELE-006_mixed.pdf"
+  },
+  {
+    "id": "ELE-007",
+    "domain": "Electrical",
+    "variant": "clean",
+    "split": "train",
+    "path": "01_Clean_Documents/Electrical/ELE-007_clean.pdf"
+  },
+  {
+    "id": "ELE-007",
+    "domain": "Electrical",
+    "variant": "spelling",
+    "split": "train",
+    "path": "02_Defective_Documents/spelling/ELE-007_spelling.pdf"
+  },
+  {
+    "id": "ELE-007",
+    "domain": "Electrical",
+    "variant": "grammar",
+    "split": "train",
+    "path": "02_Defective_Documents/grammar/ELE-007_grammar.pdf"
+  },
+  {
+    "id": "ELE-007",
+    "domain": "Electrical",
+    "variant": "formatting",
+    "split": "train",
+    "path": "02_Defective_Documents/formatting/ELE-007_formatting.pdf"
+  },
+  {
+    "id": "ELE-007",
+    "domain": "Electrical",
+    "variant": "toc",
+    "split": "train",
+    "path": "02_Defective_Documents/toc/ELE-007_toc.pdf"
+  },
+  {
+    "id": "ELE-007",
+    "domain": "Electrical",
+    "variant": "figure",
+    "split": "train",
+    "path": "02_Defective_Documents/figure/ELE-007_figure.pdf"
+  },
+  {
+    "id": "ELE-007",
+    "domain": "Electrical",
+    "variant": "table",
+    "split": "train",
+    "path": "02_Defective_Documents/table/ELE-007_table.pdf"
+  },
+  {
+    "id": "ELE-007",
+    "domain": "Electrical",
+    "variant": "header",
+    "split": "train",
+    "path": "02_Defective_Documents/header/ELE-007_header.pdf"
+  },
+  {
+    "id": "ELE-007",
+    "domain": "Electrical",
+    "variant": "numbering",
+    "split": "train",
+    "path": "02_Defective_Documents/numbering/ELE-007_numbering.pdf"
+  },
+  {
+    "id": "ELE-007",
+    "domain": "Electrical",
+    "variant": "missing",
+    "split": "train",
+    "path": "02_Defective_Documents/missing/ELE-007_missing.pdf"
+  },
+  {
+    "id": "ELE-007",
+    "domain": "Electrical",
+    "variant": "contradiction",
+    "split": "train",
+    "path": "02_Defective_Documents/contradiction/ELE-007_contradiction.pdf"
+  },
+  {
+    "id": "ELE-007",
+    "domain": "Electrical",
+    "variant": "mixed",
+    "split": "train",
+    "path": "02_Defective_Documents/mixed/ELE-007_mixed.pdf"
+  },
+  {
+    "id": "ELE-008",
+    "domain": "Electrical",
+    "variant": "clean",
+    "split": "train",
+    "path": "01_Clean_Documents/Electrical/ELE-008_clean.pdf"
+  },
+  {
+    "id": "ELE-008",
+    "domain": "Electrical",
+    "variant": "spelling",
+    "split": "train",
+    "path": "02_Defective_Documents/spelling/ELE-008_spelling.pdf"
+  },
+  {
+    "id": "ELE-008",
+    "domain": "Electrical",
+    "variant": "grammar",
+    "split": "train",
+    "path": "02_Defective_Documents/grammar/ELE-008_grammar.pdf"
+  },
+  {
+    "id": "ELE-008",
+    "domain": "Electrical",
+    "variant": "formatting",
+    "split": "train",
+    "path": "02_Defective_Documents/formatting/ELE-008_formatting.pdf"
+  },
+  {
+    "id": "ELE-008",
+    "domain": "Electrical",
+    "variant": "toc",
+    "split": "train",
+    "path": "02_Defective_Documents/toc/ELE-008_toc.pdf"
+  },
+  {
+    "id": "ELE-008",
+    "domain": "Electrical",
+    "variant": "figure",
+    "split": "train",
+    "path": "02_Defective_Documents/figure/ELE-008_figure.pdf"
+  },
+  {
+    "id": "ELE-008",
+    "domain": "Electrical",
+    "variant": "table",
+    "split": "train",
+    "path": "02_Defective_Documents/table/ELE-008_table.pdf"
+  },
+  {
+    "id": "ELE-008",
+    "domain": "Electrical",
+    "variant": "header",
+    "split": "train",
+    "path": "02_Defective_Documents/header/ELE-008_header.pdf"
+  },
+  {
+    "id": "ELE-008",
+    "domain": "Electrical",
+    "variant": "numbering",
+    "split": "train",
+    "path": "02_Defective_Documents/numbering/ELE-008_numbering.pdf"
+  },
+  {
+    "id": "ELE-008",
+    "domain": "Electrical",
+    "variant": "missing",
+    "split": "train",
+    "path": "02_Defective_Documents/missing/ELE-008_missing.pdf"
+  },
+  {
+    "id": "ELE-008",
+    "domain": "Electrical",
+    "variant": "contradiction",
+    "split": "train",
+    "path": "02_Defective_Documents/contradiction/ELE-008_contradiction.pdf"
+  },
+  {
+    "id": "ELE-008",
+    "domain": "Electrical",
+    "variant": "mixed",
+    "split": "train",
+    "path": "02_Defective_Documents/mixed/ELE-008_mixed.pdf"
+  },
+  {
+    "id": "CHE-001",
+    "domain": "Chemical",
+    "variant": "clean",
+    "split": "train",
+    "path": "01_Clean_Documents/Chemical/CHE-001_clean.pdf"
+  },
+  {
+    "id": "CHE-001",
+    "domain": "Chemical",
+    "variant": "spelling",
+    "split": "train",
+    "path": "02_Defective_Documents/spelling/CHE-001_spelling.pdf"
+  },
+  {
+    "id": "CHE-001",
+    "domain": "Chemical",
+    "variant": "grammar",
+    "split": "train",
+    "path": "02_Defective_Documents/grammar/CHE-001_grammar.pdf"
+  },
+  {
+    "id": "CHE-001",
+    "domain": "Chemical",
+    "variant": "formatting",
+    "split": "train",
+    "path": "02_Defective_Documents/formatting/CHE-001_formatting.pdf"
+  },
+  {
+    "id": "CHE-001",
+    "domain": "Chemical",
+    "variant": "toc",
+    "split": "train",
+    "path": "02_Defective_Documents/toc/CHE-001_toc.pdf"
+  },
+  {
+    "id": "CHE-001",
+    "domain": "Chemical",
+    "variant": "figure",
+    "split": "train",
+    "path": "02_Defective_Documents/figure/CHE-001_figure.pdf"
+  },
+  {
+    "id": "CHE-001",
+    "domain": "Chemical",
+    "variant": "table",
+    "split": "train",
+    "path": "02_Defective_Documents/table/CHE-001_table.pdf"
+  },
+  {
+    "id": "CHE-001",
+    "domain": "Chemical",
+    "variant": "header",
+    "split": "train",
+    "path": "02_Defective_Documents/header/CHE-001_header.pdf"
+  },
+  {
+    "id": "CHE-001",
+    "domain": "Chemical",
+    "variant": "numbering",
+    "split": "train",
+    "path": "02_Defective_Documents/numbering/CHE-001_numbering.pdf"
+  },
+  {
+    "id": "CHE-001",
+    "domain": "Chemical",
+    "variant": "missing",
+    "split": "train",
+    "path": "02_Defective_Documents/missing/CHE-001_missing.pdf"
+  },
+  {
+    "id": "CHE-001",
+    "domain": "Chemical",
+    "variant": "contradiction",
+    "split": "train",
+    "path": "02_Defective_Documents/contradiction/CHE-001_contradiction.pdf"
+  },
+  {
+    "id": "CHE-001",
+    "domain": "Chemical",
+    "variant": "mixed",
+    "split": "train",
+    "path": "02_Defective_Documents/mixed/CHE-001_mixed.pdf"
+  },
+  {
+    "id": "CHE-002",
+    "domain": "Chemical",
+    "variant": "clean",
+    "split": "train",
+    "path": "01_Clean_Documents/Chemical/CHE-002_clean.pdf"
+  },
+  {
+    "id": "CHE-002",
+    "domain": "Chemical",
+    "variant": "spelling",
+    "split": "train",
+    "path": "02_Defective_Documents/spelling/CHE-002_spelling.pdf"
+  },
+  {
+    "id": "CHE-002",
+    "domain": "Chemical",
+    "variant": "grammar",
+    "split": "train",
+    "path": "02_Defective_Documents/grammar/CHE-002_grammar.pdf"
+  },
+  {
+    "id": "CHE-002",
+    "domain": "Chemical",
+    "variant": "formatting",
+    "split": "train",
+    "path": "02_Defective_Documents/formatting/CHE-002_formatting.pdf"
+  },
+  {
+    "id": "CHE-002",
+    "domain": "Chemical",
+    "variant": "toc",
+    "split": "train",
+    "path": "02_Defective_Documents/toc/CHE-002_toc.pdf"
+  },
+  {
+    "id": "CHE-002",
+    "domain": "Chemical",
+    "variant": "figure",
+    "split": "train",
+    "path": "02_Defective_Documents/figure/CHE-002_figure.pdf"
+  },
+  {
+    "id": "CHE-002",
+    "domain": "Chemical",
+    "variant": "table",
+    "split": "train",
+    "path": "02_Defective_Documents/table/CHE-002_table.pdf"
+  },
+  {
+    "id": "CHE-002",
+    "domain": "Chemical",
+    "variant": "header",
+    "split": "train",
+    "path": "02_Defective_Documents/header/CHE-002_header.pdf"
+  },
+  {
+    "id": "CHE-002",
+    "domain": "Chemical",
+    "variant": "numbering",
+    "split": "train",
+    "path": "02_Defective_Documents/numbering/CHE-002_numbering.pdf"
+  },
+  {
+    "id": "CHE-002",
+    "domain": "Chemical",
+    "variant": "missing",
+    "split": "train",
+    "path": "02_Defective_Documents/missing/CHE-002_missing.pdf"
+  },
+  {
+    "id": "CHE-002",
+    "domain": "Chemical",
+    "variant": "contradiction",
+    "split": "train",
+    "path": "02_Defective_Documents/contradiction/CHE-002_contradiction.pdf"
+  },
+  {
+    "id": "CHE-002",
+    "domain": "Chemical",
+    "variant": "mixed",
+    "split": "train",
+    "path": "02_Defective_Documents/mixed/CHE-002_mixed.pdf"
+  },
+  {
+    "id": "CHE-003",
+    "domain": "Chemical",
+    "variant": "clean",
+    "split": "train",
+    "path": "01_Clean_Documents/Chemical/CHE-003_clean.pdf"
+  },
+  {
+    "id": "CHE-003",
+    "domain": "Chemical",
+    "variant": "spelling",
+    "split": "train",
+    "path": "02_Defective_Documents/spelling/CHE-003_spelling.pdf"
+  },
+  {
+    "id": "CHE-003",
+    "domain": "Chemical",
+    "variant": "grammar",
+    "split": "train",
+    "path": "02_Defective_Documents/grammar/CHE-003_grammar.pdf"
+  },
+  {
+    "id": "CHE-003",
+    "domain": "Chemical",
+    "variant": "formatting",
+    "split": "train",
+    "path": "02_Defective_Documents/formatting/CHE-003_formatting.pdf"
+  },
+  {
+    "id": "CHE-003",
+    "domain": "Chemical",
+    "variant": "toc",
+    "split": "train",
+    "path": "02_Defective_Documents/toc/CHE-003_toc.pdf"
+  },
+  {
+    "id": "CHE-003",
+    "domain": "Chemical",
+    "variant": "figure",
+    "split": "train",
+    "path": "02_Defective_Documents/figure/CHE-003_figure.pdf"
+  },
+  {
+    "id": "CHE-003",
+    "domain": "Chemical",
+    "variant": "table",
+    "split": "train",
+    "path": "02_Defective_Documents/table/CHE-003_table.pdf"
+  },
+  {
+    "id": "CHE-003",
+    "domain": "Chemical",
+    "variant": "header",
+    "split": "train",
+    "path": "02_Defective_Documents/header/CHE-003_header.pdf"
+  },
+  {
+    "id": "CHE-003",
+    "domain": "Chemical",
+    "variant": "numbering",
+    "split": "train",
+    "path": "02_Defective_Documents/numbering/CHE-003_numbering.pdf"
+  },
+  {
+    "id": "CHE-003",
+    "domain": "Chemical",
+    "variant": "missing",
+    "split": "train",
+    "path": "02_Defective_Documents/missing/CHE-003_missing.pdf"
+  },
+  {
+    "id": "CHE-003",
+    "domain": "Chemical",
+    "variant": "contradiction",
+    "split": "train",
+    "path": "02_Defective_Documents/contradiction/CHE-003_contradiction.pdf"
+  },
+  {
+    "id": "CHE-003",
+    "domain": "Chemical",
+    "variant": "mixed",
+    "split": "train",
+    "path": "02_Defective_Documents/mixed/CHE-003_mixed.pdf"
+  },
+  {
+    "id": "CHE-004",
+    "domain": "Chemical",
+    "variant": "clean",
+    "split": "train",
+    "path": "01_Clean_Documents/Chemical/CHE-004_clean.pdf"
+  },
+  {
+    "id": "CHE-004",
+    "domain": "Chemical",
+    "variant": "spelling",
+    "split": "train",
+    "path": "02_Defective_Documents/spelling/CHE-004_spelling.pdf"
+  },
+  {
+    "id": "CHE-004",
+    "domain": "Chemical",
+    "variant": "grammar",
+    "split": "train",
+    "path": "02_Defective_Documents/grammar/CHE-004_grammar.pdf"
+  },
+  {
+    "id": "CHE-004",
+    "domain": "Chemical",
+    "variant": "formatting",
+    "split": "train",
+    "path": "02_Defective_Documents/formatting/CHE-004_formatting.pdf"
+  },
+  {
+    "id": "CHE-004",
+    "domain": "Chemical",
+    "variant": "toc",
+    "split": "train",
+    "path": "02_Defective_Documents/toc/CHE-004_toc.pdf"
+  },
+  {
+    "id": "CHE-004",
+    "domain": "Chemical",
+    "variant": "figure",
+    "split": "train",
+    "path": "02_Defective_Documents/figure/CHE-004_figure.pdf"
+  },
+  {
+    "id": "CHE-004",
+    "domain": "Chemical",
+    "variant": "table",
+    "split": "train",
+    "path": "02_Defective_Documents/table/CHE-004_table.pdf"
+  },
+  {
+    "id": "CHE-004",
+    "domain": "Chemical",
+    "variant": "header",
+    "split": "train",
+    "path": "02_Defective_Documents/header/CHE-004_header.pdf"
+  },
+  {
+    "id": "CHE-004",
+    "domain": "Chemical",
+    "variant": "numbering",
+    "split": "train",
+    "path": "02_Defective_Documents/numbering/CHE-004_numbering.pdf"
+  },
+  {
+    "id": "CHE-004",
+    "domain": "Chemical",
+    "variant": "missing",
+    "split": "train",
+    "path": "02_Defective_Documents/missing/CHE-004_missing.pdf"
+  },
+  {
+    "id": "CHE-004",
+    "domain": "Chemical",
+    "variant": "contradiction",
+    "split": "train",
+    "path": "02_Defective_Documents/contradiction/CHE-004_contradiction.pdf"
+  },
+  {
+    "id": "CHE-004",
+    "domain": "Chemical",
+    "variant": "mixed",
+    "split": "train",
+    "path": "02_Defective_Documents/mixed/CHE-004_mixed.pdf"
+  },
+  {
+    "id": "CHE-006",
+    "domain": "Chemical",
+    "variant": "clean",
+    "split": "train",
+    "path": "01_Clean_Documents/Chemical/CHE-006_clean.pdf"
+  },
+  {
+    "id": "CHE-006",
+    "domain": "Chemical",
+    "variant": "spelling",
+    "split": "train",
+    "path": "02_Defective_Documents/spelling/CHE-006_spelling.pdf"
+  },
+  {
+    "id": "CHE-006",
+    "domain": "Chemical",
+    "variant": "grammar",
+    "split": "train",
+    "path": "02_Defective_Documents/grammar/CHE-006_grammar.pdf"
+  },
+  {
+    "id": "CHE-006",
+    "domain": "Chemical",
+    "variant": "formatting",
+    "split": "train",
+    "path": "02_Defective_Documents/formatting/CHE-006_formatting.pdf"
+  },
+  {
+    "id": "CHE-006",
+    "domain": "Chemical",
+    "variant": "toc",
+    "split": "train",
+    "path": "02_Defective_Documents/toc/CHE-006_toc.pdf"
+  },
+  {
+    "id": "CHE-006",
+    "domain": "Chemical",
+    "variant": "figure",
+    "split": "train",
+    "path": "02_Defective_Documents/figure/CHE-006_figure.pdf"
+  },
+  {
+    "id": "CHE-006",
+    "domain": "Chemical",
+    "variant": "table",
+    "split": "train",
+    "path": "02_Defective_Documents/table/CHE-006_table.pdf"
+  },
+  {
+    "id": "CHE-006",
+    "domain": "Chemical",
+    "variant": "header",
+    "split": "train",
+    "path": "02_Defective_Documents/header/CHE-006_header.pdf"
+  },
+  {
+    "id": "CHE-006",
+    "domain": "Chemical",
+    "variant": "numbering",
+    "split": "train",
+    "path": "02_Defective_Documents/numbering/CHE-006_numbering.pdf"
+  },
+  {
+    "id": "CHE-006",
+    "domain": "Chemical",
+    "variant": "missing",
+    "split": "train",
+    "path": "02_Defective_Documents/missing/CHE-006_missing.pdf"
+  },
+  {
+    "id": "CHE-006",
+    "domain": "Chemical",
+    "variant": "contradiction",
+    "split": "train",
+    "path": "02_Defective_Documents/contradiction/CHE-006_contradiction.pdf"
+  },
+  {
+    "id": "CHE-006",
+    "domain": "Chemical",
+    "variant": "mixed",
+    "split": "train",
+    "path": "02_Defective_Documents/mixed/CHE-006_mixed.pdf"
+  },
+  {
+    "id": "CHE-007",
+    "domain": "Chemical",
+    "variant": "clean",
+    "split": "train",
+    "path": "01_Clean_Documents/Chemical/CHE-007_clean.pdf"
+  },
+  {
+    "id": "CHE-007",
+    "domain": "Chemical",
+    "variant": "spelling",
+    "split": "train",
+    "path": "02_Defective_Documents/spelling/CHE-007_spelling.pdf"
+  },
+  {
+    "id": "CHE-007",
+    "domain": "Chemical",
+    "variant": "grammar",
+    "split": "train",
+    "path": "02_Defective_Documents/grammar/CHE-007_grammar.pdf"
+  },
+  {
+    "id": "CHE-007",
+    "domain": "Chemical",
+    "variant": "formatting",
+    "split": "train",
+    "path": "02_Defective_Documents/formatting/CHE-007_formatting.pdf"
+  },
+  {
+    "id": "CHE-007",
+    "domain": "Chemical",
+    "variant": "toc",
+    "split": "train",
+    "path": "02_Defective_Documents/toc/CHE-007_toc.pdf"
+  },
+  {
+    "id": "CHE-007",
+    "domain": "Chemical",
+    "variant": "figure",
+    "split": "train",
+    "path": "02_Defective_Documents/figure/CHE-007_figure.pdf"
+  },
+  {
+    "id": "CHE-007",
+    "domain": "Chemical",
+    "variant": "table",
+    "split": "train",
+    "path": "02_Defective_Documents/table/CHE-007_table.pdf"
+  },
+  {
+    "id": "CHE-007",
+    "domain": "Chemical",
+    "variant": "header",
+    "split": "train",
+    "path": "02_Defective_Documents/header/CHE-007_header.pdf"
+  },
+  {
+    "id": "CHE-007",
+    "domain": "Chemical",
+    "variant": "numbering",
+    "split": "train",
+    "path": "02_Defective_Documents/numbering/CHE-007_numbering.pdf"
+  },
+  {
+    "id": "CHE-007",
+    "domain": "Chemical",
+    "variant": "missing",
+    "split": "train",
+    "path": "02_Defective_Documents/missing/CHE-007_missing.pdf"
+  },
+  {
+    "id": "CHE-007",
+    "domain": "Chemical",
+    "variant": "contradiction",
+    "split": "train",
+    "path": "02_Defective_Documents/contradiction/CHE-007_contradiction.pdf"
+  },
+  {
+    "id": "CHE-007",
+    "domain": "Chemical",
+    "variant": "mixed",
+    "split": "train",
+    "path": "02_Defective_Documents/mixed/CHE-007_mixed.pdf"
+  },
+  {
+    "id": "QA_-003",
+    "domain": "QA_QC",
+    "variant": "clean",
+    "split": "train",
+    "path": "01_Clean_Documents/QA_QC/QA_-003_clean.pdf"
+  },
+  {
+    "id": "QA_-003",
+    "domain": "QA_QC",
+    "variant": "spelling",
+    "split": "train",
+    "path": "02_Defective_Documents/spelling/QA_-003_spelling.pdf"
+  },
+  {
+    "id": "QA_-003",
+    "domain": "QA_QC",
+    "variant": "grammar",
+    "split": "train",
+    "path": "02_Defective_Documents/grammar/QA_-003_grammar.pdf"
+  },
+  {
+    "id": "QA_-003",
+    "domain": "QA_QC",
+    "variant": "formatting",
+    "split": "train",
+    "path": "02_Defective_Documents/formatting/QA_-003_formatting.pdf"
+  },
+  {
+    "id": "QA_-003",
+    "domain": "QA_QC",
+    "variant": "toc",
+    "split": "train",
+    "path": "02_Defective_Documents/toc/QA_-003_toc.pdf"
+  },
+  {
+    "id": "QA_-003",
+    "domain": "QA_QC",
+    "variant": "figure",
+    "split": "train",
+    "path": "02_Defective_Documents/figure/QA_-003_figure.pdf"
+  },
+  {
+    "id": "QA_-003",
+    "domain": "QA_QC",
+    "variant": "table",
+    "split": "train",
+    "path": "02_Defective_Documents/table/QA_-003_table.pdf"
+  },
+  {
+    "id": "QA_-003",
+    "domain": "QA_QC",
+    "variant": "header",
+    "split": "train",
+    "path": "02_Defective_Documents/header/QA_-003_header.pdf"
+  },
+  {
+    "id": "QA_-003",
+    "domain": "QA_QC",
+    "variant": "numbering",
+    "split": "train",
+    "path": "02_Defective_Documents/numbering/QA_-003_numbering.pdf"
+  },
+  {
+    "id": "QA_-003",
+    "domain": "QA_QC",
+    "variant": "missing",
+    "split": "train",
+    "path": "02_Defective_Documents/missing/QA_-003_missing.pdf"
+  },
+  {
+    "id": "QA_-003",
+    "domain": "QA_QC",
+    "variant": "contradiction",
+    "split": "train",
+    "path": "02_Defective_Documents/contradiction/QA_-003_contradiction.pdf"
+  },
+  {
+    "id": "QA_-003",
+    "domain": "QA_QC",
+    "variant": "mixed",
+    "split": "train",
+    "path": "02_Defective_Documents/mixed/QA_-003_mixed.pdf"
+  },
+  {
+    "id": "QA_-004",
+    "domain": "QA_QC",
+    "variant": "clean",
+    "split": "train",
+    "path": "01_Clean_Documents/QA_QC/QA_-004_clean.pdf"
+  },
+  {
+    "id": "QA_-004",
+    "domain": "QA_QC",
+    "variant": "spelling",
+    "split": "train",
+    "path": "02_Defective_Documents/spelling/QA_-004_spelling.pdf"
+  },
+  {
+    "id": "QA_-004",
+    "domain": "QA_QC",
+    "variant": "grammar",
+    "split": "train",
+    "path": "02_Defective_Documents/grammar/QA_-004_grammar.pdf"
+  },
+  {
+    "id": "QA_-004",
+    "domain": "QA_QC",
+    "variant": "formatting",
+    "split": "train",
+    "path": "02_Defective_Documents/formatting/QA_-004_formatting.pdf"
+  },
+  {
+    "id": "QA_-004",
+    "domain": "QA_QC",
+    "variant": "toc",
+    "split": "train",
+    "path": "02_Defective_Documents/toc/QA_-004_toc.pdf"
+  },
+  {
+    "id": "QA_-004",
+    "domain": "QA_QC",
+    "variant": "figure",
+    "split": "train",
+    "path": "02_Defective_Documents/figure/QA_-004_figure.pdf"
+  },
+  {
+    "id": "QA_-004",
+    "domain": "QA_QC",
+    "variant": "table",
+    "split": "train",
+    "path": "02_Defective_Documents/table/QA_-004_table.pdf"
+  },
+  {
+    "id": "QA_-004",
+    "domain": "QA_QC",
+    "variant": "header",
+    "split": "train",
+    "path": "02_Defective_Documents/header/QA_-004_header.pdf"
+  },
+  {
+    "id": "QA_-004",
+    "domain": "QA_QC",
+    "variant": "numbering",
+    "split": "train",
+    "path": "02_Defective_Documents/numbering/QA_-004_numbering.pdf"
+  },
+  {
+    "id": "QA_-004",
+    "domain": "QA_QC",
+    "variant": "missing",
+    "split": "train",
+    "path": "02_Defective_Documents/missing/QA_-004_missing.pdf"
+  },
+  {
+    "id": "QA_-004",
+    "domain": "QA_QC",
+    "variant": "contradiction",
+    "split": "train",
+    "path": "02_Defective_Documents/contradiction/QA_-004_contradiction.pdf"
+  },
+  {
+    "id": "QA_-004",
+    "domain": "QA_QC",
+    "variant": "mixed",
+    "split": "train",
+    "path": "02_Defective_Documents/mixed/QA_-004_mixed.pdf"
+  },
+  {
+    "id": "QA_-005",
+    "domain": "QA_QC",
+    "variant": "clean",
+    "split": "train",
+    "path": "01_Clean_Documents/QA_QC/QA_-005_clean.pdf"
+  },
+  {
+    "id": "QA_-005",
+    "domain": "QA_QC",
+    "variant": "spelling",
+    "split": "train",
+    "path": "02_Defective_Documents/spelling/QA_-005_spelling.pdf"
+  },
+  {
+    "id": "QA_-005",
+    "domain": "QA_QC",
+    "variant": "grammar",
+    "split": "train",
+    "path": "02_Defective_Documents/grammar/QA_-005_grammar.pdf"
+  },
+  {
+    "id": "QA_-005",
+    "domain": "QA_QC",
+    "variant": "formatting",
+    "split": "train",
+    "path": "02_Defective_Documents/formatting/QA_-005_formatting.pdf"
+  },
+  {
+    "id": "QA_-005",
+    "domain": "QA_QC",
+    "variant": "toc",
+    "split": "train",
+    "path": "02_Defective_Documents/toc/QA_-005_toc.pdf"
+  },
+  {
+    "id": "QA_-005",
+    "domain": "QA_QC",
+    "variant": "figure",
+    "split": "train",
+    "path": "02_Defective_Documents/figure/QA_-005_figure.pdf"
+  },
+  {
+    "id": "QA_-005",
+    "domain": "QA_QC",
+    "variant": "table",
+    "split": "train",
+    "path": "02_Defective_Documents/table/QA_-005_table.pdf"
+  },
+  {
+    "id": "QA_-005",
+    "domain": "QA_QC",
+    "variant": "header",
+    "split": "train",
+    "path": "02_Defective_Documents/header/QA_-005_header.pdf"
+  },
+  {
+    "id": "QA_-005",
+    "domain": "QA_QC",
+    "variant": "numbering",
+    "split": "train",
+    "path": "02_Defective_Documents/numbering/QA_-005_numbering.pdf"
+  },
+  {
+    "id": "QA_-005",
+    "domain": "QA_QC",
+    "variant": "missing",
+    "split": "train",
+    "path": "02_Defective_Documents/missing/QA_-005_missing.pdf"
+  },
+  {
+    "id": "QA_-005",
+    "domain": "QA_QC",
+    "variant": "contradiction",
+    "split": "train",
+    "path": "02_Defective_Documents/contradiction/QA_-005_contradiction.pdf"
+  },
+  {
+    "id": "QA_-005",
+    "domain": "QA_QC",
+    "variant": "mixed",
+    "split": "train",
+    "path": "02_Defective_Documents/mixed/QA_-005_mixed.pdf"
+  },
+  {
+    "id": "QA_-007",
+    "domain": "QA_QC",
+    "variant": "clean",
+    "split": "train",
+    "path": "01_Clean_Documents/QA_QC/QA_-007_clean.pdf"
+  },
+  {
+    "id": "QA_-007",
+    "domain": "QA_QC",
+    "variant": "spelling",
+    "split": "train",
+    "path": "02_Defective_Documents/spelling/QA_-007_spelling.pdf"
+  },
+  {
+    "id": "QA_-007",
+    "domain": "QA_QC",
+    "variant": "grammar",
+    "split": "train",
+    "path": "02_Defective_Documents/grammar/QA_-007_grammar.pdf"
+  },
+  {
+    "id": "QA_-007",
+    "domain": "QA_QC",
+    "variant": "formatting",
+    "split": "train",
+    "path": "02_Defective_Documents/formatting/QA_-007_formatting.pdf"
+  },
+  {
+    "id": "QA_-007",
+    "domain": "QA_QC",
+    "variant": "toc",
+    "split": "train",
+    "path": "02_Defective_Documents/toc/QA_-007_toc.pdf"
+  },
+  {
+    "id": "QA_-007",
+    "domain": "QA_QC",
+    "variant": "figure",
+    "split": "train",
+    "path": "02_Defective_Documents/figure/QA_-007_figure.pdf"
+  },
+  {
+    "id": "QA_-007",
+    "domain": "QA_QC",
+    "variant": "table",
+    "split": "train",
+    "path": "02_Defective_Documents/table/QA_-007_table.pdf"
+  },
+  {
+    "id": "QA_-007",
+    "domain": "QA_QC",
+    "variant": "header",
+    "split": "train",
+    "path": "02_Defective_Documents/header/QA_-007_header.pdf"
+  },
+  {
+    "id": "QA_-007",
+    "domain": "QA_QC",
+    "variant": "numbering",
+    "split": "train",
+    "path": "02_Defective_Documents/numbering/QA_-007_numbering.pdf"
+  },
+  {
+    "id": "QA_-007",
+    "domain": "QA_QC",
+    "variant": "missing",
+    "split": "train",
+    "path": "02_Defective_Documents/missing/QA_-007_missing.pdf"
+  },
+  {
+    "id": "QA_-007",
+    "domain": "QA_QC",
+    "variant": "contradiction",
+    "split": "train",
+    "path": "02_Defective_Documents/contradiction/QA_-007_contradiction.pdf"
+  },
+  {
+    "id": "QA_-007",
+    "domain": "QA_QC",
+    "variant": "mixed",
+    "split": "train",
+    "path": "02_Defective_Documents/mixed/QA_-007_mixed.pdf"
+  }
+]

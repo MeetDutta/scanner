@@ -1,0 +1,221 @@
+{
+  "total_documents": 30,
+  "clean_documents_passing": 30,
+  "total_findings": 0,
+  "false_positives": 0,
+  "false_positive_rate": 0.0,
+  "findings_by_category": {},
+  "findings_by_severity": {},
+  "document_details": [
+    {
+      "id": "MEC-001",
+      "path": "01_Clean_Documents/Mechanical/MEC-001_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "MEC-002",
+      "path": "01_Clean_Documents/Mechanical/MEC-002_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "MEC-003",
+      "path": "01_Clean_Documents/Mechanical/MEC-003_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "MEC-004",
+      "path": "01_Clean_Documents/Mechanical/MEC-004_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "MEC-005",
+      "path": "01_Clean_Documents/Mechanical/MEC-005_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "MEC-006",
+      "path": "01_Clean_Documents/Mechanical/MEC-006_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "MEC-007",
+      "path": "01_Clean_Documents/Mechanical/MEC-007_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "MEC-008",
+      "path": "01_Clean_Documents/Mechanical/MEC-008_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "ELE-001",
+      "path": "01_Clean_Documents/Electrical/ELE-001_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "ELE-002",
+      "path": "01_Clean_Documents/Electrical/ELE-002_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "ELE-003",
+      "path": "01_Clean_Documents/Electrical/ELE-003_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "ELE-004",
+      "path": "01_Clean_Documents/Electrical/ELE-004_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "ELE-005",
+      "path": "01_Clean_Documents/Electrical/ELE-005_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "ELE-006",
+      "path": "01_Clean_Documents/Electrical/ELE-006_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "ELE-007",
+      "path": "01_Clean_Documents/Electrical/ELE-007_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "ELE-008",
+      "path": "01_Clean_Documents/Electrical/ELE-008_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "CHE-001",
+      "path": "01_Clean_Documents/Chemical/CHE-001_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "CHE-002",
+      "path": "01_Clean_Documents/Chemical/CHE-002_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "CHE-003",
+      "path": "01_Clean_Documents/Chemical/CHE-003_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "CHE-004",
+      "path": "01_Clean_Documents/Chemical/CHE-004_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "CHE-005",
+      "path": "01_Clean_Documents/Chemical/CHE-005_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "CHE-006",
+      "path": "01_Clean_Documents/Chemical/CHE-006_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "CHE-007",
+      "path": "01_Clean_Documents/Chemical/CHE-007_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "QA_-001",
+      "path": "01_Clean_Documents/QA_QC/QA_-001_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "QA_-002",
+      "path": "01_Clean_Documents/QA_QC/QA_-002_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "QA_-003",
+      "path": "01_Clean_Documents/QA_QC/QA_-003_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "QA_-004",
+      "path": "01_Clean_Documents/QA_QC/QA_-004_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "QA_-005",
+      "path": "01_Clean_Documents/QA_QC/QA_-005_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "QA_-006",
+      "path": "01_Clean_Documents/QA_QC/QA_-006_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "id": "QA_-007",
+      "path": "01_Clean_Documents/QA_QC/QA_-007_clean.pdf",
+      "status": "PASS",
+      "finding_count": 0,
+      "findings": []
+    }
+  ]
+}

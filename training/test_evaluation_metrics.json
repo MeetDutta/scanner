@@ -1,0 +1,21 @@
+{
+  "domain_classifier": {
+    "model": "DomainClassifierNet",
+    "test_samples": 48,
+    "accuracy": 0.5,
+    "macro_f1": 0.375
+  },
+  "logical_classifier": {
+    "model": "LogicalRelationNet",
+    "test_samples": 8,
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0
+  },
+  "engineering_ner": {
+    "model": "BiLSTMNER",
+    "test_samples": 16,
+    "token_accuracy": 1.0
+  }
+}

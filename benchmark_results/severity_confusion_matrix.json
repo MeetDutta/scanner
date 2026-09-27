@@ -1,0 +1,40 @@
+{
+  "matrix": {
+    "CRITICAL": {
+      "CRITICAL": 60,
+      "HIGH": 0,
+      "MEDIUM": 0,
+      "LOW": 0,
+      "INFORMATIONAL": 0
+    },
+    "HIGH": {
+      "CRITICAL": 0,
+      "HIGH": 120,
+      "MEDIUM": 0,
+      "LOW": 0,
+      "INFORMATIONAL": 0
+    },
+    "MEDIUM": {
+      "CRITICAL": 0,
+      "HIGH": 0,
+      "MEDIUM": 120,
+      "LOW": 0,
+      "INFORMATIONAL": 0
+    },
+    "LOW": {
+      "CRITICAL": 0,
+      "HIGH": 0,
+      "MEDIUM": 0,
+      "LOW": 60,
+      "INFORMATIONAL": 0
+    },
+    "INFORMATIONAL": {
+      "CRITICAL": 0,
+      "HIGH": 0,
+      "MEDIUM": 0,
+      "LOW": 0,
+      "INFORMATIONAL": 0
+    }
+  },
+  "accuracy": 1.0
+}

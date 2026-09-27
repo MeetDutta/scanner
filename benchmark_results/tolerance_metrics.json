@@ -1,0 +1,223 @@
+{
+  "cases_evaluated": 14,
+  "mean_absolute_error": 0.0,
+  "max_absolute_error": 0.0,
+  "decision_accuracy": 1.0,
+  "validation_status": "PASS",
+  "cases": [
+    {
+      "case_id": "TI-001",
+      "findings": [],
+      "expected_index": 0.0,
+      "actual_index": 0.0,
+      "absolute_error": 0.0,
+      "relative_error": 0.0,
+      "tolerance_status": "WITHIN ACCEPTABLE TOLERANCE",
+      "decision_correct": true,
+      "benchmark_match": "PASS"
+    },
+    {
+      "case_id": "TI-002",
+      "findings": [
+        "LOW",
+        "LOW"
+      ],
+      "expected_index": 1.0,
+      "actual_index": 1.0,
+      "absolute_error": 0.0,
+      "relative_error": 0.0,
+      "tolerance_status": "WITHIN ACCEPTABLE TOLERANCE",
+      "decision_correct": true,
+      "benchmark_match": "PASS"
+    },
+    {
+      "case_id": "TI-003",
+      "findings": [
+        "LOW",
+        "LOW",
+        "LOW",
+        "LOW",
+        "LOW"
+      ],
+      "expected_index": 2.5,
+      "actual_index": 2.5,
+      "absolute_error": 0.0,
+      "relative_error": 0.0,
+      "tolerance_status": "WITHIN ACCEPTABLE TOLERANCE",
+      "decision_correct": true,
+      "benchmark_match": "PASS"
+    },
+    {
+      "case_id": "TI-004",
+      "findings": [
+        "MEDIUM",
+        "MEDIUM"
+      ],
+      "expected_index": 4.0,
+      "actual_index": 4.0,
+      "absolute_error": 0.0,
+      "relative_error": 0.0,
+      "tolerance_status": "WITHIN ACCEPTABLE TOLERANCE",
+      "decision_correct": true,
+      "benchmark_match": "PASS"
+    },
+    {
+      "case_id": "TI-005",
+      "findings": [
+        "MEDIUM",
+        "MEDIUM",
+        "MEDIUM",
+        "MEDIUM",
+        "MEDIUM"
+      ],
+      "expected_index": 10.0,
+      "actual_index": 10.0,
+      "absolute_error": 0.0,
+      "relative_error": 0.0,
+      "tolerance_status": "WITHIN ACCEPTABLE TOLERANCE",
+      "decision_correct": true,
+      "benchmark_match": "PASS"
+    },
+    {
+      "case_id": "TI-006",
+      "findings": [
+        "HIGH"
+      ],
+      "expected_index": 5.0,
+      "actual_index": 5.0,
+      "absolute_error": 0.0,
+      "relative_error": 0.0,
+      "tolerance_status": "WITHIN ACCEPTABLE TOLERANCE",
+      "decision_correct": true,
+      "benchmark_match": "PASS"
+    },
+    {
+      "case_id": "TI-007",
+      "findings": [
+        "HIGH",
+        "HIGH"
+      ],
+      "expected_index": 10.0,
+      "actual_index": 10.0,
+      "absolute_error": 0.0,
+      "relative_error": 0.0,
+      "tolerance_status": "WITHIN ACCEPTABLE TOLERANCE",
+      "decision_correct": true,
+      "benchmark_match": "PASS"
+    },
+    {
+      "case_id": "TI-008",
+      "findings": [
+        "CRITICAL"
+      ],
+      "expected_index": 10.0,
+      "actual_index": 10.0,
+      "absolute_error": 0.0,
+      "relative_error": 0.0,
+      "tolerance_status": "NOT ELIGIBLE",
+      "decision_correct": true,
+      "benchmark_match": "PASS"
+    },
+    {
+      "case_id": "TI-009",
+      "findings": [
+        "LOW",
+        "MEDIUM",
+        "MEDIUM",
+        "HIGH"
+      ],
+      "expected_index": 9.5,
+      "actual_index": 9.5,
+      "absolute_error": 0.0,
+      "relative_error": 0.0,
+      "tolerance_status": "WITHIN ACCEPTABLE TOLERANCE",
+      "decision_correct": true,
+      "benchmark_match": "PASS"
+    },
+    {
+      "case_id": "TI-010",
+      "findings": [
+        "MEDIUM",
+        "HIGH",
+        "HIGH"
+      ],
+      "expected_index": 12.0,
+      "actual_index": 12.0,
+      "absolute_error": 0.0,
+      "relative_error": 0.0,
+      "tolerance_status": "ABOVE ACCEPTABLE TOLERANCE",
+      "decision_correct": true,
+      "benchmark_match": "PASS"
+    },
+    {
+      "case_id": "TI-011",
+      "findings": [
+        "CRITICAL",
+        "HIGH"
+      ],
+      "expected_index": 15.0,
+      "actual_index": 15.0,
+      "absolute_error": 0.0,
+      "relative_error": 0.0,
+      "tolerance_status": "NOT ELIGIBLE",
+      "decision_correct": true,
+      "benchmark_match": "PASS"
+    },
+    {
+      "case_id": "TI-012",
+      "findings": [
+        "LOW",
+        "LOW",
+        "LOW",
+        "LOW",
+        "LOW",
+        "LOW",
+        "LOW",
+        "LOW",
+        "LOW",
+        "LOW"
+      ],
+      "expected_index": 5.0,
+      "actual_index": 5.0,
+      "absolute_error": 0.0,
+      "relative_error": 0.0,
+      "tolerance_status": "WITHIN ACCEPTABLE TOLERANCE",
+      "decision_correct": true,
+      "benchmark_match": "PASS"
+    },
+    {
+      "case_id": "TI-013",
+      "findings": [
+        "MEDIUM",
+        "MEDIUM",
+        "MEDIUM",
+        "MEDIUM",
+        "MEDIUM",
+        "MEDIUM"
+      ],
+      "expected_index": 12.0,
+      "actual_index": 12.0,
+      "absolute_error": 0.0,
+      "relative_error": 0.0,
+      "tolerance_status": "ABOVE ACCEPTABLE TOLERANCE",
+      "decision_correct": true,
+      "benchmark_match": "PASS"
+    },
+    {
+      "case_id": "TI-014",
+      "findings": [
+        "LOW",
+        "MEDIUM",
+        "HIGH",
+        "CRITICAL"
+      ],
+      "expected_index": 17.5,
+      "actual_index": 17.5,
+      "absolute_error": 0.0,
+      "relative_error": 0.0,
+      "tolerance_status": "NOT ELIGIBLE",
+      "decision_correct": true,
+      "benchmark_match": "PASS"
+    }
+  ]
+}

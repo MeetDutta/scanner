@@ -1,0 +1,234 @@
+{
+  "timestamp": "2026-09-27T15:38:22Z",
+  "domain_classifier": {
+    "model": "DomainClassifierNet",
+    "best_val_acc": 1.0,
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 0.911,
+        "train_acc": 0.6548,
+        "val_loss": 0.5797,
+        "val_acc": 0.8
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.3145,
+        "train_acc": 0.9048,
+        "val_loss": 0.3662,
+        "val_acc": 0.9667
+      },
+      {
+        "epoch": 3,
+        "train_loss": 0.0638,
+        "train_acc": 0.9881,
+        "val_loss": 0.2787,
+        "val_acc": 0.9667
+      },
+      {
+        "epoch": 4,
+        "train_loss": 0.0221,
+        "train_acc": 0.996,
+        "val_loss": 0.1927,
+        "val_acc": 0.9667
+      },
+      {
+        "epoch": 5,
+        "train_loss": 0.0154,
+        "train_acc": 0.996,
+        "val_loss": 0.2726,
+        "val_acc": 0.8
+      },
+      {
+        "epoch": 6,
+        "train_loss": 0.0055,
+        "train_acc": 1.0,
+        "val_loss": 0.0842,
+        "val_acc": 1.0
+      },
+      {
+        "epoch": 7,
+        "train_loss": 0.0028,
+        "train_acc": 1.0,
+        "val_loss": 0.0681,
+        "val_acc": 1.0
+      },
+      {
+        "epoch": 8,
+        "train_loss": 0.0014,
+        "train_acc": 1.0,
+        "val_loss": 0.0593,
+        "val_acc": 1.0
+      },
+      {
+        "epoch": 9,
+        "train_loss": 0.0011,
+        "train_acc": 1.0,
+        "val_loss": 0.0574,
+        "val_acc": 1.0
+      },
+      {
+        "epoch": 10,
+        "train_loss": 0.002,
+        "train_acc": 1.0,
+        "val_loss": 0.2903,
+        "val_acc": 0.8
+      },
+      {
+        "epoch": 11,
+        "train_loss": 0.0017,
+        "train_acc": 1.0,
+        "val_loss": 0.1743,
+        "val_acc": 0.8
+      },
+      {
+        "epoch": 12,
+        "train_loss": 0.0006,
+        "train_acc": 1.0,
+        "val_loss": 0.1989,
+        "val_acc": 0.8
+      },
+      {
+        "epoch": 13,
+        "train_loss": 0.0005,
+        "train_acc": 1.0,
+        "val_loss": 0.1859,
+        "val_acc": 0.8
+      },
+      {
+        "epoch": 14,
+        "train_loss": 0.0005,
+        "train_acc": 1.0,
+        "val_loss": 0.1444,
+        "val_acc": 0.9833
+      },
+      {
+        "epoch": 15,
+        "train_loss": 0.0005,
+        "train_acc": 1.0,
+        "val_loss": 0.1057,
+        "val_acc": 1.0
+      }
+    ],
+    "weights_path": "/Users/meet/Desktop/scanner/models/checkpoints/domain_classifier.pt",
+    "onnx_path": "/Users/meet/Desktop/scanner/models/onnx/domain_classifier.onnx"
+  },
+  "logical_classifier": {
+    "model": "LogicalRelationNet",
+    "best_val_acc": 1.0,
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 0.5908,
+        "train_acc": 0.8571,
+        "val_loss": 0.275,
+        "val_acc": 1.0
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.1631,
+        "train_acc": 1.0,
+        "val_loss": 0.005,
+        "val_acc": 1.0
+      },
+      {
+        "epoch": 3,
+        "train_loss": 0.0018,
+        "train_acc": 1.0,
+        "val_loss": 0.0,
+        "val_acc": 1.0
+      },
+      {
+        "epoch": 4,
+        "train_loss": 0.0,
+        "train_acc": 1.0,
+        "val_loss": 0.0,
+        "val_acc": 1.0
+      },
+      {
+        "epoch": 5,
+        "train_loss": 0.0,
+        "train_acc": 1.0,
+        "val_loss": 0.0,
+        "val_acc": 1.0
+      },
+      {
+        "epoch": 6,
+        "train_loss": 0.0,
+        "train_acc": 1.0,
+        "val_loss": 0.0,
+        "val_acc": 1.0
+      },
+      {
+        "epoch": 7,
+        "train_loss": 0.0,
+        "train_acc": 1.0,
+        "val_loss": 0.0,
+        "val_acc": 1.0
+      },
+      {
+        "epoch": 8,
+        "train_loss": 0.0,
+        "train_acc": 1.0,
+        "val_loss": 0.0,
+        "val_acc": 1.0
+      },
+      {
+        "epoch": 9,
+        "train_loss": 0.0,
+        "train_acc": 1.0,
+        "val_loss": 0.0,
+        "val_acc": 1.0
+      },
+      {
+        "epoch": 10,
+        "train_loss": 0.0,
+        "train_acc": 1.0,
+        "val_loss": 0.0,
+        "val_acc": 1.0
+      },
+      {
+        "epoch": 11,
+        "train_loss": 0.0,
+        "train_acc": 1.0,
+        "val_loss": 0.0,
+        "val_acc": 1.0
+      },
+      {
+        "epoch": 12,
+        "train_loss": 0.0,
+        "train_acc": 1.0,
+        "val_loss": 0.0,
+        "val_acc": 1.0
+      },
+      {
+        "epoch": 13,
+        "train_loss": 0.0,
+        "train_acc": 1.0,
+        "val_loss": 0.0,
+        "val_acc": 1.0
+      },
+      {
+        "epoch": 14,
+        "train_loss": 0.0,
+        "train_acc": 1.0,
+        "val_loss": 0.0,
+        "val_acc": 1.0
+      },
+      {
+        "epoch": 15,
+        "train_loss": 0.0,
+        "train_acc": 1.0,
+        "val_loss": 0.0,
+        "val_acc": 1.0
+      }
+    ],
+    "weights_path": "/Users/meet/Desktop/scanner/models/checkpoints/logical_classifier.pt",
+    "onnx_path": "/Users/meet/Desktop/scanner/models/onnx/logical_classifier.onnx"
+  },
+  "engineering_ner": {
+    "model": "BiLSTMNER",
+    "best_loss": 0.0,
+    "weights_path": "/Users/meet/Desktop/scanner/models/checkpoints/engineering_ner.pt"
+  }
+}

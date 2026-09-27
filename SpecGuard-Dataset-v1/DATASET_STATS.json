@@ -1,0 +1,14 @@
+{
+  "clean_documents": 30,
+  "defective_variants": 300,
+  "total_controlled_pdfs": 330,
+  "defect_families": 11,
+  "ocr_cases": 6,
+  "tolerance_cases": 14,
+  "ground_truth_findings": 366,
+  "splits": {
+    "train_base_documents": 21,
+    "validation_base_documents": 5,
+    "test_base_documents": 4
+  }
+}

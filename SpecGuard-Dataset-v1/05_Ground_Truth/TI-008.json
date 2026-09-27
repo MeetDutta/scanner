@@ -1,0 +1,16 @@
+{
+  "case_id": "TI-008",
+  "findings": [
+    "CRITICAL"
+  ],
+  "weights": {
+    "CRITICAL": 10.0,
+    "HIGH": 5.0,
+    "MEDIUM": 2.0,
+    "LOW": 0.5,
+    "INFORMATIONAL": 0.0
+  },
+  "expected_raw_score": 10.0,
+  "reference_tolerance_index": 10.0,
+  "maximum_acceptable_tolerance": 10.0
+}

@@ -1,0 +1,42 @@
+# SpecGuard Machine Learning Model Training Configuration
+seed: 42
+dataset_root: "SpecGuard-Dataset-v1"
+
+splits:
+  train_ratio: 0.70
+  validation_ratio: 0.15
+  test_ratio: 0.15
+
+domain_classifier:
+  vocab_size: 5000
+  embed_dim: 64
+  hidden_dim: 64
+  num_classes: 4
+  classes: ["mechanical", "electrical", "chemical", "general"]
+  batch_size: 8
+  epochs: 15
+  learning_rate: 0.003
+  export_onnx: true
+
+logical_classifier:
+  vocab_size: 5000
+  embed_dim: 64
+  hidden_dim: 64
+  batch_size: 8
+  epochs: 15
+  learning_rate: 0.003
+  export_onnx: true
+
+engineering_ner:
+  vocab_size: 5000
+  embed_dim: 64
+  hidden_dim: 64
+  batch_size: 8
+  epochs: 15
+  learning_rate: 0.003
+  export_onnx: true
+
+artifacts:
+  checkpoints_dir: "models/checkpoints"
+  onnx_dir: "models/onnx"
+  metrics_file: "training/training_metrics.json"

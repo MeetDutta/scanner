@@ -1,0 +1,190 @@
+[
+  {
+    "name": "DomainClassifierNet",
+    "type": "BiLSTM Text Classifier",
+    "framework": "PyTorch / ONNX",
+    "model_file": "models/checkpoints/domain_classifier.pt, models/onnx/domain_classifier.onnx",
+    "input": "Tokenized document text sequence (max_len=128)",
+    "output": "Engineering discipline logits (4 classes: MECHANICAL, ELECTRICAL, CHEMICAL, GENERAL)",
+    "training_required": true,
+    "currently_used": true,
+    "dataset_categories": [
+      "DOMAIN",
+      "GENERAL"
+    ],
+    "status": "WORKING"
+  },
+  {
+    "name": "LogicalRelationNet",
+    "type": "Siamese Dual-Encoder Net",
+    "framework": "PyTorch / ONNX",
+    "model_file": "models/checkpoints/logical_classifier.pt, models/onnx/logical_classifier.onnx",
+    "input": "Paired engineering proposition sentences (statement_a, statement_b)",
+    "output": "Contradiction classification logits (0: Consistent, 1: Contradictory)",
+    "training_required": true,
+    "currently_used": true,
+    "dataset_categories": [
+      "CONTRADICTION"
+    ],
+    "status": "WORKING"
+  },
+  {
+    "name": "EngineeringNERNet (BiLSTMNER)",
+    "type": "BiLSTM Token Sequence Tagger",
+    "framework": "PyTorch",
+    "model_file": "models/checkpoints/engineering_ner.pt",
+    "input": "Regex offset-tokenized technical sentences",
+    "output": "BIO label sequence for engineering parameters, values, and units",
+    "training_required": true,
+    "currently_used": true,
+    "dataset_categories": [
+      "TABLE_VALUE",
+      "ENGINEERING"
+    ],
+    "status": "WORKING"
+  },
+  {
+    "name": "DocumentParser",
+    "type": "PDF Parser & Vector AST",
+    "framework": "PyMuPDF (fitz)",
+    "model_file": "",
+    "input": "PDF byte stream",
+    "output": "DocumentModel (pages, blocks, lines, spans, bboxes)",
+    "training_required": false,
+    "currently_used": true,
+    "dataset_categories": [
+      "ALL"
+    ],
+    "status": "RULE_BASED"
+  },
+  {
+    "name": "ScannedDocumentPipeline",
+    "type": "OCR Engine & Image Enhancer",
+    "framework": "OpenCV / Tesseract",
+    "model_file": "",
+    "input": "Scanned bitmap raster image",
+    "output": "Extracted OCR text and bounding boxes",
+    "training_required": false,
+    "currently_used": false,
+    "dataset_categories": [
+      "OCR"
+    ],
+    "status": "FAILED"
+  },
+  {
+    "name": "GrammarAnalyzer",
+    "type": "Deterministic Lexical NLP",
+    "framework": "Python / Regex Whitelist",
+    "model_file": "",
+    "input": "Text blocks and tokens",
+    "output": "Spelling errors, subject-verb agreement, and repeated words",
+    "training_required": false,
+    "currently_used": true,
+    "dataset_categories": [
+      "SPELLING",
+      "GRAMMAR",
+      "MIXED"
+    ],
+    "status": "RULE_BASED"
+  },
+  {
+    "name": "FormattingAnalyzer",
+    "type": "Deterministic Typography Checker",
+    "framework": "Python",
+    "model_file": "",
+    "input": "Font attributes, span sizes, and page margins",
+    "output": "Typography and font-size outlier findings",
+    "training_required": false,
+    "currently_used": true,
+    "dataset_categories": [
+      "FORMATTING"
+    ],
+    "status": "RULE_BASED"
+  },
+  {
+    "name": "TOCAnalyzer",
+    "type": "Deterministic Outline Matching",
+    "framework": "Python",
+    "model_file": "",
+    "input": "TOC items and heading AST",
+    "output": "TOC pagination drift and missing heading findings",
+    "training_required": false,
+    "currently_used": true,
+    "dataset_categories": [
+      "TOC"
+    ],
+    "status": "RULE_BASED"
+  },
+  {
+    "name": "FigureAnalyzer",
+    "type": "Deterministic Sequence Tracking",
+    "framework": "Python",
+    "model_file": "",
+    "input": "Figure caption strings and indices",
+    "output": "Figure sequence gaps and duplicate label findings",
+    "training_required": false,
+    "currently_used": true,
+    "dataset_categories": [
+      "FIGURE_REFERENCE"
+    ],
+    "status": "RULE_BASED"
+  },
+  {
+    "name": "TableAnalyzer",
+    "type": "Deterministic Tabular Parser",
+    "framework": "Python",
+    "model_file": "",
+    "input": "Table grid rows, headers, and cells",
+    "output": "Table value out-of-spec and unit inconsistency findings",
+    "training_required": false,
+    "currently_used": true,
+    "dataset_categories": [
+      "TABLE_VALUE"
+    ],
+    "status": "RULE_BASED"
+  },
+  {
+    "name": "StructureAnalyzer",
+    "type": "Deterministic Document Control Engine",
+    "framework": "Python",
+    "model_file": "",
+    "input": "Revision headers, subclause numbering, placeholder text",
+    "output": "Revision mismatch, section numbering, and missing content findings",
+    "training_required": false,
+    "currently_used": true,
+    "dataset_categories": [
+      "DOCUMENT_CONTROL",
+      "NUMBERING",
+      "MISSING_CONTENT"
+    ],
+    "status": "RULE_BASED"
+  },
+  {
+    "name": "SeverityEngine",
+    "type": "Algorithmic Risk Engine",
+    "framework": "Python",
+    "model_file": "",
+    "input": "Finding parameters and confidence metrics",
+    "output": "Calibrated finding severity ranking",
+    "training_required": false,
+    "currently_used": true,
+    "dataset_categories": [
+      "ALL"
+    ],
+    "status": "RULE_BASED"
+  },
+  {
+    "name": "ToleranceCalculator",
+    "type": "Deterministic Calculation Engine",
+    "framework": "Python",
+    "model_file": "",
+    "input": "Finding list, severity weights, and threshold limit",
+    "output": "Tolerance Index and publication readiness status",
+    "training_required": false,
+    "currently_used": true,
+    "dataset_categories": [
+      "TOLERANCE"
+    ],
+    "status": "RULE_BASED"
+  }
+]

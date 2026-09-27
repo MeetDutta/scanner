@@ -178,3 +178,7 @@ class EngineeringNERNet(nn.Module):
         if attention_mask is not None:
             logits = logits * attention_mask.unsqueeze(-1)
         return logits
+
+
+BiLSTMNER = EngineeringNERNet
+

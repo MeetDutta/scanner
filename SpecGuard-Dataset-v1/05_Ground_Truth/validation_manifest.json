@@ -1,0 +1,422 @@
+[
+  {
+    "id": "MEC-005",
+    "domain": "Mechanical",
+    "variant": "clean",
+    "split": "validation",
+    "path": "01_Clean_Documents/Mechanical/MEC-005_clean.pdf"
+  },
+  {
+    "id": "MEC-005",
+    "domain": "Mechanical",
+    "variant": "spelling",
+    "split": "validation",
+    "path": "02_Defective_Documents/spelling/MEC-005_spelling.pdf"
+  },
+  {
+    "id": "MEC-005",
+    "domain": "Mechanical",
+    "variant": "grammar",
+    "split": "validation",
+    "path": "02_Defective_Documents/grammar/MEC-005_grammar.pdf"
+  },
+  {
+    "id": "MEC-005",
+    "domain": "Mechanical",
+    "variant": "formatting",
+    "split": "validation",
+    "path": "02_Defective_Documents/formatting/MEC-005_formatting.pdf"
+  },
+  {
+    "id": "MEC-005",
+    "domain": "Mechanical",
+    "variant": "toc",
+    "split": "validation",
+    "path": "02_Defective_Documents/toc/MEC-005_toc.pdf"
+  },
+  {
+    "id": "MEC-005",
+    "domain": "Mechanical",
+    "variant": "figure",
+    "split": "validation",
+    "path": "02_Defective_Documents/figure/MEC-005_figure.pdf"
+  },
+  {
+    "id": "MEC-005",
+    "domain": "Mechanical",
+    "variant": "table",
+    "split": "validation",
+    "path": "02_Defective_Documents/table/MEC-005_table.pdf"
+  },
+  {
+    "id": "MEC-005",
+    "domain": "Mechanical",
+    "variant": "header",
+    "split": "validation",
+    "path": "02_Defective_Documents/header/MEC-005_header.pdf"
+  },
+  {
+    "id": "MEC-005",
+    "domain": "Mechanical",
+    "variant": "numbering",
+    "split": "validation",
+    "path": "02_Defective_Documents/numbering/MEC-005_numbering.pdf"
+  },
+  {
+    "id": "MEC-005",
+    "domain": "Mechanical",
+    "variant": "missing",
+    "split": "validation",
+    "path": "02_Defective_Documents/missing/MEC-005_missing.pdf"
+  },
+  {
+    "id": "MEC-005",
+    "domain": "Mechanical",
+    "variant": "contradiction",
+    "split": "validation",
+    "path": "02_Defective_Documents/contradiction/MEC-005_contradiction.pdf"
+  },
+  {
+    "id": "MEC-005",
+    "domain": "Mechanical",
+    "variant": "mixed",
+    "split": "validation",
+    "path": "02_Defective_Documents/mixed/MEC-005_mixed.pdf"
+  },
+  {
+    "id": "MEC-008",
+    "domain": "Mechanical",
+    "variant": "clean",
+    "split": "validation",
+    "path": "01_Clean_Documents/Mechanical/MEC-008_clean.pdf"
+  },
+  {
+    "id": "MEC-008",
+    "domain": "Mechanical",
+    "variant": "spelling",
+    "split": "validation",
+    "path": "02_Defective_Documents/spelling/MEC-008_spelling.pdf"
+  },
+  {
+    "id": "MEC-008",
+    "domain": "Mechanical",
+    "variant": "grammar",
+    "split": "validation",
+    "path": "02_Defective_Documents/grammar/MEC-008_grammar.pdf"
+  },
+  {
+    "id": "MEC-008",
+    "domain": "Mechanical",
+    "variant": "formatting",
+    "split": "validation",
+    "path": "02_Defective_Documents/formatting/MEC-008_formatting.pdf"
+  },
+  {
+    "id": "MEC-008",
+    "domain": "Mechanical",
+    "variant": "toc",
+    "split": "validation",
+    "path": "02_Defective_Documents/toc/MEC-008_toc.pdf"
+  },
+  {
+    "id": "MEC-008",
+    "domain": "Mechanical",
+    "variant": "figure",
+    "split": "validation",
+    "path": "02_Defective_Documents/figure/MEC-008_figure.pdf"
+  },
+  {
+    "id": "MEC-008",
+    "domain": "Mechanical",
+    "variant": "table",
+    "split": "validation",
+    "path": "02_Defective_Documents/table/MEC-008_table.pdf"
+  },
+  {
+    "id": "MEC-008",
+    "domain": "Mechanical",
+    "variant": "header",
+    "split": "validation",
+    "path": "02_Defective_Documents/header/MEC-008_header.pdf"
+  },
+  {
+    "id": "MEC-008",
+    "domain": "Mechanical",
+    "variant": "numbering",
+    "split": "validation",
+    "path": "02_Defective_Documents/numbering/MEC-008_numbering.pdf"
+  },
+  {
+    "id": "MEC-008",
+    "domain": "Mechanical",
+    "variant": "missing",
+    "split": "validation",
+    "path": "02_Defective_Documents/missing/MEC-008_missing.pdf"
+  },
+  {
+    "id": "MEC-008",
+    "domain": "Mechanical",
+    "variant": "contradiction",
+    "split": "validation",
+    "path": "02_Defective_Documents/contradiction/MEC-008_contradiction.pdf"
+  },
+  {
+    "id": "MEC-008",
+    "domain": "Mechanical",
+    "variant": "mixed",
+    "split": "validation",
+    "path": "02_Defective_Documents/mixed/MEC-008_mixed.pdf"
+  },
+  {
+    "id": "ELE-001",
+    "domain": "Electrical",
+    "variant": "clean",
+    "split": "validation",
+    "path": "01_Clean_Documents/Electrical/ELE-001_clean.pdf"
+  },
+  {
+    "id": "ELE-001",
+    "domain": "Electrical",
+    "variant": "spelling",
+    "split": "validation",
+    "path": "02_Defective_Documents/spelling/ELE-001_spelling.pdf"
+  },
+  {
+    "id": "ELE-001",
+    "domain": "Electrical",
+    "variant": "grammar",
+    "split": "validation",
+    "path": "02_Defective_Documents/grammar/ELE-001_grammar.pdf"
+  },
+  {
+    "id": "ELE-001",
+    "domain": "Electrical",
+    "variant": "formatting",
+    "split": "validation",
+    "path": "02_Defective_Documents/formatting/ELE-001_formatting.pdf"
+  },
+  {
+    "id": "ELE-001",
+    "domain": "Electrical",
+    "variant": "toc",
+    "split": "validation",
+    "path": "02_Defective_Documents/toc/ELE-001_toc.pdf"
+  },
+  {
+    "id": "ELE-001",
+    "domain": "Electrical",
+    "variant": "figure",
+    "split": "validation",
+    "path": "02_Defective_Documents/figure/ELE-001_figure.pdf"
+  },
+  {
+    "id": "ELE-001",
+    "domain": "Electrical",
+    "variant": "table",
+    "split": "validation",
+    "path": "02_Defective_Documents/table/ELE-001_table.pdf"
+  },
+  {
+    "id": "ELE-001",
+    "domain": "Electrical",
+    "variant": "header",
+    "split": "validation",
+    "path": "02_Defective_Documents/header/ELE-001_header.pdf"
+  },
+  {
+    "id": "ELE-001",
+    "domain": "Electrical",
+    "variant": "numbering",
+    "split": "validation",
+    "path": "02_Defective_Documents/numbering/ELE-001_numbering.pdf"
+  },
+  {
+    "id": "ELE-001",
+    "domain": "Electrical",
+    "variant": "missing",
+    "split": "validation",
+    "path": "02_Defective_Documents/missing/ELE-001_missing.pdf"
+  },
+  {
+    "id": "ELE-001",
+    "domain": "Electrical",
+    "variant": "contradiction",
+    "split": "validation",
+    "path": "02_Defective_Documents/contradiction/ELE-001_contradiction.pdf"
+  },
+  {
+    "id": "ELE-001",
+    "domain": "Electrical",
+    "variant": "mixed",
+    "split": "validation",
+    "path": "02_Defective_Documents/mixed/ELE-001_mixed.pdf"
+  },
+  {
+    "id": "QA_-002",
+    "domain": "QA_QC",
+    "variant": "clean",
+    "split": "validation",
+    "path": "01_Clean_Documents/QA_QC/QA_-002_clean.pdf"
+  },
+  {
+    "id": "QA_-002",
+    "domain": "QA_QC",
+    "variant": "spelling",
+    "split": "validation",
+    "path": "02_Defective_Documents/spelling/QA_-002_spelling.pdf"
+  },
+  {
+    "id": "QA_-002",
+    "domain": "QA_QC",
+    "variant": "grammar",
+    "split": "validation",
+    "path": "02_Defective_Documents/grammar/QA_-002_grammar.pdf"
+  },
+  {
+    "id": "QA_-002",
+    "domain": "QA_QC",
+    "variant": "formatting",
+    "split": "validation",
+    "path": "02_Defective_Documents/formatting/QA_-002_formatting.pdf"
+  },
+  {
+    "id": "QA_-002",
+    "domain": "QA_QC",
+    "variant": "toc",
+    "split": "validation",
+    "path": "02_Defective_Documents/toc/QA_-002_toc.pdf"
+  },
+  {
+    "id": "QA_-002",
+    "domain": "QA_QC",
+    "variant": "figure",
+    "split": "validation",
+    "path": "02_Defective_Documents/figure/QA_-002_figure.pdf"
+  },
+  {
+    "id": "QA_-002",
+    "domain": "QA_QC",
+    "variant": "table",
+    "split": "validation",
+    "path": "02_Defective_Documents/table/QA_-002_table.pdf"
+  },
+  {
+    "id": "QA_-002",
+    "domain": "QA_QC",
+    "variant": "header",
+    "split": "validation",
+    "path": "02_Defective_Documents/header/QA_-002_header.pdf"
+  },
+  {
+    "id": "QA_-002",
+    "domain": "QA_QC",
+    "variant": "numbering",
+    "split": "validation",
+    "path": "02_Defective_Documents/numbering/QA_-002_numbering.pdf"
+  },
+  {
+    "id": "QA_-002",
+    "domain": "QA_QC",
+    "variant": "missing",
+    "split": "validation",
+    "path": "02_Defective_Documents/missing/QA_-002_missing.pdf"
+  },
+  {
+    "id": "QA_-002",
+    "domain": "QA_QC",
+    "variant": "contradiction",
+    "split": "validation",
+    "path": "02_Defective_Documents/contradiction/QA_-002_contradiction.pdf"
+  },
+  {
+    "id": "QA_-002",
+    "domain": "QA_QC",
+    "variant": "mixed",
+    "split": "validation",
+    "path": "02_Defective_Documents/mixed/QA_-002_mixed.pdf"
+  },
+  {
+    "id": "QA_-006",
+    "domain": "QA_QC",
+    "variant": "clean",
+    "split": "validation",
+    "path": "01_Clean_Documents/QA_QC/QA_-006_clean.pdf"
+  },
+  {
+    "id": "QA_-006",
+    "domain": "QA_QC",
+    "variant": "spelling",
+    "split": "validation",
+    "path": "02_Defective_Documents/spelling/QA_-006_spelling.pdf"
+  },
+  {
+    "id": "QA_-006",
+    "domain": "QA_QC",
+    "variant": "grammar",
+    "split": "validation",
+    "path": "02_Defective_Documents/grammar/QA_-006_grammar.pdf"
+  },
+  {
+    "id": "QA_-006",
+    "domain": "QA_QC",
+    "variant": "formatting",
+    "split": "validation",
+    "path": "02_Defective_Documents/formatting/QA_-006_formatting.pdf"
+  },
+  {
+    "id": "QA_-006",
+    "domain": "QA_QC",
+    "variant": "toc",
+    "split": "validation",
+    "path": "02_Defective_Documents/toc/QA_-006_toc.pdf"
+  },
+  {
+    "id": "QA_-006",
+    "domain": "QA_QC",
+    "variant": "figure",
+    "split": "validation",
+    "path": "02_Defective_Documents/figure/QA_-006_figure.pdf"
+  },
+  {
+    "id": "QA_-006",
+    "domain": "QA_QC",
+    "variant": "table",
+    "split": "validation",
+    "path": "02_Defective_Documents/table/QA_-006_table.pdf"
+  },
+  {
+    "id": "QA_-006",
+    "domain": "QA_QC",
+    "variant": "header",
+    "split": "validation",
+    "path": "02_Defective_Documents/header/QA_-006_header.pdf"
+  },
+  {
+    "id": "QA_-006",
+    "domain": "QA_QC",
+    "variant": "numbering",
+    "split": "validation",
+    "path": "02_Defective_Documents/numbering/QA_-006_numbering.pdf"
+  },
+  {
+    "id": "QA_-006",
+    "domain": "QA_QC",
+    "variant": "missing",
+    "split": "validation",
+    "path": "02_Defective_Documents/missing/QA_-006_missing.pdf"
+  },
+  {
+    "id": "QA_-006",
+    "domain": "QA_QC",
+    "variant": "contradiction",
+    "split": "validation",
+    "path": "02_Defective_Documents/contradiction/QA_-006_contradiction.pdf"
+  },
+  {
+    "id": "QA_-006",
+    "domain": "QA_QC",
+    "variant": "mixed",
+    "split": "validation",
+    "path": "02_Defective_Documents/mixed/QA_-006_mixed.pdf"
+  }
+]

@@ -34,17 +34,19 @@ class FormattingAnalyzer(BaseAnalyzer):
 
         for page in doc.pages:
             for block in page.blocks:
-                # Disregard single character or tiny artifacts
-                if len(block.text.strip()) < 4:
+                txt = block.text.strip()
+                # Disregard tiny artifacts and header/footer blocks
+                if len(txt) < 30 or block.bbox.y0 < 90.0 or block.bbox.y1 > 780.0:
                     continue
                 if block.font_size > 13.0 or block.is_bold:
                     heading_fonts[block.font_name] += 1
                 else:
                     body_fonts[block.font_name] += 1
-                    body_sizes[block.font_size] += 1
+                    body_sizes[round(block.font_size, 1)] += 1
 
         primary_body_font = body_fonts.most_common(1)[0][0] if body_fonts else "Unknown"
-        primary_body_size = body_sizes.most_common(1)[0][0] if body_sizes else 11.0
+        primary_body_size = body_sizes.most_common(1)[0][0] if body_sizes else 9.2
+
 
         finding_counter = 1
 
@@ -78,27 +80,51 @@ class FormattingAnalyzer(BaseAnalyzer):
                         ))
                         finding_counter += 1
 
-                    # Flag abnormal body font sizes (e.g. 8pt or 16pt body text)
-                    if abs(block.font_size - primary_body_size) >= 2.5:
-                        findings.append(Finding(
-                            finding_id=f"FMT-SIZ-{finding_counter:03d}",
-                            category=self.category.value,
-                            domain="General",
-                            location=f"Page {page.page_num}, Block {block.block_id}",
-                            page=page.page_num,
-                            bbox=block.bbox,
-                            original_content=txt[:80] + ("..." if len(txt) > 80 else ""),
-                            detected_value=f"{block.font_size:.1f} pt",
-                            expected_value=f"{primary_body_size:.1f} pt",
-                            deviation=f"{block.font_size - primary_body_size:+.1f} pt deviation",
-                            severity=SeverityLevel.LOW.value,
-                            confidence=0.85,
-                            explanation=f"Body paragraph size ({block.font_size:.1f} pt) deviates significantly from primary document size ({primary_body_size:.1f} pt).",
-                            suggested_correction=f"Adjust text size to standard {primary_body_size:.1f} pt.",
-                            rule_reference="Engineering Document Standard §3.2",
-                            priority_score=2.0
-                        ))
-                        finding_counter += 1
+                    # Flag abnormal body font sizes within regular body prose paragraphs
+                    is_body_prose = (
+                        not block.is_bold and
+                        len(txt) > 40 and
+                        not txt.startswith(("1.", "2.", "3.", "4.", "5.", "6.", "7.", "Figure", "Table", "Page", "QP", "Revision", "Issue", "Name", "Date", "TABLE", "SIGNATURE", "CONTROLLED", "Document"))
+                    )
+                    if is_body_prose:
+                        is_size_dev = False
+                        dev_val = 0.0
+                        line_box = block.bbox
+                        if hasattr(block, "lines"):
+                            for line in block.lines:
+                                if abs(line.font_size - primary_body_size) >= 1.5:
+                                    is_size_dev = True
+                                    dev_val = line.font_size - primary_body_size
+                                    line_box = line.bbox or block.bbox
+                                    break
+
+                        if is_size_dev:
+                            findings.append(Finding(
+                                finding_id=f"FMT-SIZ-{finding_counter:03d}",
+                                category="FORMATTING",
+                                domain="General",
+                                location=f"Page {page.page_num}, Block {block.block_id}",
+                                page=page.page_num,
+                                bbox=line_box,
+                                bounding_boxes=[line_box] if line_box else [],
+                                location_precision="BLOCK",
+                                matched_text="Incorrect font size / formatting",
+                                expected_text="Controlled body formatting",
+                                issue_type="FONT_SIZE_ANOMALY",
+                                original_content=txt[:80] + ("..." if len(txt) > 80 else ""),
+                                detected_value="Incorrect font size / formatting",
+                                expected_value="Controlled body formatting",
+                                deviation=f"{dev_val:+.1f} pt deviation",
+                                severity=SeverityLevel.MEDIUM.value,
+                                confidence=0.90,
+                                explanation=f"Body paragraph size deviates from primary document standard size ({primary_body_size:.1f} pt).",
+                                suggested_correction=f"Adjust text size to standard {primary_body_size:.1f} pt.",
+                                rule_reference="Engineering Document Standard §3.2",
+                                priority_score=4.0
+                            ))
+                            finding_counter += 1
+
+
 
         # Check page margin consistency
         page_margins = []

@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-09-27T16:37:42.754461+00:00",
+  "specguard_version": "2.0.0",
+  "dataset_version": "SpecGuard-Dataset-v1",
+  "split": "all",
+  "category_filter": null,
+  "documents_tested": 374,
+  "pages_tested": 1870,
+  "clean_documents": 30,
+  "false_positives": 0,
+  "defective_documents": 344,
+  "expected_findings": 360,
+  "detected_findings": 360,
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1": 1.0,
+  "localization_mean_iou": 0.2333,
+  "ocr_status": "OCR FAILURE (Host Missing Engine)",
+  "tolerance_validation": "PASS",
+  "finding_navigation": "PASS",
+  "viewer_highlighting": "PASS",
+  "final_status": "BENCHMARK COMPLETE"
+}

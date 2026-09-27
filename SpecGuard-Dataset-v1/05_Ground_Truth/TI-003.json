@@ -1,0 +1,20 @@
+{
+  "case_id": "TI-003",
+  "findings": [
+    "LOW",
+    "LOW",
+    "LOW",
+    "LOW",
+    "LOW"
+  ],
+  "weights": {
+    "CRITICAL": 10.0,
+    "HIGH": 5.0,
+    "MEDIUM": 2.0,
+    "LOW": 0.5,
+    "INFORMATIONAL": 0.0
+  },
+  "expected_raw_score": 2.5,
+  "reference_tolerance_index": 2.5,
+  "maximum_acceptable_tolerance": 10.0
+}

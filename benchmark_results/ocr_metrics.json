@@ -1,0 +1,69 @@
+{
+  "cases_tested": 6,
+  "processing_failures": 6,
+  "system_status": "OCR FAILURE (Host Missing Engine)",
+  "mean_character_accuracy": 0.0,
+  "mean_word_accuracy": 0.0,
+  "case_results": [
+    {
+      "case_id": "OCR-001",
+      "file": "clean_scan.pdf",
+      "status": "OCR FAILURE",
+      "error": "No tessdata specified and Tesseract is not installed",
+      "expected_text": "stainless steel components",
+      "extracted_text": "",
+      "character_accuracy": 0.0,
+      "word_accuracy": 0.0
+    },
+    {
+      "case_id": "OCR-002",
+      "file": "low_resolution.pdf",
+      "status": "OCR FAILURE",
+      "error": "No tessdata specified and Tesseract is not installed",
+      "expected_text": "stainless steel components",
+      "extracted_text": "",
+      "character_accuracy": 0.0,
+      "word_accuracy": 0.0
+    },
+    {
+      "case_id": "OCR-003",
+      "file": "rotated.pdf",
+      "status": "OCR FAILURE",
+      "error": "No tessdata specified and Tesseract is not installed",
+      "expected_text": "stainless steel components",
+      "extracted_text": "",
+      "character_accuracy": 0.0,
+      "word_accuracy": 0.0
+    },
+    {
+      "case_id": "OCR-004",
+      "file": "low_contrast.pdf",
+      "status": "OCR FAILURE",
+      "error": "No tessdata specified and Tesseract is not installed",
+      "expected_text": "stainless steel components",
+      "extracted_text": "",
+      "character_accuracy": 0.0,
+      "word_accuracy": 0.0
+    },
+    {
+      "case_id": "OCR-005",
+      "file": "compressed.pdf",
+      "status": "OCR FAILURE",
+      "error": "No tessdata specified and Tesseract is not installed",
+      "expected_text": "stainless steel components",
+      "extracted_text": "",
+      "character_accuracy": 0.0,
+      "word_accuracy": 0.0
+    },
+    {
+      "case_id": "OCR-006",
+      "file": "stamped.pdf",
+      "status": "OCR FAILURE",
+      "error": "No tessdata specified and Tesseract is not installed",
+      "expected_text": "stainless steel components",
+      "extracted_text": "",
+      "character_accuracy": 0.0,
+      "word_accuracy": 0.0
+    }
+  ]
+}

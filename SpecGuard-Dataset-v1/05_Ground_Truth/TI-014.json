@@ -1,0 +1,19 @@
+{
+  "case_id": "TI-014",
+  "findings": [
+    "LOW",
+    "MEDIUM",
+    "HIGH",
+    "CRITICAL"
+  ],
+  "weights": {
+    "CRITICAL": 10.0,
+    "HIGH": 5.0,
+    "MEDIUM": 2.0,
+    "LOW": 0.5,
+    "INFORMATIONAL": 0.0
+  },
+  "expected_raw_score": 17.5,
+  "reference_tolerance_index": 17.5,
+  "maximum_acceptable_tolerance": 10.0
+}

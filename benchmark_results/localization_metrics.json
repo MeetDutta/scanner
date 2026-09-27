@@ -1,0 +1,8 @@
+{
+  "total_evaluated": 360,
+  "page_accuracy": 1.0,
+  "mean_iou": 0.2333,
+  "median_iou": 0.1346,
+  "percentage_iou_gte_50": 16.67,
+  "percentage_iou_gte_75": 0.0
+}

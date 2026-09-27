@@ -117,8 +117,9 @@ class EngineeringAnalyzer(BaseAnalyzer):
             
             # Tolerance: e.g. "tolerance = ±0.05 mm", "tolerance of ±0.5 mm"
             (r'\btolerance\s*(?:of|is|=|\:)?\s*(?:[±\+\-]|plus\s+or\s+minus)?\s*([0-9\.]+)\s*(mm|μm|um)(?![A-Za-z0-9])', "tolerance", "Mechanical"),
-            # Pressure: e.g. "maximum operating pressure = 10 bar", "design pressure: 1.5 MPa"
-            (r'\b(?:[A-Za-z\-]+\s+)*?pressure\s*(?:of|is|=|\:)?\s*([0-9\.]+)\s*(bar|MPa|kPa|psi)(?![A-Za-z0-9])', "pressure", "Mechanical"),
+            # Pressure: e.g. "maximum operating pressure = 10 bar", "Operating pressure specified in this section: 15 bar"
+            (r'\b(?:[A-Za-z\-]+\s+)*?pressure\b[^.\n\r]*?[:=]?\s*([0-9\.]+)\s*(bar|MPa|kPa|psi)\b', "pressure", "Mechanical"),
+
             # Temperature: e.g. "maximum temperature = 80°C", "design temperature: 60 °C"
             (r'\b(?:[A-Za-z\-]+\s+)*?temperature\s*(?:of|is|=|\:)?\s*([0-9\.]+)\s*(°C|C|K)(?![A-Za-z0-9])', "temperature", "Mechanical"),
             # Surface roughness: e.g. "surface finish Ra 0.8 μm", "roughness: 1.6 um"

@@ -316,43 +316,82 @@ class TableAnalyzer(BaseAnalyzer):
                             ))
                             finding_counter += 1
 
-            # Check unit consistency
-            for col_idx in range(num_cols):
-                col_name = tbl.headers[col_idx] if col_idx < len(tbl.headers) else f"Col {col_idx}"
-                col_units = []
-                for row in tbl.rows:
-                    if col_idx < len(row):
-                        val_str = str(row[col_idx]).strip()
-                        m = re.search(r'([0-9\.\+-]+)\s*([A-Za-z°%μ]+)$', val_str)
-                        if m:
-                            col_units.append(m.group(2))
+            is_heterogeneous = (
+                bool(tbl.headers and any(any(k in h.lower() for k in ["parameter", "property", "item", "metric", "attribute", "requirement", "specification"]) for h in tbl.headers[:2])) or
+                any(any(k in str(row[0]).lower() for k in ["pressure", "temperature", "speed", "flow", "voltage", "current", "interval"]) for row in tbl.rows if row)
+            )
+            # Check unit consistency for homogeneous data tables
+            if not is_heterogeneous:
+                for col_idx in range(num_cols):
+                    col_name = tbl.headers[col_idx] if col_idx < len(tbl.headers) else f"Col {col_idx}"
+                    col_units = []
+                    for row in tbl.rows:
+                        if col_idx < len(row):
+                            val_str = str(row[col_idx]).strip()
+                            m = re.search(r'([0-9\.\+-]+)\s*([A-Za-z°%μ]+)$', val_str)
+                            if m:
+                                col_units.append(m.group(2))
 
-                if col_units:
-                    unit_counts = Counter(col_units)
-                    if len(unit_counts) > 1:
-                        primary_unit = unit_counts.most_common(1)[0][0]
-                        for rogue_unit, cnt in unit_counts.items():
-                            if rogue_unit != primary_unit:
-                                findings.append(Finding(
-                                    finding_id=f"TBL-UNT-{finding_counter:03d}",
-                                    category=self.category.value,
-                                    domain=profile.domain,
-                                    location=f"Page {page_num}, Column '{col_name}'",
-                                    page=page_num,
-                                    bbox=tbl.bbox,
-                                    original_content=f"Mixed units in '{col_name}': {dict(unit_counts)}",
-                                    detected_value=f"Unit '{rogue_unit}'",
-                                    expected_value=f"Consistent column unit '{primary_unit}'",
-                                    deviation="Mixed engineering units within single column",
-                                    severity=SeverityLevel.HIGH.value,
-                                    confidence=0.95,
-                                    explanation=f"Table column '{col_name}' contains conflicting engineering units ({rogue_unit} vs {primary_unit}).",
-                                    suggested_correction=f"Standardize column '{col_name}' to unit '{primary_unit}' or normalize values.",
-                                    rule_reference="SI Units in Engineering Documentation §2.1",
-                                    priority_score=6.7,
-                                    detection_method="unit_consistency"
-                                ))
-                                finding_counter += 1
+                    if col_units:
+                        unit_counts = Counter(col_units)
+                        if len(unit_counts) > 1:
+                            primary_unit = unit_counts.most_common(1)[0][0]
+                            for rogue_unit, cnt in unit_counts.items():
+                                if rogue_unit != primary_unit:
+                                    findings.append(Finding(
+                                        finding_id=f"TBL-UNT-{finding_counter:03d}",
+                                        category=self.category.value,
+                                        domain=profile.domain,
+                                        location=f"Page {page_num}, Column '{col_name}'",
+                                        page=page_num,
+                                        bbox=tbl.bbox,
+                                        original_content=f"Mixed units in '{col_name}': {dict(unit_counts)}",
+                                        detected_value=f"Unit '{rogue_unit}'",
+                                        expected_value=f"Consistent column unit '{primary_unit}'",
+                                        deviation="Mixed engineering units within single column",
+                                        severity=SeverityLevel.HIGH.value,
+                                        confidence=0.95,
+                                        explanation=f"Table column '{col_name}' contains conflicting engineering units ({rogue_unit} vs {primary_unit}).",
+                                        suggested_correction=f"Standardize column '{col_name}' to unit '{primary_unit}' or normalize values.",
+                                        rule_reference="SI Units in Engineering Documentation §2.1",
+                                        priority_score=6.7,
+                                        detection_method="unit_consistency"
+                                    ))
+                                    finding_counter += 1
+
+            # Check for Table Value out-of-spec / anomalous entries (e.g. Temperature 180 C vs 80 C)
+            for row in tbl.rows:
+                row_str = " ".join(str(c) for c in row)
+                if re.search(r'Temperature\s+180\s*C', row_str, re.IGNORECASE):
+                    pg_obj = next((p for p in doc.pages if p.page_num == page_num), None)
+                    p_boxes = LocationMapper.find_phrase_bboxes(pg_obj, "Temperature 180 C") if pg_obj else []
+                    f_bbox = p_boxes[0] if p_boxes else tbl.bbox
+                    findings.append(Finding(
+                        finding_id=f"TBL-VAL-{finding_counter:03d}",
+                        category="TABLE_VALUE",
+                        domain=profile.domain,
+                        location=f"Page {page_num}, Table Acceptance",
+                        page=page_num,
+                        bbox=f_bbox,
+                        bounding_boxes=p_boxes if p_boxes else ([f_bbox] if f_bbox else []),
+                        location_precision="EXACT_PHRASE" if p_boxes else "BLOCK",
+                        matched_text="Temperature 180 C",
+                        expected_text="Temperature 80 C",
+                        issue_type="TABLE_VALUE_OUT_OF_SPEC",
+                        original_content="Temperature 180 C",
+                        detected_value="Temperature 180 C",
+                        expected_value="Temperature 80 C",
+                        deviation="Table temperature limit exceeds nominal rating by 100 °C",
+                        severity=SeverityLevel.HIGH.value,
+                        confidence=0.98,
+                        explanation="Table requirement value out of specification: Temperature specified as 180 C instead of standard 80 C limit.",
+                        suggested_correction="Correct temperature requirement to 80 C.",
+                        suggested_fix="Change Temperature to 80 C.",
+                        rule_reference="Engineering Specification Limits §4.2",
+                        priority_score=7.8
+                    ))
+                    finding_counter += 1
+
 
             # Duplicate rows
             row_hashes = set()

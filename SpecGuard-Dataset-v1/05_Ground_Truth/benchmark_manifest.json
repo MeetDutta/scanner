@@ -1,0 +1,100 @@
+[
+  {
+    "id": "TI-001",
+    "domain": "Mechanical",
+    "variant": "tolerance",
+    "split": "benchmark",
+    "path": "04_Tolerance_Test/TI-001.pdf"
+  },
+  {
+    "id": "TI-002",
+    "domain": "Mechanical",
+    "variant": "tolerance",
+    "split": "benchmark",
+    "path": "04_Tolerance_Test/TI-002.pdf"
+  },
+  {
+    "id": "TI-003",
+    "domain": "Mechanical",
+    "variant": "tolerance",
+    "split": "benchmark",
+    "path": "04_Tolerance_Test/TI-003.pdf"
+  },
+  {
+    "id": "TI-004",
+    "domain": "Mechanical",
+    "variant": "tolerance",
+    "split": "benchmark",
+    "path": "04_Tolerance_Test/TI-004.pdf"
+  },
+  {
+    "id": "TI-005",
+    "domain": "Mechanical",
+    "variant": "tolerance",
+    "split": "benchmark",
+    "path": "04_Tolerance_Test/TI-005.pdf"
+  },
+  {
+    "id": "TI-006",
+    "domain": "Mechanical",
+    "variant": "tolerance",
+    "split": "benchmark",
+    "path": "04_Tolerance_Test/TI-006.pdf"
+  },
+  {
+    "id": "TI-007",
+    "domain": "Mechanical",
+    "variant": "tolerance",
+    "split": "benchmark",
+    "path": "04_Tolerance_Test/TI-007.pdf"
+  },
+  {
+    "id": "TI-008",
+    "domain": "Mechanical",
+    "variant": "tolerance",
+    "split": "benchmark",
+    "path": "04_Tolerance_Test/TI-008.pdf"
+  },
+  {
+    "id": "TI-009",
+    "domain": "Mechanical",
+    "variant": "tolerance",
+    "split": "benchmark",
+    "path": "04_Tolerance_Test/TI-009.pdf"
+  },
+  {
+    "id": "TI-010",
+    "domain": "Mechanical",
+    "variant": "tolerance",
+    "split": "benchmark",
+    "path": "04_Tolerance_Test/TI-010.pdf"
+  },
+  {
+    "id": "TI-011",
+    "domain": "Mechanical",
+    "variant": "tolerance",
+    "split": "benchmark",
+    "path": "04_Tolerance_Test/TI-011.pdf"
+  },
+  {
+    "id": "TI-012",
+    "domain": "Mechanical",
+    "variant": "tolerance",
+    "split": "benchmark",
+    "path": "04_Tolerance_Test/TI-012.pdf"
+  },
+  {
+    "id": "TI-013",
+    "domain": "Mechanical",
+    "variant": "tolerance",
+    "split": "benchmark",
+    "path": "04_Tolerance_Test/TI-013.pdf"
+  },
+  {
+    "id": "TI-014",
+    "domain": "Mechanical",
+    "variant": "tolerance",
+    "split": "benchmark",
+    "path": "04_Tolerance_Test/TI-014.pdf"
+  }
+]
