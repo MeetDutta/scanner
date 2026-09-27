@@ -111,6 +111,20 @@ def list_findings(
         cursor.execute(query, tuple(params + [limit, offset]))
         rows = cursor.fetchall()
 
+        # Attempt to load rich disk snapshot if available
+        disk_findings_map = {}
+        try:
+            repo = RepositoryManager(db=db)
+            findings_json_file = repo.comps_dir / target_id / "findings.json"
+            if findings_json_file.exists():
+                with open(findings_json_file, "r", encoding="utf-8") as f_json:
+                    disk_list = json.load(f_json)
+                    for item in disk_list:
+                        if isinstance(item, dict) and "finding_id" in item:
+                            disk_findings_map[item["finding_id"]] = item
+        except Exception as e:
+            logger.debug("Could not read disk snapshot for %s: %s", target_id, e)
+
         findings = []
         for r in rows:
             bbox_dict = None
@@ -120,15 +134,18 @@ def list_findings(
                 except Exception:
                     bbox_dict = None
 
-            findings.append({
+            f_id = r["finding_id"]
+            finding_dict = {
                 "id": r["id"],
                 "session_id": target_id,
-                "finding_id": r["finding_id"],
+                "finding_id": f_id,
                 "category": r["category"],
                 "domain": r["domain"],
                 "location": r["location"] or "",
                 "page": r["page"],
+                "page_number": r["page"],
                 "bbox": bbox_dict,
+                "bounding_boxes": [bbox_dict] if bbox_dict else [],
                 "original_content": r["original_content"] or "",
                 "detected_value": r["detected_value"] or "",
                 "expected_value": r["expected_value"] or "",
@@ -137,9 +154,30 @@ def list_findings(
                 "confidence": r["confidence"],
                 "explanation": r["explanation"] or "",
                 "suggested_correction": r["suggested_correction"] or "",
+                "suggested_fix": r["suggested_correction"] or "",
                 "rule_reference": r["rule_reference"] or "",
-                "priority_score": r["priority_score"]
-            })
+                "rule_id": r["rule_reference"] or f_id,
+                "priority_score": r["priority_score"],
+                "evidence": "",
+                "source_analyzer": "SpecGuard Inspection Engine",
+                "issue_type": "",
+                "matched_text": str(r["detected_value"] or r["original_content"] or ""),
+                "expected_text": str(r["expected_value"] or ""),
+                "location_precision": "BLOCK",
+                "related_finding_ids": []
+            }
+
+            if disk_findings_map and f_id in disk_findings_map:
+                disk_f = disk_findings_map[f_id]
+                for k in [
+                    "bounding_boxes", "location_precision", "issue_type", "message",
+                    "suggested_fix", "matched_text", "expected_text", "evidence",
+                    "source_analyzer", "rule_id", "related_finding_ids"
+                ]:
+                    if k in disk_f and disk_f[k] is not None:
+                        finding_dict[k] = disk_f[k]
+
+            findings.append(finding_dict)
 
         # Severity summary for current session
         cursor.execute(f"""
@@ -207,14 +245,17 @@ def get_finding_detail(finding_id: str, session_id: Optional[str] = None) -> Dic
             except Exception:
                 bbox_dict = None
 
-        return {
+        target_session = row["comparison_id"] if "comparison_id" in row.keys() else row["session_id"]
+        res = {
             "finding_id": row["finding_id"],
-            "session_id": row["comparison_id"] if "comparison_id" in row.keys() else row["session_id"],
+            "session_id": target_session,
             "category": row["category"],
             "domain": row["domain"],
             "location": row["location"] or "",
             "page": row["page"],
+            "page_number": row["page"],
             "bbox": bbox_dict,
+            "bounding_boxes": [bbox_dict] if bbox_dict else [],
             "original_content": row["original_content"] or "",
             "detected_value": row["detected_value"] or "",
             "expected_value": row["expected_value"] or "",
@@ -223,6 +264,37 @@ def get_finding_detail(finding_id: str, session_id: Optional[str] = None) -> Dic
             "confidence": row["confidence"],
             "explanation": row["explanation"] or "",
             "suggested_correction": row["suggested_correction"] or "",
+            "suggested_fix": row["suggested_correction"] or "",
             "rule_reference": row["rule_reference"] or "",
-            "priority_score": row["priority_score"]
+            "rule_id": row["rule_reference"] or row["finding_id"],
+            "priority_score": row["priority_score"],
+            "evidence": "",
+            "source_analyzer": "SpecGuard Inspection Engine",
+            "issue_type": "",
+            "matched_text": str(row["detected_value"] or row["original_content"] or ""),
+            "expected_text": str(row["expected_value"] or ""),
+            "location_precision": "BLOCK",
+            "related_finding_ids": []
         }
+
+        # Try enriching from disk snapshot if present
+        try:
+            repo = RepositoryManager(db=db)
+            findings_json_file = repo.comps_dir / target_session / "findings.json"
+            if findings_json_file.exists():
+                with open(findings_json_file, "r", encoding="utf-8") as f_json:
+                    disk_list = json.load(f_json)
+                    for item in disk_list:
+                        if isinstance(item, dict) and item.get("finding_id") == finding_id:
+                            for k in [
+                                "bounding_boxes", "location_precision", "issue_type", "message",
+                                "suggested_fix", "matched_text", "expected_text", "evidence",
+                                "source_analyzer", "rule_id", "related_finding_ids"
+                            ]:
+                                if k in item and item[k] is not None:
+                                    res[k] = item[k]
+                            break
+        except Exception:
+            pass
+
+        return res

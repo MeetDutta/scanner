@@ -749,21 +749,21 @@ class DocumentViewerComponent {
       </div>
 
       <div class="finding-prop-group">
-        <span class="finding-prop-label">Remediation Guidance</span>
-        <p class="finding-prop-value" style="color: var(--accent-primary); font-weight: 600; font-size: 12px;">
-          💡 ${escapeHtml(f.suggested_fix || f.suggested_correction || "Verify against domain guidelines.")}
+        <span class="finding-prop-label">Suggested Action (Information Only)</span>
+        <p class="finding-prop-value" style="color: var(--accent-primary); font-weight: 600; font-size: 12px; line-height: 1.45;">
+          💡 ${escapeHtml(f.suggested_fix || f.suggested_correction || "Verify and correct manually in the source document.")}
         </p>
       </div>
 
       <div class="finding-prop-group">
         <span class="finding-prop-label">Engineering Standard Reference</span>
         <span class="finding-prop-value" style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">
-          ${escapeHtml(f.rule_reference || "DocReady Core Rules")}
+          ${escapeHtml(f.rule_reference || "SpecGuard Compliance Standards")}
         </span>
       </div>
 
-      <div style="margin-top: 8px; padding-top: 10px; border-top: 1px solid var(--border-subtle); display: flex; gap: 8px;">
-        <button class="btn btn-secondary btn-sm" style="flex: 1;" onclick="window.toast.info('Finding marked as reviewed.')">Mark Reviewed</button>
+      <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-subtle); font-size: 11px; color: var(--text-muted); text-align: center;">
+        Read-Only Inspection Mode • Source Document Unmodified
       </div>
     `;
 

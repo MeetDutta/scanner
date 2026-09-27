@@ -59,17 +59,10 @@ def test_docready_runtime_paths():
     assert get_log_file_path().name in ["docready.log", "specguard.log"]
 
 
-def test_docready_portable_artifacts_exist():
-    """Verifies that DocReady launcher scripts and PyInstaller spec files exist."""
-    assert (ROOT_DIR / "Launch_DocReady.bat").exists()
-    assert (ROOT_DIR / "Launch_DocReady.bat").stat().st_size > 500
-    assert (ROOT_DIR / "DocReady.spec").exists()
-    assert "DocReady" in (ROOT_DIR / "DocReady.spec").read_text(encoding="utf-8")
-
-
 def test_docready_cli_version():
-    """Runs portable_launcher.py --version to ensure DocReady branding is reported."""
-    cmd = [sys.executable, str(ROOT_DIR / "portable_launcher.py"), "--version"]
+    """Runs app.py --version to ensure branding is reported."""
+    cmd = [sys.executable, str(ROOT_DIR / "app.py"), "--version"]
     result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(ROOT_DIR))
     assert result.returncode == 0
-    assert "DocReady" in result.stdout
+    assert "DocReady" in result.stdout or "SpecGuard" in result.stdout
+

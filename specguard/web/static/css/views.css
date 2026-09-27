@@ -167,8 +167,9 @@
   border-radius: var(--radius-md);
 }
 
-/* --- VIEW: Analysis Workspace --- */
-.workspace-container {
+/* --- VIEW: Analysis Progress / Workspace --- */
+.workspace-container,
+.progress-container {
   max-width: 900px;
   margin: 0 auto;
   display: flex;
@@ -176,7 +177,8 @@
   gap: 20px;
 }
 
-.workspace-header-bar {
+.workspace-header-bar,
+.progress-header-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -566,7 +568,7 @@
   margin-bottom: 16px;
 }
 
-/* --- VIEW: ML Training --- */
+/* --- VIEW: Settings & Diagnostics --- */
 .hardware-specs-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

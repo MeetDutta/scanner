@@ -13,11 +13,9 @@ The DocReady repository is a 100% offline-capable, modular document formatting a
 
 ```
 scanner/
-├── app.py                         # Application CLI & PySide6 Desktop launcher entry point
-├── portable_launcher.py           # Production portable launcher (port allocation, pre-flight checks, uvicorn)
-├── run_web.py                     # Minimal web launcher delegating to portable_launcher
+├── app.py                         # Application CLI & Web server entry point
+├── run_web.py                     # Convenience web launcher
 ├── pyproject.toml                 # Packaging metadata, scripts, and runtime dependencies
-├── requirements-build.txt         # PyInstaller freeze build requirements
 ├── Dockerfile                     # [To be generated] Container definition for cloud/Render deployment
 ├── render.yaml                    # [To be generated] Infrastructure-as-code deployment blueprint
 ├── .env.example                   # [To be generated] Documented environment variables template

@@ -1,7 +1,6 @@
 """
 SpecGuard Local Web Application Launcher.
-Delegates to portable_launcher for unified dynamic port discovery,
-logging, environment verification, and clean shutdown.
+Directly launches the local web server and API platform.
 """
 
 import sys
@@ -11,13 +10,12 @@ BASE_DIR = Path(__file__).resolve().parent
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
-import portable_launcher
+import app
 
 
 def main():
-    portable_launcher.main()
+    app.main()
 
 
 if __name__ == "__main__":
     main()
-

@@ -301,7 +301,7 @@ window.NewAnalysisView = {
       window.appState.set("activeDomain", this.selectedDomain);
 
       window.toast.info("Analysis pipeline launched.");
-      window.router.navigate("workspace");
+      window.router.navigate("progress");
     } catch (err) {
       window.toast.error(`Failed starting analysis: ${err.message}`);
       const startBtn = document.getElementById("btn-start-analysis");

@@ -6,17 +6,21 @@
 class Router {
   constructor() {
     this.routes = {
-      dashboard: { title: "Executive Dashboard", view: window.DashboardView },
-      new_analysis: { title: "New Document Verification", view: window.NewAnalysisView },
-      workspace: { title: "Analysis Workspace", view: window.WorkspaceView },
-      results: { title: "Verification Results", view: window.ResultsView },
-      viewer: { title: "Interactive Document Canvas", view: window.ViewerView },
-      findings: { title: "Findings Management", view: window.FindingsView },
-      history: { title: "Document History & Revisions", view: window.HistoryView },
-      reports: { title: "Certified Reports Export", view: window.ReportsView },
-      standards: { title: "Standards & Domain Templates", view: window.StandardsView },
-      training: { title: "Machine Learning & Models", view: window.TrainingView },
-      settings: { title: "Settings & System Health", view: window.SettingsView }
+      dashboard: { title: "Quality Dashboard", view: window.DashboardView },
+      new_analysis: { title: "New Document Analysis", view: window.NewAnalysisView },
+      progress: { title: "Analysis Progress", view: window.AnalysisProgressView },
+      workspace: { title: "Analysis Progress", view: window.AnalysisProgressView },
+      results: { title: "Analysis Results", view: window.ResultsView },
+      findings: { title: "Document Findings", view: window.FindingsView },
+      overview: { title: "Document Overview & Structure", view: window.DocumentInspectionView },
+      viewer: { title: "Page Inspection", view: window.ViewerView },
+      formatting: { title: "Formatting Issues", view: window.FormattingView },
+      structural: { title: "Structural Issues", view: window.StructuralIssuesView },
+      content: { title: "Content & Engineering Issues", view: window.ContentIssuesView },
+      reports: { title: "Inspection Reports", view: window.ReportsView },
+      history: { title: "Analysis History", view: window.HistoryView },
+      standards: { title: "Standards & Rules", view: window.StandardsView },
+      settings: { title: "Settings & Health", view: window.SettingsView }
     };
 
     this.container = null;

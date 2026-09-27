@@ -80,49 +80,26 @@ A permanent **100% OFFLINE** verification badge and diagnostic screen continuous
 - Python 3.9+ (Python 3.11 recommended)
 - macOS, Linux, or Windows
 
-### Running DocReady
+### Running SpecGuard / DocReady
 
-#### 1. Windows Portable Zero-Install Package (No Python or Node.js Required)
-1. Extract `DocReady-v1.0.0-Windows-x64-Portable.zip`.
-2. Double-click `DocReady.exe` or `Launch_DocReady.bat`.
-3. The local backend initializes automatically on `127.0.0.1:8765` and opens your default browser.
-
-#### 2. Modern Web Application via Python (Development & Intranet Mode)
 ```bash
-# Launch the modern local web interface (default localhost: 127.0.0.1):
-./.venv/bin/python portable_launcher.py
+# Launch the web application (default: http://127.0.0.1:8765):
+python app.py
 
-# Launch for private corporate intranet access:
-./.venv/bin/python portable_launcher.py --host 0.0.0.0
+# Launch on custom host and port:
+python app.py --host 0.0.0.0 --port 8765
 
-# Or via convenience launchers:
-./.venv/bin/python run_web.py
-./.venv/bin/python app.py
+# Or via the convenience runner:
+python run_web.py
 ```
-The application starts the local backend at `http://127.0.0.1:8765` (or the next available port) and opens the user interface in your default browser.
-
-#### 3. Legacy PySide6 Desktop GUI (Rollback Fallback)
-```bash
-./.venv/bin/python app.py --gui
-```
-
-### Building the Windows Portable Distribution
-```cmd
-# Automated Windows build script (cmd):
-build_portable.bat
-
-# Assemble checksummed ZIP distribution:
-python package_zip.py
-```
-See [BUILD_INSTRUCTIONS.md](BUILD_INSTRUCTIONS.md), [PORTABLE_DEPLOYMENT.md](PORTABLE_DEPLOYMENT.md), and [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for full deployment documentation.
+The application starts the local backend server at `http://127.0.0.1:8765` and serves the inspection platform UI with zero external dependencies.
 
 ### Running Automated Test Suite
 
 ```bash
-./.venv/bin/pytest -v
+pytest -v
 ```
-All 123 tests (DocReady branding & aliases, multi-page streaming, reading order, TOC drift, cross-references, IEEE compliance, custom template learning, region annotations, local layout ML training, offline intranet security, document comparator, stress benchmarks, portable packaging, and web APIs) execute 100% offline.
-
+All tests execute 100% offline.
 
 ---
 
@@ -148,20 +125,21 @@ Pre-generated synthetic engineering test documents containing realistic deviatio
 ## 6. Project Structure
 
 ```text
-├── app.py                      # Main entry point (defaults to web, accepts --gui)
-├── run_web.py                  # Local web application launcher (uvicorn + browser)
+├── app.py                      # Web application server entry point (FastAPI + Uvicorn)
+├── run_web.py                  # Convenience web runner
 ├── pyproject.toml              # Dependencies & packaging metadata
+├── Dockerfile                  # Container definition for web deployment
+├── render.yaml                 # Render infrastructure configuration
 ├── specguard/
-│   ├── analyzers/              # 10 pure Python analysis & severity modules
+│   ├── analyzers/              # 16+ pure Python analysis & severity modules
 │   ├── core/                   # Pipeline orchestrator, document parsers, models
 │   ├── export/                 # PDF annotator, DOCX annotator, HTML/JSON reports
 │   ├── models/                 # Dynamic model registry & ML services
 │   ├── repository/             # Document archive & revision diff engine
 │   ├── security/               # Audit logger & SHA-256 integrity verifier
 │   ├── storage/                # SQLite database manager & repositories
-│   ├── templates/              # Domain template manager & definitions
-│   ├── training/               # Offline training pipelines & hardware manager
-│   ├── gui/                    # Legacy PySide6 desktop GUI (preserved for rollback)
+│   ├── templates/              # Domain template manager & custom profile learner
+│   ├── training/               # Offline model training & evaluation pipelines
 │   ├── server/                 # Local FastAPI service & REST API endpoints
 │   └── web/                    # Modern offline HTML5/CSS3/JS user interface
 │       ├── templates/          # Semantic index.html application shell
@@ -169,7 +147,7 @@ Pre-generated synthetic engineering test documents containing realistic deviatio
 ├── demo_samples/               # Ready-to-analyze engineering test files
 ├── standards/                  # Local machine-readable standards (ASME, IEC, etc.)
 ├── templates/                  # Fixed domain templates (Mechanical, Electrical, Chemical)
-└── tests/                      # Pytest automated test suite (68 passing tests)
+└── tests/                      # Pytest automated test suite
 ```
 
 ---

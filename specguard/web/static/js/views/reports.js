@@ -5,15 +5,34 @@
 
 window.ReportsView = {
   async render(container) {
-    const sessionId = window.appState.get("activeSessionId");
-    const activeDoc = window.appState.get("activeDocument");
+    let sessionId = window.appState.get("activeSessionId");
+    let activeDoc = window.appState.get("activeDocument");
+
+    if (!sessionId) {
+      try {
+        const recent = await window.api.dashboard.getRecent(1);
+        if (recent.recent_comparisons && recent.recent_comparisons.length > 0) {
+          const latest = recent.recent_comparisons[0];
+          sessionId = latest.comparison_id;
+          activeDoc = {
+            filename: latest.document_filename,
+            file_hash: latest.document_sha256,
+            page_count: latest.page_count || 1
+          };
+          window.appState.set("activeSessionId", sessionId);
+          window.appState.set("activeDocument", activeDoc);
+        }
+      } catch (e) {
+        console.warn("Could not fetch recent session for reports:", e);
+      }
+    }
 
     if (!sessionId) {
       container.innerHTML = `
         <div class="empty-state">
           <div class="empty-state-icon">📄</div>
           <div class="empty-state-title">No Active Verification Session Selected</div>
-          <div class="empty-state-desc">Select a completed analysis from Document History to export certified audit reports.</div>
+          <div class="empty-state-desc">Select a completed analysis from Document History to export inspection audit reports.</div>
           <button class="btn btn-primary" onclick="window.router.navigate('history')">Select from History</button>
         </div>
       `;

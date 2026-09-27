@@ -24,7 +24,6 @@ _SUBPACKAGES = [
     "models",
     "repository",
     "security",
-    "gui",
     "web",
 ]
 

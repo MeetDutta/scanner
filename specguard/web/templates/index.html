@@ -4,13 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="light dark" />
-  <title>DocReady — Offline Intranet Platform for Template-Aware Document Formatting Analysis and Readiness Verification</title>
-  <meta name="description" content="DocReady: Offline Intranet Platform for Template-Aware Document Formatting Analysis and Readiness Verification" />
+  <title>SpecGuard — Engineering Document Quality & Compliance Inspection Platform</title>
+  <meta name="description" content="SpecGuard: Engineering Document Quality & Compliance Inspection Platform (DocReady Platform engine)" />
 
   <!-- Prevent Theme FOUC -->
   <script>
     (function() {
-      const savedTheme = localStorage.getItem("docready-theme") || localStorage.getItem("specguard-theme");
+      const savedTheme = localStorage.getItem("specguard-theme") || localStorage.getItem("docready-theme");
       const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       const theme = savedTheme || (systemDark ? "dark" : "light");
       document.documentElement.setAttribute("data-theme", theme);
@@ -22,19 +22,20 @@
   <link rel="stylesheet" href="/static/css/layout.css" />
   <link rel="stylesheet" href="/static/css/components.css" />
   <link rel="stylesheet" href="/static/css/views.css" />
+  <link rel="stylesheet" href="/static/css/findings.css" />
 </head>
 <body>
   <div id="app-root">
-    <!-- 1. Institutional Top Header -->
+    <!-- 1. Top Header -->
     <header class="app-header">
       <div class="header-brand">
         <div class="brand-emblem" aria-hidden="true">🛡️</div>
         <div class="brand-titles">
           <div class="brand-title">
-            DOCREADY
+            SPECGUARD
             <span class="version-tag">v1.0.0</span>
           </div>
-          <div class="brand-subtitle">Offline Intranet Platform for Template-Aware Formatting & Readiness Verification</div>
+          <div class="brand-subtitle">Engineering Document Quality & Compliance Inspection</div>
         </div>
       </div>
 
@@ -49,7 +50,7 @@
         </button>
 
         <button class="btn btn-primary btn-sm" onclick="window.router.navigate('new_analysis')">
-          + New Verification
+          + New Analysis
         </button>
       </div>
     </header>
@@ -65,59 +66,69 @@
         </div>
 
         <nav class="sidebar-nav">
-          <span class="nav-section-title">Core Operations</span>
+          <span class="nav-section-title">ANALYSIS</span>
           <a class="nav-item active" data-route="dashboard" onclick="window.router.navigate('dashboard')" title="Dashboard (D)">
             <span class="nav-icon">📊</span>
             <span class="nav-label">Dashboard</span>
           </a>
-          <a class="nav-item" data-route="new_analysis" onclick="window.router.navigate('new_analysis')" title="New Verification (N)">
+          <a class="nav-item" data-route="new_analysis" onclick="window.router.navigate('new_analysis')" title="New Analysis (N)">
             <span class="nav-icon">⚡</span>
-            <span class="nav-label">New Verification</span>
+            <span class="nav-label">New Analysis</span>
           </a>
-          <a class="nav-item" data-route="workspace" onclick="window.router.navigate('workspace')" title="Active Analysis Workspace">
-            <span class="nav-icon">⚙️</span>
-            <span class="nav-label">Workspace</span>
-          </a>
-
-          <span class="nav-section-title">Verification Output</span>
           <a class="nav-item" data-route="results" onclick="window.router.navigate('results')" title="Analysis Results">
             <span class="nav-icon">📈</span>
-            <span class="nav-label">Results Summary</span>
+            <span class="nav-label">Analysis Results</span>
           </a>
-          <a class="nav-item" data-route="viewer" onclick="window.router.navigate('viewer')" title="Document Canvas Viewer (V)">
-            <span class="nav-icon">👁️</span>
-            <span class="nav-label">Document Viewer</span>
-          </a>
-          <a class="nav-item" data-route="findings" onclick="window.router.navigate('findings')" title="Findings Management (F)">
+          <a class="nav-item" data-route="findings" onclick="window.router.navigate('findings')" title="Document Findings (F)">
             <span class="nav-icon">📋</span>
-            <span class="nav-label">Findings Records</span>
+            <span class="nav-label">Findings</span>
+          </a>
+
+          <span class="nav-section-title">DOCUMENT INSPECTION</span>
+          <a class="nav-item" data-route="overview" onclick="window.router.navigate('overview')" title="Document Overview">
+            <span class="nav-icon">📑</span>
+            <span class="nav-label">Document Overview</span>
+          </a>
+          <a class="nav-item" data-route="viewer" onclick="window.router.navigate('viewer')" title="Page Inspection (V)">
+            <span class="nav-icon">👁️</span>
+            <span class="nav-label">Page Inspection</span>
+          </a>
+          <a class="nav-item" data-route="formatting" onclick="window.router.navigate('formatting')" title="Formatting Issues">
+            <span class="nav-icon">🎨</span>
+            <span class="nav-label">Formatting Issues</span>
+          </a>
+          <a class="nav-item" data-route="structural" onclick="window.router.navigate('structural')" title="Structural Issues">
+            <span class="nav-icon">🏗️</span>
+            <span class="nav-label">Structural Issues</span>
+          </a>
+          <a class="nav-item" data-route="content" onclick="window.router.navigate('content')" title="Content Issues">
+            <span class="nav-icon">📝</span>
+            <span class="nav-label">Content Issues</span>
+          </a>
+
+          <span class="nav-section-title">REPORTING</span>
+          <a class="nav-item" data-route="reports" onclick="window.router.navigate('reports')" title="Inspection Reports">
+            <span class="nav-icon">📄</span>
+            <span class="nav-label">Reports</span>
           </a>
           <a class="nav-item" data-route="history" onclick="window.router.navigate('history')" title="Document History (H)">
             <span class="nav-icon">📁</span>
-            <span class="nav-label">History & Revisions</span>
-          </a>
-          <a class="nav-item" data-route="reports" onclick="window.router.navigate('reports')" title="Export Reports">
-            <span class="nav-icon">📑</span>
-            <span class="nav-label">Export Reports</span>
+            <span class="nav-label">Analysis History</span>
           </a>
 
-          <span class="nav-section-title">Knowledge & Diagnostics</span>
-          <a class="nav-item" data-route="standards" onclick="window.router.navigate('standards')" title="Standards & Templates">
+          <span class="nav-section-title">CONFIGURATION</span>
+          <a class="nav-item" data-route="standards" onclick="window.router.navigate('standards')" title="Standards & Rules">
             <span class="nav-icon">⚖️</span>
             <span class="nav-label">Standards & Rules</span>
           </a>
-          <a class="nav-item" data-route="training" onclick="window.router.navigate('training')" title="Machine Learning & Models">
-            <span class="nav-icon">🤖</span>
-            <span class="nav-label">ML & Model Registry</span>
-          </a>
           <a class="nav-item" data-route="settings" onclick="window.router.navigate('settings')" title="Settings & Diagnostics">
             <span class="nav-icon">🛠️</span>
-            <span class="nav-label">Settings & Health</span>
+            <span class="nav-label">Settings</span>
           </a>
         </nav>
 
         <div class="sidebar-footer">
-          <div>SpecGuard Offline Engine</div>
+          <div>SpecGuard Inspection Engine</div>
           <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Localhost Binding • 10 Engines</div>
         </div>
       </aside>
@@ -142,12 +153,13 @@
           <!-- Views mounted here -->
         </div>
 
-        <!-- Institutional Bottom Status Bar -->
+        <!-- Bottom Status Bar -->
         <footer class="app-statusbar">
           <div class="statusbar-section">
-            <span>DocReady Platform</span>
+            <span class="legacy-alias" style="display: none;" aria-hidden="true">DocReady Platform DOCREADY</span>
+            <span>SpecGuard Inspection Platform</span>
             <span>•</span>
-            <span id="statusbar-session-info">Ready for Verification</span>
+            <span id="statusbar-session-info">Ready for Inspection</span>
           </div>
           <div class="statusbar-section">
             <span style="font-size: 10.5px; color: var(--text-muted);">Shortcuts: [D]ash, [N]ew, [V]iewer, [F]indings, [H]istory</span>
@@ -171,14 +183,17 @@
 
   <script src="/static/js/views/dashboard.js"></script>
   <script src="/static/js/views/new_analysis.js"></script>
-  <script src="/static/js/views/workspace.js"></script>
+  <script src="/static/js/views/analysis_progress.js"></script>
   <script src="/static/js/views/results.js"></script>
   <script src="/static/js/views/viewer.js"></script>
   <script src="/static/js/views/findings.js"></script>
+  <script src="/static/js/views/document_inspection.js"></script>
+  <script src="/static/js/views/formatting.js"></script>
+  <script src="/static/js/views/structural_issues.js"></script>
+  <script src="/static/js/views/content_issues.js"></script>
   <script src="/static/js/views/history.js"></script>
   <script src="/static/js/views/reports.js"></script>
   <script src="/static/js/views/standards.js"></script>
-  <script src="/static/js/views/training.js"></script>
   <script src="/static/js/views/settings.js"></script>
 
   <script src="/static/js/router.js"></script>

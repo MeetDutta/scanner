@@ -150,12 +150,9 @@ Navigate to `https://<your-service-name>.onrender.com/`:
 2. Go to the **Events** tab.
 3. Locate the previous successful deploy and click **Rollback to this deploy**.
 
-### Local Desktop Execution Unaffected
-The original offline desktop workflow remains completely untouched:
+### Local Web Execution
+Run the local web dashboard:
 ```bash
-# To run local offline web dashboard:
-python portable_launcher.py
-
-# To run local PySide6 desktop GUI:
-python app.py --gui
+python app.py
 ```
+

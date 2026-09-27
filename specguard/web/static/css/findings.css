@@ -1,0 +1,458 @@
+/* ==========================================================================
+   SpecGuard Findings & Document Inspection Styles
+   Strictly local offline CSS for error inspection, localization, & reports.
+   ========================================================================== */
+
+/* --- Document Findings Layout --- */
+.findings-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.findings-toolbar-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  box-shadow: var(--shadow-sm);
+}
+
+.findings-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.filter-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* --- Findings Table & Inspection --- */
+.findings-table-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.findings-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.findings-table th {
+  background: var(--bg-surface-sunken);
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.findings-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.findings-table tr:hover td {
+  background: var(--bg-hover);
+  cursor: pointer;
+}
+
+.findings-table tr.selected td {
+  background: rgba(37, 99, 235, 0.08);
+  border-left: 3px solid var(--accent-primary);
+}
+
+/* --- Detailed Inspection Drawer / Panel --- */
+.inspection-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  box-shadow: var(--shadow-md);
+}
+
+.inspection-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--border-default);
+  padding-bottom: 12px;
+}
+
+.inspection-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.finding-code-id {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.finding-issue-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.inspection-location-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Comparison Blocks: Detected vs Expected */
+.inspection-comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 6px 0;
+}
+
+@media (max-width: 768px) {
+  .inspection-comparison-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.comparison-box {
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.comparison-box.detected {
+  background: rgba(220, 38, 38, 0.06);
+  border: 1px solid rgba(220, 38, 38, 0.25);
+  border-left: 4px solid var(--sev-critical);
+}
+
+.comparison-box.expected {
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-left: 4px solid #10b981;
+}
+
+.comparison-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.comparison-box.detected .comparison-label {
+  color: var(--sev-critical);
+}
+
+.comparison-box.expected .comparison-label {
+  color: #059669;
+}
+
+.comparison-value {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.45;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.comparison-box.detected .comparison-value {
+  color: var(--text-primary);
+}
+
+.comparison-box.expected .comparison-value {
+  color: #047857;
+  font-weight: 600;
+}
+
+/* Explanation & Why */
+.inspection-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.inspection-section-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.inspection-explanation-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.inspection-remediation-box {
+  background: rgba(37, 99, 235, 0.06);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  border-left: 4px solid var(--accent-primary);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+}
+
+.remediation-notice {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--accent-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.remediation-guidance {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.45;
+}
+
+/* Inspection Metadata & Evidence */
+.inspection-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+  background: var(--bg-surface-sunken);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  font-size: 11.5px;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.meta-item-label {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.meta-item-val {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+/* --- Page Issue Heatmap --- */
+.page-heatmap-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 18px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+}
+
+.heatmap-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s ease;
+  cursor: pointer;
+}
+
+.heatmap-row:hover {
+  background: var(--bg-hover);
+}
+
+.heatmap-page-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  min-width: 60px;
+}
+
+.heatmap-bar-track {
+  flex: 1;
+  height: 18px;
+  background: var(--bg-surface-sunken);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid var(--border-subtle);
+}
+
+.heatmap-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+  display: flex;
+  align-items: center;
+  padding-left: 6px;
+}
+
+.heatmap-bar-fill.density-critical {
+  background: linear-gradient(90deg, #dc2626, #ef4444);
+}
+
+.heatmap-bar-fill.density-high {
+  background: linear-gradient(90deg, #ea580c, #f97316);
+}
+
+.heatmap-bar-fill.density-medium {
+  background: linear-gradient(90deg, #d97706, #f59e0b);
+}
+
+.heatmap-bar-fill.density-low {
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+}
+
+.heatmap-count-badge {
+  font-size: 11px;
+  font-weight: 800;
+  min-width: 32px;
+  text-align: right;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+/* --- Category Breakdown Grid --- */
+.categories-breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+}
+
+.category-stat-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+}
+
+.category-stat-card:hover {
+  border-color: var(--accent-primary);
+  transform: translateY(-2px);
+}
+
+.cat-stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cat-stat-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.cat-stat-icon {
+  font-size: 16px;
+}
+
+.cat-stat-count {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-top: 2px;
+}
+
+.cat-stat-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* --- Formatting Inspector Specifics --- */
+.formatting-groups-tabs {
+  display: flex;
+  gap: 6px;
+  border-bottom: 2px solid var(--border-default);
+  padding-bottom: 2px;
+  overflow-x: auto;
+}
+
+.formatting-tab-btn {
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.formatting-tab-btn:hover {
+  color: var(--text-primary);
+}
+
+.formatting-tab-btn.active {
+  color: var(--accent-primary);
+  border-bottom-color: var(--accent-primary);
+}
+
+.issue-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s ease;
+}
+
+.issue-card:hover {
+  border-color: var(--border-focus);
+}
+
+.issue-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}

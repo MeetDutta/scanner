@@ -1,28 +1,31 @@
 /**
- * SpecGuard Analysis Workspace View
- * Live stage-based progress reporting, duration timer, and real log streaming.
+ * SpecGuard Analysis Progress View
+ * Purely communicates document verification progress, stage milestones,
+ * pipeline duration, and execution logs with zero editing/rectification tools.
  */
 
-window.WorkspaceView = {
+window.AnalysisProgressView = {
   pollInterval: null,
-  eventSource: null,
 
   stagesList: [
-    { name: "Acquiring and stream parsing document pages...", threshold: 10 },
-    { name: "Reconstructing geometric reading order & layout...", threshold: 22 },
-    { name: "Analyzing structural outline & section hierarchy...", threshold: 28 },
-    { name: "Cross-checking Table of Contents & page drift...", threshold: 35 },
-    { name: "Inspecting tables & multi-page split continuity...", threshold: 42 },
-    { name: "Validating figures, drawings & caption placement...", threshold: 50 },
-    { name: "Inspecting mathematical equations & labels...", threshold: 56 },
-    { name: "Resolving document-wide citation & cross-reference graph...", threshold: 64 },
-    { name: "Evaluating grammar, syntax & technical vocabulary...", threshold: 70 },
-    { name: "Extracting engineering parameters & propositions...", threshold: 76 },
-    { name: "Validating domain & IEEE compliance rules...", threshold: 84 },
-    { name: "Detecting semantic propositions & contradictions...", threshold: 88 },
-    { name: "Evaluating local engineering standards...", threshold: 93 },
-    { name: "Computing severity scores & evidence ranking...", threshold: 98 },
-    { name: "Analysis complete.", threshold: 100 }
+    { name: "Uploading document", threshold: 4 },
+    { name: "Reading document", threshold: 8 },
+    { name: "Extracting text", threshold: 14 },
+    { name: "Detecting document structure", threshold: 20 },
+    { name: "Analyzing formatting", threshold: 28 },
+    { name: "Checking headings", threshold: 34 },
+    { name: "Checking TOC", threshold: 40 },
+    { name: "Checking figures", threshold: 48 },
+    { name: "Checking tables", threshold: 54 },
+    { name: "Checking equations", threshold: 60 },
+    { name: "Checking references", threshold: 66 },
+    { name: "Checking grammar and terminology", threshold: 72 },
+    { name: "Checking engineering rules", threshold: 78 },
+    { name: "Checking standards", threshold: 84 },
+    { name: "Detecting logical inconsistencies", threshold: 90 },
+    { name: "Calculating severity", threshold: 94 },
+    { name: "Generating findings", threshold: 98 },
+    { name: "Analysis complete", threshold: 100 }
   ],
 
   async render(container) {
@@ -49,11 +52,11 @@ window.WorkspaceView = {
           <div style="display: flex; align-items: center; gap: 14px;">
             <div class="status-indicator-pill">
               <span class="status-dot"></span>
-              <span id="ws-status-text">RUNNING</span>
+              <span id="ws-status-text">ANALYZING</span>
             </div>
             <div>
               <div style="font-weight: 800; font-size: 15px; color: var(--text-primary);" id="ws-doc-name">
-                ${activeDoc ? activeDoc.filename : "Engineering Specification"}
+                ${activeDoc ? activeDoc.filename : "Engineering Document"}
               </div>
               <div style="font-size: 12px; color: var(--text-muted);">
                 Domain: <strong style="text-transform: capitalize; color: var(--accent-primary);">${activeDomain}</strong>
@@ -61,7 +64,7 @@ window.WorkspaceView = {
               </div>
             </div>
           </div>
-          <button class="btn btn-danger btn-sm" id="btn-cancel-job">Cancel</button>
+          <button class="btn btn-danger btn-sm" id="btn-cancel-job">Cancel Analysis</button>
         </div>
 
         <!-- Stage Progression Card -->
@@ -80,7 +83,7 @@ window.WorkspaceView = {
             <div class="progress-bar-fill" id="ws-progress-fill" style="width: 5%;"></div>
           </div>
 
-          <!-- Detailed Stages List -->
+          <!-- Detailed 18 Stages List -->
           <div class="stage-list" id="ws-stage-list">
             ${this.stagesList.map((s, idx) => `
               <div class="stage-item pending" id="ws-stage-${idx}">
@@ -159,17 +162,20 @@ window.WorkspaceView = {
       // Check for completion
       if (job.status === "completed") {
         this.stopTracking();
-        window.toast.success(`Verification completed! Recorded ${job.total_findings || 0} findings.`);
+        window.toast.success(`Analysis complete! Recorded ${job.total_findings || 0} findings.`);
 
         setTimeout(async () => {
           if (job.session_id) {
             window.appState.set("activeSessionId", job.session_id);
-            // Fetch findings for session
-            const res = await window.api.findings.list({ session_id: job.session_id, limit: 200 });
-            window.appState.set("activeFindings", res.findings || []);
+            try {
+              const res = await window.api.findings.list({ session_id: job.session_id, limit: 300 });
+              window.appState.set("activeFindings", res.findings || []);
+            } catch (e) {
+              console.error("Error preloading findings:", e);
+            }
           }
           window.router.navigate("results");
-        }, 800);
+        }, 600);
       } else if (job.status === "failed") {
         this.stopTracking();
         window.toast.error(`Analysis failed: ${job.error || "Unknown error"}`);
@@ -217,3 +223,6 @@ window.WorkspaceView = {
     });
   }
 };
+
+// Backward-compatible alias
+window.WorkspaceView = window.AnalysisProgressView;
