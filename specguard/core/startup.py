@@ -14,7 +14,7 @@ from typing import Dict, Any, List, Tuple
 import logging
 
 from specguard.core.config import (
-    BASE_DIR, DATA_DIR, MODELS_DIR, STANDARDS_DIR, REPORTS_DIR, REPO_DIR, DATASETS_DIR
+    BASE_DIR, DATA_DIR, MODELS_DIR, STANDARDS_DIR, REPORTS_DIR, REPO_DIR
 )
 
 logger = logging.getLogger(__name__)
@@ -113,7 +113,7 @@ def verify_environment() -> StartupReport:
         warnings.append(f"Could not probe PyTorch hardware backend: {e}")
 
     from specguard.core.config import (
-        BASE_DIR, DATA_DIR, MODELS_DIR, STANDARDS_DIR, REPORTS_DIR, REPO_DIR, DATASETS_DIR, LOGS_DIR, UPLOADS_DIR
+        BASE_DIR, DATA_DIR, MODELS_DIR, STANDARDS_DIR, REPORTS_DIR, REPO_DIR, LOGS_DIR, UPLOADS_DIR
     )
     from specguard.core.runtime_paths import detect_tesseract
 

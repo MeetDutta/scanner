@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "docready"
+name = "specguard"
 version = "1.0.0"
-description = "DocReady — An Offline Intranet Platform for Template-Aware Document Formatting Analysis and Readiness Verification"
+description = "SpecGuard — Engineering Document Quality & Compliance Inspection Platform"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
@@ -25,13 +25,7 @@ dependencies = [
 ml = [
     "torch>=2.0.0",
     "onnx>=1.14.0",
-    "onnxscript>=0.1.0",
     "onnxruntime>=1.15.0"
-]
-research = [
-    "scikit-learn>=1.2.0",
-    "scipy>=1.10.0",
-    "psutil>=5.9.0"
 ]
 dev = [
     "pytest>=7.3.0",
@@ -39,7 +33,6 @@ dev = [
 ]
 
 [project.scripts]
-docready = "app:main"
 specguard = "app:main"
 
 [tool.pytest.ini_options]

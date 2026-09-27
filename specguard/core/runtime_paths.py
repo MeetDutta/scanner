@@ -17,26 +17,16 @@ from typing import Optional, List
 logger = logging.getLogger("SpecGuard.RuntimePaths")
 
 
-def is_frozen() -> bool:
-    """Always returns False as desktop bundling has been retired."""
-    return False
-
-
 def get_app_dir() -> Path:
     """
     Returns the root directory where the application is installed or running.
     Resolves to the repository root directory containing app.py and pyproject.toml.
     """
-    env_app_dir = os.environ.get("DOCREADY_APP_DIR")
+    env_app_dir = os.environ.get("SPECGUARD_APP_DIR") or os.environ.get("DOCREADY_APP_DIR")
     if env_app_dir:
         return Path(env_app_dir).resolve()
     # Walk up from this file: specguard/core/runtime_paths.py -> root
     return Path(__file__).resolve().parent.parent.parent
-
-
-def get_bundle_dir() -> Path:
-    """Returns application root directory."""
-    return get_app_dir()
 
 
 def _is_writable(path: Path) -> bool:
@@ -55,11 +45,11 @@ def get_data_dir(subdir: str = "") -> Path:
     """
     Returns the persistent writable user data directory.
     Priority:
-    1. `DOCREADY_DATA_DIR` environment variable (for Render/Docker persistent mounts)
+    1. `SPECGUARD_DATA_DIR` / `DOCREADY_DATA_DIR` environment variable
     2. `<app_dir>/data`
-    3. `~/.docready/data` (fallback if app_dir is read-only)
+    3. `~/.specguard/data` (fallback if app_dir is read-only)
     """
-    env_data_dir = os.environ.get("DOCREADY_DATA_DIR")
+    env_data_dir = os.environ.get("SPECGUARD_DATA_DIR") or os.environ.get("DOCREADY_DATA_DIR")
     if env_data_dir:
         target = Path(env_data_dir).resolve()
     else:
@@ -68,7 +58,7 @@ def get_data_dir(subdir: str = "") -> Path:
         if _is_writable(candidate):
             target = candidate
         else:
-            target = Path.home() / ".docready" / "data"
+            target = Path.home() / ".specguard" / "data"
 
     target.mkdir(parents=True, exist_ok=True)
     if subdir:
@@ -104,27 +94,27 @@ def get_database_path() -> Path:
     db_folder = data_dir / "database"
 
     candidates = [
-        db_folder / "docready.db",
-        data_dir / "docready.db",
         db_folder / "specguard.db",
         data_dir / "specguard.db",
+        db_folder / "docready.db",
+        data_dir / "docready.db",
     ]
     for c in candidates:
         if c.exists():
             return c
 
     db_folder.mkdir(parents=True, exist_ok=True)
-    return db_folder / "docready.db"
+    return db_folder / "specguard.db"
 
 
 def get_log_file_path() -> Path:
     """Returns the path to the primary runtime log file."""
     logs_dir = get_data_dir("logs")
-    if (logs_dir / "docready.log").exists():
-        return logs_dir / "docready.log"
     if (logs_dir / "specguard.log").exists():
         return logs_dir / "specguard.log"
-    return logs_dir / "docready.log"
+    if (logs_dir / "docready.log").exists():
+        return logs_dir / "docready.log"
+    return logs_dir / "specguard.log"
 
 
 def get_reports_dir() -> Path:

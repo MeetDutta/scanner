@@ -79,11 +79,6 @@ def test_models_and_hardware_endpoints(client):
     models = res_models.json()
     assert isinstance(models, list)
 
-    res_dataset = client.get("/api/models/dataset-health")
-    assert res_dataset.status_code == 200
-    health = res_dataset.json()
-    assert "total_annotations" in health
-
 
 def test_settings_endpoints(client):
     """Verifies pre-flight diagnostics and storage telemetry."""

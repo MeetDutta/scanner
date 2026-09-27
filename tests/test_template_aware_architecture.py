@@ -16,7 +16,6 @@ from specguard.analyzers.template_analyzer import TemplateAnalyzer
 from specguard.analyzers.standards import StandardsAnalyzer
 from specguard.core.models import DocumentModel, PageModel, TextBlock, BBox, EngineeringParameter, Finding
 from specguard.core.pipeline import AnalysisPipeline
-from specguard.training.augmentation import EngineeringAugmenter, ProvenanceSample
 
 
 def test_load_all_domain_templates():
@@ -84,61 +83,6 @@ def test_rule_only_fallback_in_pipeline():
     tol_findings = [f for f in findings if "tolerance" in f.explanation.lower() or "tolerance" in (f.deviation or "").lower()]
     assert len(tol_findings) >= 1, "Deterministic rule must detect tolerance deviation ±0.5 mm vs ±0.05 mm"
 
-
-def test_data_augmentation_provenance_and_test_isolation():
-    augmenter = EngineeringAugmenter(seed=42)
-
-    # 1. Statement variation test
-    variants = augmenter.generate_statement_variations(
-        param_name="Operating Voltage",
-        value=415.0,
-        unit="V",
-        domain="electrical",
-        count=3
-    )
-    assert len(variants) == 3
-    for v in variants:
-        assert v.source_type == "augmented"
-        assert len(v.entities) >= 2, "Entities must be aligned with offsets"
-
-    # 2. Error generation test
-    from specguard.templates.manager import ParameterDef
-    p_def = ParameterDef(
-        parameter_id="temp",
-        parameter="temperature",
-        display_name="Operating Temperature",
-        unit="°C",
-        max_value=80.0
-    )
-    err_samples = augmenter.generate_error_samples(p_def, domain="mechanical")
-    assert len(err_samples) == 3
-    for e in err_samples:
-        assert e.source_type == "synthetic"
-        assert e.deviation_type in ("out_of_range", "wrong_unit", "missing_val")
-
-    # 3. Test set isolation check
-    real_samples = [
-        ProvenanceSample("REAL-1", "Scope paragraph", [], "real", "mechanical", "DOC-001"),
-        ProvenanceSample("REAL-2", "Requirements paragraph", [], "real", "mechanical", "DOC-002"),
-        ProvenanceSample("REAL-3", "Tolerances paragraph", [], "real", "mechanical", "DOC-003"),
-        ProvenanceSample("REAL-4", "Testing paragraph", [], "real", "mechanical", "DOC-004")
-    ]
-
-    train_set, val_set, test_set = augmenter.build_domain_training_corpus(
-        domain="mechanical",
-        real_doc_samples=real_samples,
-        augmentation_multiplier=2
-    )
-
-    # Held out real test set must have ONLY real samples
-    assert len(test_set) >= 1
-    for s in test_set:
-        assert s.source_type == "real", "Test set MUST NEVER contain augmented or synthetic samples!"
-
-    # Train set should contain augmented and synthetic samples
-    train_types = {s.source_type for s in train_set}
-    assert "augmented" in train_types
-    assert "synthetic" in train_types
 
 
 def test_low_confidence_ml_guardrail():

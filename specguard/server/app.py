@@ -51,8 +51,8 @@ async def lifespan(app: FastAPI):
 def create_app() -> FastAPI:
     """Factory creating and configuring the DocReady FastAPI server."""
     app = FastAPI(
-        title="DocReady — Offline Intranet Platform for Template-Aware Document Formatting Analysis and Readiness Verification",
-        description="DocReady 100% Offline Intranet Document Intelligence & Formatting Readiness System",
+        title="SpecGuard — Engineering Document Quality & Compliance Inspection Platform",
+        description="SpecGuard 100% Offline Document Intelligence & Compliance Inspection System",
         version=DEFAULT_CONFIG.version,
         lifespan=lifespan,
         docs_url="/api/docs",

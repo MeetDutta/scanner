@@ -1,24 +1,19 @@
 """
-Integration Tests for SpecGuard Model Registry and ONNX Parity Engine.
+Integration Tests for SpecGuard Model Registry and Cryptographic Integrity.
 Verifies:
 1. Dynamic model registration with SHA-256 calculation.
 2. Safe model activation (blocks corrupted or missing models).
-3. Deactivation and status tracking.
-4. Cryptographic SHA-256 integrity check.
-5. ONNX Export and Numerical Parity Verification with ONNX Runtime.
+3. Cryptographic SHA-256 integrity check.
+4. Side-by-side comparison of model versions.
+Strictly offline.
 """
 
 import pytest
 import tempfile
-import json
 from pathlib import Path
 import torch
-import numpy as np
 
 from specguard.models.registry import ModelRegistry, calculate_sha256
-from specguard.models.domain_classifier import DomainClassifierNet
-from specguard.models.engineering_ner import EngineeringNERNet
-from specguard.training.onnx_exporter import ONNXExporter
 
 
 def test_model_registration_and_integrity_verification():
@@ -62,31 +57,30 @@ def test_activation_blocks_corrupted_model():
         reg_file = Path(tmp_dir) / "registry.json"
         registry = ModelRegistry(registry_file=reg_file)
 
-        ckpt_path = Path(tmp_dir) / "corrupted_model.pt"
-        ckpt_path.write_bytes(b"Original valid content")
+        ckpt_path = Path(tmp_dir) / "corrupt_model.pt"
+        ckpt_path.write_bytes(b"original valid model weights")
 
         registry.register_model(
             model_id="SG-CORRUPT-001",
-            model_name="CorruptibleModel",
-            task="engineering_ner",
+            model_name="CorruptModel",
+            task="domain_classifier",
             domain="electrical",
             version="1.0.0",
             dataset_version="v1.0",
-            training_run_id="RUN-TEST-02",
+            training_run_id="RUN-02",
             framework="PyTorch",
-            architecture="EngineeringNERNet",
+            architecture="Net",
             device="cpu",
             checkpoint_path=str(ckpt_path)
         )
 
-        # Deactivate first
+        # Deactivate
         registry.deactivate_model("SG-CORRUPT-001")
-        assert registry.get_model("SG-CORRUPT-001")["status"] == "INACTIVE"
 
-        # Tamper with file
-        ckpt_path.write_bytes(b"TAMPERED CORRUPTED CONTENT")
+        # Corrupt file on disk
+        ckpt_path.write_bytes(b"tampered malicious model weights")
 
-        # Attempt to reactivate
+        # Activation must fail
         success = registry.activate_model("SG-CORRUPT-001")
         assert success is False, "Security failure: Registry activated a corrupted model!"
         assert registry.get_model("SG-CORRUPT-001")["status"] == "INACTIVE"
@@ -131,31 +125,3 @@ def test_model_version_comparison():
         assert comp["model_2"]["version"] == "2.0.0"
         assert comp["model_1"]["metrics"]["f1"] == 0.82
         assert comp["model_2"]["metrics"]["f1"] == 0.91
-
-
-def test_onnx_parity_real_execution():
-    """
-    Exports a model to ONNX and validates prediction parity between PyTorch and ONNX Runtime.
-    Ensures that discrepancies exceeding tolerance are caught as FAIL.
-    """
-    net = DomainClassifierNet(vocab_size=100, embed_dim=16, hidden_dim=16, num_classes=3)
-    net.eval()
-
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        onnx_file = Path(tmp_dir) / "classifier.onnx"
-        out_path, parity, max_diff = ONNXExporter.export_classifier(
-            model=net,
-            output_path=str(onnx_file),
-            seq_len=16
-        )
-
-        assert Path(out_path).exists()
-        assert parity is True
-        assert max_diff < 1e-4
-
-        # Verify parity helper method returns PASS
-        dummy_input = torch.randint(1, 100, (1, 16), dtype=torch.long)
-        passed, diff, status = ONNXExporter.verify_parity(net, onnx_file, (dummy_input,))
-        assert passed is True
-        assert status == "PASS"
-        assert diff < 1e-4

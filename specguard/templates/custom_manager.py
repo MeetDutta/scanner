@@ -95,8 +95,8 @@ class CustomTemplateManager:
         if tmpl_dir.exists():
             raise FileExistsError(f"Template with ID '{clean_id}' already exists.")
 
-        # Create isolated subdirectories
-        for sub in ["samples", "annotations", "models", "versions", "reports"]:
+        # Create isolated subdirectories for versions and reports
+        for sub in ["versions", "reports"]:
             (tmpl_dir / sub).mkdir(parents=True, exist_ok=True)
 
         metadata = CustomTemplateMetadata(
@@ -277,6 +277,48 @@ class CustomTemplateManager:
             self._save_metadata(tmpl_dir, meta)
             return meta
         raise RuntimeError("Rollback failed to restore valid metadata.")
+
+    def activate_template(self, template_id: str):
+        """Activates a template profile into the global ProfileRegistry for document analysis."""
+        profile = self.get_profile(template_id)
+        if not profile:
+            raise FileNotFoundError(f"Template profile for '{template_id}' not found.")
+
+        meta = self.get_template(template_id)
+        name = meta.name if meta else template_id
+        summary_rules = profile.get("summary_rules", {})
+        layout = summary_rules.get("layout", {})
+        structure = summary_rules.get("structure", {})
+        objects = summary_rules.get("objects", {})
+
+        from specguard.core.profiles import ProfileConfig, PROFILES
+
+        dyn_config = ProfileConfig(
+            profile_id=template_id,
+            display_name=name,
+            domain=meta.category if meta else "Custom",
+            description=meta.description if meta else f"Custom template {template_id}",
+            requires_toc=structure.get("requires_toc", False),
+            toc_min_pages=5,
+            required_sections=structure.get("required_sections", []),
+            optional_sections=structure.get("optional_sections", []),
+            section_numbering_style=structure.get("numbering_style", "any"),
+            expected_layout=layout.get("expected_layout", "any"),
+            table_caption_position=objects.get("table_caption_position", "above"),
+            figure_caption_position=objects.get("figure_caption_position", "below"),
+            validate_equations=objects.get("has_equations", False),
+            validate_cross_references=True,
+            custom_rules={
+                "custom_template_id": template_id,
+                "tolerances": profile.get("tolerances", {}),
+                "summary_rules": summary_rules
+            }
+        )
+
+        PROFILES[template_id] = dyn_config
+        self.update_status(template_id, "ACTIVE")
+        logger.info("Activated custom template '%s' in ProfileRegistry", template_id)
+        return dyn_config
 
     def delete_template(self, template_id: str) -> bool:
         tmpl_dir = self.get_template_dir(template_id)

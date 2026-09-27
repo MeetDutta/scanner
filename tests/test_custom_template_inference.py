@@ -8,9 +8,6 @@ import fitz
 from pathlib import Path
 
 from specguard.templates.custom_manager import CustomTemplateManager
-from specguard.templates.sample_manager import SampleManager
-from specguard.templates.profile_learner import ProfileLearner
-from specguard.templates.profile_approver import ProfileApprover
 from specguard.core.pipeline import AnalysisPipeline
 from specguard.core.models import FindingCategory
 
@@ -20,7 +17,6 @@ def custom_setup(tmp_path):
     custom_dir = tmp_path / "templates" / "custom"
     custom_dir.mkdir(parents=True, exist_ok=True)
     custom_mgr = CustomTemplateManager(base_dir=custom_dir)
-    sample_mgr = SampleManager(template_manager=custom_mgr)
 
     # 1. Create template
     custom_mgr.create_template(
@@ -29,29 +25,36 @@ def custom_setup(tmp_path):
         description="Specifications for industrial steam turbines"
     )
 
-    # 2. Create sample PDF
-    sample_pdf = tmp_path / "sample_turbine.pdf"
-    doc = fitz.open()
-    p1 = doc.new_page(width=595, height=842)
-    p1.insert_text((50, 60), "STEAM TURBINE SPECIFICATION", fontsize=16)
-    p1.insert_text((50, 100), "1. Scope", fontsize=13)
-    p1.insert_text((50, 120), "General scope of steam turbine supply.", fontsize=10)
-    p1.insert_text((50, 160), "2. Rotor Assembly", fontsize=13)
-    p1.insert_text((50, 180), "The rotor must withstand 3600 RPM continuously.", fontsize=10)
-    doc.save(str(sample_pdf))
-    doc.close()
+    # 2. Save configured profile
+    custom_mgr.save_profile("turbine_spec", {
+        "template_id": "turbine_spec",
+        "display_name": "Steam Turbine Standard",
+        "category": "Mechanical",
+        "status": "APPROVED",
+        "is_approved": True,
+        "summary_rules": {
+            "structure": {
+                "required_sections": ["1. Scope", "2. Rotor Assembly"]
+            },
+            "typography": {
+                "body_font_size": 10.0
+            }
+        },
+        "learned_properties": {
+            "typography": {
+                "body_font_size": 10.0
+            }
+        },
+        "tolerances": {
+            "font_size_pt": 1.0,
+            "margin_mm": 5.0
+        }
+    })
 
-    # 3. Ingest and Learn
-    sample_mgr.ingest_sample("turbine_spec", sample_pdf)
-    learner = ProfileLearner(custom_mgr, sample_mgr)
-    learner.learn_profile("turbine_spec")
+    # 3. Activate template into ProfileRegistry
+    custom_mgr.activate_template("turbine_spec")
 
-    # 4. Approve & Activate
-    approver = ProfileApprover(custom_mgr)
-    approver.approve_profile("turbine_spec")
-    approver.activate_template("turbine_spec")
-
-    return custom_mgr, sample_mgr, approver
+    return custom_mgr
 
 
 def test_custom_template_pipeline_compliance_and_drift(custom_setup, tmp_path):
@@ -59,7 +62,7 @@ def test_custom_template_pipeline_compliance_and_drift(custom_setup, tmp_path):
     Verifies that AnalysisPipeline evaluates documents against the activated custom template
     and detects missing mandatory sections and font size drift.
     """
-    custom_mgr, _, _ = custom_setup
+    custom_mgr = custom_setup
 
     # Create test document that violates the turbine_spec:
     # - Missing '2. Rotor Assembly'

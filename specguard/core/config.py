@@ -18,10 +18,9 @@ from specguard.core.runtime_paths import (
     get_log_file_path,
     get_web_dir,
     get_repository_dir,
-    is_frozen,
 )
 
-# Root application directory (frozen-aware)
+# Root application directory
 BASE_DIR = get_app_dir()
 
 # Persistent user data paths
@@ -35,7 +34,6 @@ REPO_DIR = get_repository_dir()
 # Bundled application resource paths
 STANDARDS_DIR = get_resource_dir("standards")
 MODELS_DIR = get_resource_dir("models")
-DATASETS_DIR = get_resource_dir("datasets")
 DEMO_SAMPLES_DIR = get_resource_dir("demo_samples")
 TEMPLATES_DIR = get_resource_dir("templates")
 RULES_DIR = get_resource_dir("rules")

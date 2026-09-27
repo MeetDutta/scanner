@@ -1,21 +1,62 @@
 """
-Machine Learning and Deep Learning Training Management API for SpecGuard.
-Manages local model checkpoints, ONNX graphs, cryptographic SHA-256 verification,
-hardware profiling, and dataset health checks without cloud AI dependencies.
+Model Inspection & Hardware Diagnostics API for SpecGuard.
+Lists active offline inference models and reports local compute capabilities
+(CPU cores, RAM, Metal/MPS, CUDA) without training laboratory endpoints.
 """
 
-from fastapi import APIRouter, HTTPException, Query
+import os
 from typing import Dict, Any, List, Optional
-from dataclasses import asdict
 import logging
+from fastapi import APIRouter, Query
+import torch
+
+try:
+    import psutil
+except ImportError:
+    psutil = None
 
 from specguard.models.registry import ModelRegistry
-from specguard.training.hardware import HardwareManager
-from specguard.training.dataset_validator import DatasetValidator
-from specguard.training.annotation_manager import AnnotationManager
 
 logger = logging.getLogger("SpecGuard.API.Models")
 router = APIRouter(prefix="/models", tags=["models"])
+
+
+def _get_hardware_profile() -> Dict[str, Any]:
+    """Inspects local hardware without training-specific dependencies."""
+    cpu_cores = os.cpu_count() or 4
+    if psutil:
+        ram_gb = round(psutil.virtual_memory().total / (1024 ** 3), 1)
+    else:
+        try:
+            ram_gb = round((os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')) / (1024 ** 3), 1)
+        except Exception:
+            ram_gb = 16.0
+
+    if torch.cuda.is_available():
+        device = "cuda"
+        gpu_name = torch.cuda.get_device_name(0)
+        gpu_available = True
+        recommendations = f"NVIDIA GPU detected ({gpu_name}). CUDA acceleration active."
+    elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+        device = "mps"
+        gpu_name = "Apple Silicon GPU (Metal Performance Shaders)"
+        gpu_available = True
+        recommendations = "Apple Silicon MPS acceleration active."
+    else:
+        device = "cpu"
+        gpu_name = "None (CPU Only)"
+        gpu_available = False
+        recommendations = "CPU execution active."
+
+    return {
+        "device": device,
+        "device_name": gpu_name if gpu_available else "CPU",
+        "cpu_cores": cpu_cores,
+        "ram_gb": ram_gb,
+        "gpu_available": gpu_available,
+        "gpu_name": gpu_name,
+        "recommendations": recommendations,
+    }
 
 
 @router.get("")
@@ -30,7 +71,6 @@ def list_models(
     models = registry.list_models(task=task, domain=domain, status=status_filter)
     statuses = registry.get_all_statuses()
 
-    # Enrich model data with real service statuses
     for m in models:
         m["service_status"] = statuses.get(m["model_id"], "Standby")
 
@@ -40,49 +80,4 @@ def list_models(
 @router.get("/hardware")
 def get_hardware_profile() -> Dict[str, Any]:
     """Inspects local hardware, CPU cores, RAM, and Metal (MPS) / CUDA GPU acceleration."""
-    profile = HardwareManager.get_profile()
-    return asdict(profile)
-
-
-@router.get("/dataset-health")
-def get_dataset_health(domain: Optional[str] = Query(None)) -> Dict[str, Any]:
-    """Validates local dataset health, partition integrity, and prevents synthetic leakage."""
-    annot_mgr = AnnotationManager()
-    validator = DatasetValidator(annot_mgr)
-    report = validator.validate_dataset(domain)
-    return asdict(report)
-
-
-@router.post("/{model_id}/activate")
-def activate_model(model_id: str) -> Dict[str, Any]:
-    """Activates an offline model checkpoint in the registry."""
-    registry = ModelRegistry()
-    success = registry.activate_model(model_id)
-    if not success:
-        raise HTTPException(status_code=400, detail=f"Could not activate model {model_id}.")
-    return {"status": "success", "message": f"Model {model_id} activated."}
-
-
-@router.post("/{model_id}/deactivate")
-def deactivate_model(model_id: str) -> Dict[str, Any]:
-    """Deactivates a model in the registry."""
-    registry = ModelRegistry()
-    success = registry.deactivate_model(model_id)
-    return {"status": "success", "message": f"Model {model_id} deactivated."}
-
-
-@router.post("/{model_id}/verify-hash")
-def verify_model_integrity(model_id: str) -> Dict[str, Any]:
-    """Verifies the SHA-256 cryptographic digest of a model artifact."""
-    registry = ModelRegistry()
-    return registry.verify_model_hash(model_id)
-
-
-@router.get("/compare/{model_id_1}/{model_id_2}")
-def compare_model_versions(model_id_1: str, model_id_2: str) -> Dict[str, Any]:
-    """Compares metrics, architecture, and accuracy across two model versions."""
-    registry = ModelRegistry()
-    try:
-        return registry.compare_versions(model_id_1, model_id_2)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Model comparison failed: {e}")
+    return _get_hardware_profile()
