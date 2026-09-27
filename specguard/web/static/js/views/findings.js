@@ -26,24 +26,37 @@ window.FindingsView = {
   _keyHandler: null,
 
   async render(container) {
-    const sessionId = window.appState.get("activeSessionId");
+    let sessionId = window.appState.get("activeSessionId");
     let activeDoc = window.appState.get("activeDocument");
 
-    // Auto-resolve activeDoc from session history if missing
-    if (!activeDoc && sessionId) {
-      try {
-        const hist = await window.api.history.get(sessionId);
-        if (hist) {
-          activeDoc = {
-            filename: hist.document_filename,
-            file_hash: hist.document_sha256,
-            page_count: hist.page_count || 1
-          };
-          window.appState.set("activeDocument", activeDoc);
-          if (hist.domain) window.appState.set("activeDomain", hist.domain);
+    if (!activeDoc) {
+      if (!sessionId) {
+        try {
+          const recent = await window.api.dashboard.getRecent(1);
+          if (recent && recent.recent_comparisons && recent.recent_comparisons.length > 0) {
+            sessionId = recent.recent_comparisons[0].comparison_id;
+            window.appState.set("activeSessionId", sessionId);
+          }
+        } catch (e) {
+          console.warn("Could not get recent session:", e);
         }
-      } catch (e) {
-        console.warn("Could not resolve document info from session:", e);
+      }
+
+      if (sessionId) {
+        try {
+          const hist = await window.api.history.get(sessionId);
+          if (hist) {
+            activeDoc = {
+              filename: hist.document_filename,
+              file_hash: hist.document_sha256,
+              page_count: hist.page_count || 1
+            };
+            window.appState.set("activeDocument", activeDoc);
+            if (hist.domain) window.appState.set("activeDomain", hist.domain);
+          }
+        } catch (e) {
+          console.warn("Could not resolve document info from session:", e);
+        }
       }
     }
     this.activeDoc = activeDoc;
@@ -325,6 +338,22 @@ window.FindingsView = {
       this.allFindings = res.findings || [];
       window.appState.set("activeFindings", this.allFindings);
       this.applyFilters();
+
+      if (!this.activeDoc && (sessionId || res.session_id)) {
+        try {
+          const hist = await window.api.history.get(sessionId || res.session_id);
+          if (hist) {
+            this.activeDoc = {
+              filename: hist.document_filename,
+              file_hash: hist.document_sha256,
+              page_count: hist.page_count || 1
+            };
+            window.appState.set("activeDocument", this.activeDoc);
+          }
+        } catch (e) {
+          console.warn("Could not resolve document info:", e);
+        }
+      }
 
       // Initialize DocumentViewerComponent inside #findings-doc-viewer-mount
       const mountEl = document.getElementById("findings-doc-viewer-mount");
