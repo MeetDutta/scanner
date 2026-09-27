@@ -44,8 +44,11 @@ def main():
         sys.exit(0)
 
     logger.info("Starting SpecGuard Web Server on http://%s:%d", args.host, args.port)
-    app = create_app()
-    uvicorn.run(app, host=args.host, port=args.port, reload=args.reload, log_level="info")
+    if args.reload:
+        uvicorn.run("specguard.server.app:app", host=args.host, port=args.port, reload=True, log_level="info")
+    else:
+        app = create_app()
+        uvicorn.run(app, host=args.host, port=args.port, log_level="info")
 
 
 if __name__ == "__main__":
