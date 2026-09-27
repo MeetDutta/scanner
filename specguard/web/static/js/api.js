@@ -95,7 +95,15 @@ class ApiClient {
   // Reports
   reports = {
     generate: (data) => this.request("/reports/generate", { method: "POST", body: JSON.stringify(data) }),
-    previewUrl: (sessionId) => `${this.baseUrl}/reports/preview/${encodeURIComponent(sessionId)}`
+    previewUrl: (sessionId) => `${this.baseUrl}/reports/preview/${encodeURIComponent(sessionId)}`,
+    getTolerance: (sessionId, params = {}) => {
+      const qs = new URLSearchParams();
+      Object.entries(params).forEach(([k, v]) => {
+        if (v !== undefined && v !== null && v !== "") qs.append(k, v);
+      });
+      return this.request(`/reports/tolerance/${encodeURIComponent(sessionId)}?${qs.toString()}`);
+    },
+    getProfiles: () => this.request("/reports/profiles")
   };
 
   // Standards & Templates

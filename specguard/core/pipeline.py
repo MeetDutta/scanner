@@ -290,6 +290,19 @@ class AnalysisPipeline:
             details=f"Session {session_id}, Profile: {profile_config.profile_id}, Findings: {len(ranked_findings)}, Duration: {duration_ms}ms"
         )
 
+        # Calculate and persist initial Document Tolerance Report
+        try:
+            from specguard.core.tolerance import ToleranceCalculator
+            tol_result = ToleranceCalculator.calculate(
+                session_id=session_id,
+                doc=doc,
+                findings=ranked_findings,
+                profile_identifier=profile_config.profile_id
+            )
+            self.db.save_tolerance_report(tol_result.to_dict())
+        except Exception as tol_err:
+            logger.error("Failed calculating and persisting tolerance report: %s", tol_err)
+
         # Force resource cleanup
         gc.collect()
 

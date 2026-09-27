@@ -203,7 +203,90 @@ class DatabaseManager:
             CREATE INDEX IF NOT EXISTS idx_repo_doc_sha ON repo_documents(sha256);
             CREATE INDEX IF NOT EXISTS idx_repo_cmp_date ON repo_comparisons(analysis_completed_at);
             CREATE INDEX IF NOT EXISTS idx_repo_cmp_domain ON repo_comparisons(domain);
+
+            CREATE TABLE IF NOT EXISTS document_tolerance_reports (
+                session_id TEXT PRIMARY KEY,
+                document_no TEXT DEFAULT 'Not Provided',
+                document_title TEXT DEFAULT 'Not Provided',
+                revision TEXT DEFAULT 'Not Provided',
+                inspection_profile TEXT NOT NULL,
+                inspection_date TEXT NOT NULL,
+                pages_inspected INTEGER DEFAULT 1,
+                engine_version TEXT DEFAULT 'SpecGuard 1.0.0',
+                raw_tolerance REAL DEFAULT 0.0,
+                normalization_factor REAL DEFAULT 1.0,
+                tolerance_index REAL NOT NULL,
+                maximum_acceptable_tolerance REAL NOT NULL,
+                tolerance_utilization REAL NOT NULL,
+                acceptance_status TEXT NOT NULL,
+                status_reason TEXT,
+                total_findings INTEGER DEFAULT 0,
+                critical_count INTEGER DEFAULT 0,
+                high_count INTEGER DEFAULT 0,
+                medium_count INTEGER DEFAULT 0,
+                low_count INTEGER DEFAULT 0,
+                info_count INTEGER DEFAULT 0,
+                category_summary_json TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            CREATE INDEX IF NOT EXISTS idx_tolerance_session ON document_tolerance_reports(session_id);
             """)
             conn.commit()
             logger.info("SQLite database schema initialized at %s", self.db_path)
+
+    def save_tolerance_report(self, tol_data: Dict[str, Any]):
+        """Persists a calculated tolerance result to prevent re-calculation drift."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT OR REPLACE INTO document_tolerance_reports (
+                    session_id, document_no, document_title, revision,
+                    inspection_profile, inspection_date, pages_inspected,
+                    engine_version, raw_tolerance, normalization_factor,
+                    tolerance_index, maximum_acceptable_tolerance, tolerance_utilization,
+                    acceptance_status, status_reason, total_findings,
+                    critical_count, high_count, medium_count, low_count, info_count,
+                    category_summary_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                tol_data["session_id"],
+                tol_data.get("document_no", "Not Provided"),
+                tol_data.get("document_title", "Not Provided"),
+                tol_data.get("revision", "Not Provided"),
+                tol_data.get("inspection_profile", "Publication / Submission"),
+                tol_data.get("inspection_date", ""),
+                tol_data.get("pages_inspected", 1),
+                tol_data.get("engine_version", "SpecGuard 1.0.0"),
+                tol_data.get("raw_tolerance", 0.0),
+                tol_data.get("normalization_factor", 1.0),
+                tol_data["tolerance_index"],
+                tol_data["maximum_acceptable_tolerance"],
+                tol_data["tolerance_utilization"],
+                tol_data["acceptance_status"],
+                tol_data.get("status_reason", ""),
+                tol_data.get("total_findings", 0),
+                tol_data.get("critical_count", 0),
+                tol_data.get("high_count", 0),
+                tol_data.get("medium_count", 0),
+                tol_data.get("low_count", 0),
+                tol_data.get("info_count", 0),
+                json.dumps(tol_data.get("category_summary", {}))
+            ))
+            conn.commit()
+
+    def get_tolerance_report(self, session_id: str) -> Optional[Dict[str, Any]]:
+        """Retrieves persisted tolerance report for an exact session ID."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM document_tolerance_reports WHERE session_id = ?", (session_id,))
+            row = cursor.fetchone()
+            if not row:
+                return None
+            d = dict(row)
+            if d.get("category_summary_json"):
+                try:
+                    d["category_summary"] = json.loads(d["category_summary_json"])
+                except Exception:
+                    d["category_summary"] = {}
+            return d
 

@@ -1,9 +1,10 @@
 """
 Reports Generation and Export API for SpecGuard.
-Produces publication-quality certified PDF, DOCX, HTML, and JSON audit reports
-strictly using the local export engines.
+Produces formal Document Inspection / Publication Readiness Reports (PDF, HTML, JSON, DOCX).
+100% offline, local generation with transparent tolerance evaluation and persistent results.
 """
 
+import re
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 import logging
@@ -16,8 +17,8 @@ from specguard.core.config import REPORTS_DIR
 from specguard.storage.database import DatabaseManager
 from specguard.repository.manager import RepositoryManager
 from specguard.export.report_generator import ReportGenerator, DOCXAnnotator
-from specguard.export.pdf_annotator import PDFAnnotator
 from specguard.core.document_parser import DocumentParser
+from specguard.core.tolerance import ToleranceResult, ToleranceCalculator, BUILTIN_PROFILES
 
 logger = logging.getLogger("SpecGuard.API.Reports")
 router = APIRouter(prefix="/reports", tags=["reports"])
@@ -25,34 +26,85 @@ router = APIRouter(prefix="/reports", tags=["reports"])
 
 class ReportRequest(BaseModel):
     session_id: str
-    format: str = "html"  # html, json, pdf, docx
+    format: str = "pdf"  # pdf, html, json, docx
+    document_no: Optional[str] = None
+    document_title: Optional[str] = None
+    revision: Optional[str] = None
+    inspection_profile: Optional[str] = None
+    max_tolerance: Optional[float] = None
 
 
-@router.post("/generate")
-def generate_report(req: ReportRequest) -> Dict[str, Any]:
-    """Generates an audit report in the specified format."""
+@router.get("/profiles")
+def list_inspection_profiles() -> List[Dict[str, Any]]:
+    """Lists available inspection profiles with tolerance thresholds and severity policies."""
+    return [
+        {
+            "profile_id": p.profile_id,
+            "name": p.name,
+            "description": p.description,
+            "max_tolerance": p.max_tolerance,
+            "max_critical": p.max_critical,
+            "max_high": p.max_high
+        }
+        for p in BUILTIN_PROFILES.values()
+    ]
+
+
+@router.get("/tolerance/{session_id}")
+def get_session_tolerance(
+    session_id: str,
+    profile: Optional[str] = None,
+    document_no: Optional[str] = None,
+    document_title: Optional[str] = None,
+    revision: Optional[str] = None,
+    max_tolerance: Optional[float] = None
+) -> Dict[str, Any]:
+    """Retrieves or calculates the formal tolerance evaluation result for a session."""
+    db = DatabaseManager()
+    persisted = db.get_tolerance_report(session_id)
+    if persisted and not any([profile, document_no, document_title, revision, max_tolerance]):
+        return persisted
+
+    # If parameters provided or not yet persisted, calculate
+    res = _evaluate_tolerance(
+        session_id=session_id,
+        profile_identifier=profile,
+        custom_meta={
+            "document_no": document_no,
+            "document_title": document_title,
+            "revision": revision
+        },
+        custom_max_tolerance=max_tolerance
+    )
+    db.save_tolerance_report(res.to_dict())
+    return res.to_dict()
+
+
+def _evaluate_tolerance(
+    session_id: str,
+    profile_identifier: Optional[str] = None,
+    custom_meta: Optional[Dict[str, str]] = None,
+    custom_max_tolerance: Optional[float] = None
+) -> ToleranceResult:
+    """Helper to evaluate tolerance from repo comparison or database session."""
     repo = RepositoryManager()
-    session_id = req.session_id
-    fmt = req.format.lower().strip()
+    db = DatabaseManager()
 
     rec = repo.get_comparison_record(session_id)
     findings = repo.get_comparison_findings(session_id)
 
     if not rec:
-        # Fallback to session repository
-        db = DatabaseManager()
         with db.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM analysis_sessions WHERE session_id = ?", (session_id,))
             s_row = cursor.fetchone()
             if not s_row:
-                raise HTTPException(status_code=404, detail=f"Analysis session {session_id} not found.")
+                raise HTTPException(status_code=404, detail=f"Analysis session '{session_id}' not found.")
 
-        # Get findings from findings table
         from specguard.storage.repositories import SessionRepository
         findings = SessionRepository(db).get_findings_for_session(session_id)
 
-    # Resolve original document
+    # Locate document file
     doc_path = None
     if rec:
         doc_info = repo.get_document(rec.document_id)
@@ -60,8 +112,6 @@ def generate_report(req: ReportRequest) -> Dict[str, Any]:
             doc_path = Path(doc_info.original_path)
 
     if not doc_path:
-        # Check if file exists in demo_samples or uploads
-        db = DatabaseManager()
         with db.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
@@ -73,49 +123,99 @@ def generate_report(req: ReportRequest) -> Dict[str, Any]:
                 doc_path = Path(row["original_path"])
 
     if not doc_path or not doc_path.exists():
-        # Look in repository documents
         for p in repo.docs_dir.glob("*.*"):
             doc_path = p
             break
 
+    if not doc_path or not doc_path.exists():
+        from specguard.core.config import DEMO_SAMPLES_DIR
+        for p in DEMO_SAMPLES_DIR.glob("*.*"):
+            doc_path = p
+            break
+
     if not doc_path:
-        raise HTTPException(status_code=404, detail="Original document not found for report generation.")
+        raise HTTPException(status_code=404, detail="Original document not found for tolerance evaluation.")
 
     doc_model = DocumentParser.parse_file(str(doc_path))
 
-    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
-    clean_stem = Path(doc_model.file_path).stem
+    return ToleranceCalculator.calculate(
+        session_id=session_id,
+        doc=doc_model,
+        findings=findings,
+        profile_identifier=profile_identifier or (rec.domain if rec else "publication"),
+        custom_meta=custom_meta,
+        custom_max_tolerance=custom_max_tolerance
+    )
 
-    if fmt == "html":
-        out_filename = f"{clean_stem}_{session_id}_Audit.html"
-        out_path = REPORTS_DIR / out_filename
-        ReportGenerator.generate_html_report(doc_model, findings, session_id, str(out_path))
-    elif fmt == "json":
-        out_filename = f"{clean_stem}_{session_id}_Findings.json"
-        out_path = REPORTS_DIR / out_filename
-        ReportGenerator.generate_json_report(doc_model, findings, session_id, str(out_path))
-    elif fmt == "pdf":
-        out_filename = f"{clean_stem}_{session_id}_Annotated.pdf"
-        out_path = REPORTS_DIR / out_filename
-        if Path(doc_model.file_path).suffix.lower() == ".pdf":
-            PDFAnnotator.create_annotated_pdf(doc_model.file_path, str(out_path), findings)
-        else:
-            # Fallback to HTML report if original document is not PDF
-            out_filename = f"{clean_stem}_{session_id}_Audit.html"
-            out_path = REPORTS_DIR / out_filename
-            ReportGenerator.generate_html_report(doc_model, findings, session_id, str(out_path))
-    elif fmt == "docx":
-        out_filename = f"{clean_stem}_{session_id}_Annotated.docx"
-        out_path = REPORTS_DIR / out_filename
-        if Path(doc_model.file_path).suffix.lower() == ".docx":
-            DOCXAnnotator.create_annotated_docx(doc_model.file_path, str(out_path), findings)
-        else:
-            # Fallback to HTML report if original is non-DOCX
-            out_filename = f"{clean_stem}_{session_id}_Audit.html"
-            out_path = REPORTS_DIR / out_filename
-            ReportGenerator.generate_html_report(doc_model, findings, session_id, str(out_path))
+
+@router.post("/generate")
+def generate_report(req: ReportRequest) -> Dict[str, Any]:
+    """Generates a concise formal Document Inspection / Publication Readiness Report."""
+    session_id = req.session_id.strip()
+    fmt = req.format.lower().strip()
+    db = DatabaseManager()
+
+    # Check for existing persisted tolerance report
+    custom_provided = any([req.document_no, req.document_title, req.revision, req.inspection_profile, req.max_tolerance])
+    persisted = db.get_tolerance_report(session_id)
+
+    if persisted and not custom_provided:
+        res = ToleranceResult.from_dict(persisted)
     else:
-        raise HTTPException(status_code=400, detail=f"Unsupported format '{fmt}'. Choose html, json, pdf, or docx.")
+        res = _evaluate_tolerance(
+            session_id=session_id,
+            profile_identifier=req.inspection_profile,
+            custom_meta={
+                "document_no": req.document_no,
+                "document_title": req.document_title,
+                "revision": req.revision
+            },
+            custom_max_tolerance=req.max_tolerance
+        )
+        # Persist so historical reports do not silently change
+        db.save_tolerance_report(res.to_dict())
+
+    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Standard report file naming per specification:
+    # {DOCUMENT_NO}_{SESSION_ID}_Inspection_Report.pdf
+    # or {SESSION_ID}_Inspection_Report.pdf if Document No is Not Provided
+    clean_doc_no = re.sub(r'[^A-Za-z0-9_-]', '_', res.document_no or "").strip('_')
+    clean_sess_id = re.sub(r'[^A-Za-z0-9_-]', '_', res.session_id).strip('_')
+
+    if clean_doc_no and clean_doc_no != "Not_Provided":
+        base_name = f"{clean_doc_no}_{clean_sess_id}_Inspection_Report"
+    else:
+        base_name = f"{clean_sess_id}_Inspection_Report"
+
+    if fmt == "pdf":
+        out_filename = f"{base_name}.pdf"
+        out_path = REPORTS_DIR / out_filename
+        ReportGenerator.generate_pdf_report(res, str(out_path))
+    elif fmt == "html":
+        out_filename = f"{base_name}.html"
+        out_path = REPORTS_DIR / out_filename
+        ReportGenerator.generate_html_report(res, str(out_path))
+    elif fmt == "json":
+        out_filename = f"{base_name}.json"
+        out_path = REPORTS_DIR / out_filename
+        ReportGenerator.generate_json_report(res, str(out_path))
+    elif fmt == "docx":
+        out_filename = f"{base_name}.docx"
+        out_path = REPORTS_DIR / out_filename
+        # DOCX Report
+        repo = RepositoryManager()
+        findings = repo.get_comparison_findings(session_id)
+        # Use dummy empty docx or existing template
+        dummy_docx = REPORTS_DIR / f"{clean_sess_id}_temp.docx"
+        doc = docx.Document()
+        doc.add_paragraph()
+        doc.save(str(dummy_docx))
+        DOCXAnnotator.create_annotated_docx(str(dummy_docx), str(out_path), findings, res)
+        if dummy_docx.exists():
+            dummy_docx.unlink()
+    else:
+        raise HTTPException(status_code=400, detail=f"Unsupported format '{fmt}'. Choose pdf, html, json, or docx.")
 
     return {
         "status": "success",
@@ -123,15 +223,18 @@ def generate_report(req: ReportRequest) -> Dict[str, Any]:
         "filename": out_filename,
         "file_size": out_path.stat().st_size if out_path.exists() else 0,
         "download_url": f"/api/reports/download/{out_filename}",
-        "preview_url": f"/api/reports/preview/{session_id}" if fmt == "html" else None
+        "preview_url": f"/api/reports/preview/{session_id}",
+        "tolerance_result": res.to_dict()
     }
 
 
 @router.get("/preview/{session_id}")
 def preview_html_report(session_id: str):
-    """Renders the HTML compliance report directly in a browser frame."""
-    # Check if existing report file exists
-    for f in REPORTS_DIR.glob(f"*{session_id}*.html"):
+    """Renders the HTML publication inspection report directly in a browser frame."""
+    clean_sess_id = re.sub(r'[^A-Za-z0-9_-]', '_', session_id).strip('_')
+
+    # Look for existing generated report
+    for f in REPORTS_DIR.glob(f"*{clean_sess_id}*.html"):
         return HTMLResponse(content=f.read_text(encoding="utf-8"))
 
     # Generate on the fly
@@ -143,7 +246,7 @@ def preview_html_report(session_id: str):
 
 @router.get("/download/{filename}")
 def download_report(filename: str):
-    """Downloads a generated report."""
+    """Downloads a generated report with proper headers."""
     target = REPORTS_DIR / filename
     if not target.exists():
         raise HTTPException(status_code=404, detail="Report file not found.")
