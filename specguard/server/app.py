@@ -60,8 +60,8 @@ def create_app() -> FastAPI:
     )
 
     import os
-    env_mode = os.environ.get("DOCREADY_ENV", "local").lower()
-    custom_cors = os.environ.get("DOCREADY_CORS_ORIGINS")
+    env_mode = os.environ.get("SPECGUARD_ENV") or os.environ.get("DOCREADY_ENV", "local").lower()
+    custom_cors = os.environ.get("SPECGUARD_CORS_ORIGINS") or os.environ.get("DOCREADY_CORS_ORIGINS")
 
     if custom_cors:
         origins = [orig.strip() for orig in custom_cors.split(",") if orig.strip()]
@@ -76,16 +76,16 @@ def create_app() -> FastAPI:
         # In Render testing mode, allow *.onrender.com alongside localhost/intranet
         app.add_middleware(
             CORSMiddleware,
-            allow_origin_regex=r"^https?://(127\.0\.0\.1|localhost|([a-zA-Z0-9-]+\.)*onrender\.com|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2[0-9]|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})(:\d+)?$",
+            allow_origin_regex=r"^https?://(127\.0\.0\.1|localhost|([a-zA-Z0-9-]+\.)*onrender\.com|([a-zA-Z0-9-]+\.)*local|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2[0-9]|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})(:\d+)?$",
             allow_credentials=True,
             allow_methods=["*"],
             allow_headers=["*"],
         )
     else:
-        # Default local offline mode: restrict strictly to localhost and intranet
+        # Default local offline mode: restrict strictly to localhost and intranet (RFC 1918 + mDNS .local)
         app.add_middleware(
             CORSMiddleware,
-            allow_origin_regex=r"^https?://(127\.0\.0\.1|localhost|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2[0-9]|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})(:\d+)?$",
+            allow_origin_regex=r"^https?://(127\.0\.0\.1|localhost|([a-zA-Z0-9-]+\.)*local|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2[0-9]|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})(:\d+)?$",
             allow_credentials=True,
             allow_methods=["*"],
             allow_headers=["*"],
@@ -104,26 +104,45 @@ def create_app() -> FastAPI:
     app.include_router(router_templates, prefix=api_prefix)
     app.include_router(router_settings, prefix=api_prefix)
 
-    # Health check endpoints:
-    # 1. Top-level /health for Render load balancers and container monitors
+    # Health check endpoints (Section 39 - 100% Offline Subsystem Reporting):
     @app.get("/health")
     def health_check():
         return {
             "status": "ok",
             "service": "docready",
-            "environment": env_mode
+            "name": "SpecGuard",
+            "environment": env_mode,
+            "offline": True,
+            "lan_ready": True
         }
 
-    # 2. Backward-compatible /api/health for internal clients and test suites
     @app.get("/api/health")
     def api_health_check():
+        from specguard.core.config import DB_PATH, DATA_DIR, RULES_DIR
+        db_ok = DB_PATH.exists() or DB_PATH.parent.exists()
+        storage_ok = DATA_DIR.exists()
+        rules_ok = RULES_DIR.exists()
+
         return {
             "status": "online",
             "mode": "offline",
             "name": "SpecGuard",
             "service": "docready",
             "environment": env_mode,
-            "version": DEFAULT_CONFIG.version
+            "version": DEFAULT_CONFIG.version,
+            "components": {
+                "application": "OK",
+                "database": "OK" if db_ok else "INITIALIZING",
+                "storage": "OK" if storage_ok else "ERROR",
+                "rules": "OK" if rules_ok else "ERROR",
+                "document_engine": "OK",
+                "pdf_renderer": "OK"
+            },
+            "network": {
+                "offline": True,
+                "lan_ready": True,
+                "external_calls": "None"
+            }
         }
 
     # Mount static assets

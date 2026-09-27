@@ -61,14 +61,16 @@ class AnalysisRequest(BaseModel):
 
 
 def sanitize_filename(filename: str) -> str:
-    """Safe alphanumeric filename preservation."""
-    clean = "".join(c for c in filename if c.isalnum() or c in "._- ")
+    """Safe alphanumeric filename preservation, preventing directory traversal."""
+    base = Path(filename).name
+    clean = "".join(c for c in base if c.isalnum() or c in "._- ")
+    clean = clean.lstrip(".")
     return clean or "document"
 
 
 @router.post("/upload")
 async def upload_document(file: UploadFile = File(...)) -> Dict[str, Any]:
-    """Uploads and validates a document for analysis."""
+    """Uploads and validates a document for analysis with path containment verification."""
     filename = sanitize_filename(file.filename or "uploaded_doc")
     ext = Path(filename).suffix.lower()
 
@@ -78,8 +80,12 @@ async def upload_document(file: UploadFile = File(...)) -> Dict[str, Any]:
             detail=f"Unsupported format '{ext}'. Supported: {', '.join(sorted(SUPPORTED_EXTENSIONS))}"
         )
 
-    # Stream file to disk and calculate SHA-256
-    temp_target = UPLOADS_DIR / f"{uuid.uuid4().hex[:8]}_{filename}"
+    # Secure target destination with UUID prefix and directory containment check
+    unique_prefix = uuid.uuid4().hex[:8]
+    temp_target = (UPLOADS_DIR / f"{unique_prefix}_{filename}").resolve()
+    if not str(temp_target).startswith(str(UPLOADS_DIR.resolve())):
+        raise HTTPException(status_code=400, detail="Invalid file destination path.")
+
     sha256 = hashlib.sha256()
     size = 0
 

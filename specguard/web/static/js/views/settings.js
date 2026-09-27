@@ -32,10 +32,10 @@ window.SettingsView = {
             <div style="border-top: 1px solid var(--border-subtle); padding-top: 14px; display: flex; justify-content: space-between; align-items: center;">
               <div>
                 <strong style="color: var(--text-primary);">Offline Enforcement Policy</strong>
-                <div style="font-size: 12px; color: var(--text-muted);">SpecGuard operates exclusively on localhost (127.0.0.1) with zero telemetry.</div>
+                <div style="font-size: 12px; color: var(--text-muted);">SpecGuard operates 100% offline on local LAN/intranet with zero external telemetry.</div>
               </div>
               <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #059669; padding: 4px 10px;">
-                ✓ 100% OFFLINE CONFIRMED
+                ✓ 100% OFFLINE / LAN CONFIRMED
               </span>
             </div>
           </div>

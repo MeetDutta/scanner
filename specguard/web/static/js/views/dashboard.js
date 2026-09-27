@@ -111,7 +111,7 @@ window.DashboardView = {
                 Session: <strong style="font-family: var(--font-mono);">${sessionId || "No session loaded"}</strong>
                 • Pages: <strong>${totalPages}</strong>
                 • Total Findings: <strong>${findings.length}</strong>
-                • Inspection Mode: 100% Offline (Localhost)
+                • Inspection Mode: 100% Offline (Local / LAN)
               </div>
             </div>
 
