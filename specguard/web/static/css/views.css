@@ -441,6 +441,45 @@
   transition: stroke-width 0.15s ease;
 }
 
+/* Numbered Defect Pointer & Highlight Pulse */
+@keyframes defectPulseAnimation {
+  0% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(220, 38, 38, 0.6)); }
+  50% { transform: scale(1.02); filter: drop-shadow(0 0 10px rgba(220, 38, 38, 0.95)); }
+  100% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(220, 38, 38, 0.6)); }
+}
+
+@keyframes strokeDashPulse {
+  to { stroke-dashoffset: -12; }
+}
+
+.defect-pulsing {
+  animation: defectPulseAnimation 0.8s ease-in-out 3;
+}
+
+.active-defect-pulse {
+  animation: strokeDashPulse 1.2s linear infinite;
+}
+
+.finding-annotation-group text {
+  user-select: none;
+}
+
+.finding-annotation-group:hover text {
+  fill: #ffffff !important;
+}
+
+.missing-content-group {
+  transition: all 0.2s ease;
+}
+
+.missing-content-group:hover rect {
+  stroke-width: 2.2px !important;
+}
+
+.missing-content-group.focused {
+  filter: drop-shadow(0 2px 8px rgba(220, 38, 38, 0.35));
+}
+
 /* Bi-directional Linked Finding Jump Button */
 .finding-link-btn {
   display: inline-flex;

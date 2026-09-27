@@ -135,6 +135,6 @@ window.StructuralIssuesView = {
       window.appState.set("focusedFinding", f);
       window.appState.set("activePage", f.page_number || f.page || 1);
     }
-    window.router.navigate("viewer");
+    window.router.navigate("findings");
   }
 };

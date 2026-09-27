@@ -7,12 +7,17 @@
  */
 
 class DocumentViewerComponent {
-  constructor(containerId) {
+  constructor(containerId, options = {}) {
     this.container = document.getElementById(containerId);
+    this.options = Object.assign({
+      showDrawer: true,
+      showSidebar: true,
+      initialZoom: 1.25
+    }, options);
     this.docId = null;
     this.currentPage = 1;
     this.totalPages = 1;
-    this.zoomLevel = 1.25;
+    this.zoomLevel = this.options.initialZoom || 1.25;
     this.findings = [];
     this.focusedFinding = null;
     this.pageWidth = 612;
@@ -77,24 +82,65 @@ class DocumentViewerComponent {
   }
 
   focusFinding(finding) {
+    if (!finding) return;
     this.focusedFinding = finding;
-    const targetPage = finding.page_number || finding.page || 1;
-    if (targetPage !== this.currentPage) {
+    const targetPage = parseInt(finding.page_number || finding.page || 1, 10);
+    if (targetPage !== this.currentPage && targetPage >= 1 && targetPage <= this.totalPages) {
       this.currentPage = targetPage;
     }
+
+    // Zoom behavior: calculate appropriate viewport without over-zooming (Section 19)
+    if (finding.bbox) {
+      const viewport = this.container.querySelector("#viewer-canvas-viewport");
+      if (viewport && this.pageWidth > 0) {
+        const availableW = viewport.clientWidth - 48;
+        const targetZoom = Math.min(1.45, Math.max(1.15, availableW / this.pageWidth));
+        if (this.zoomLevel < 1.15) {
+          this.zoomLevel = targetZoom;
+        }
+      }
+    }
+
     this.renderPageCanvas();
     this.updateToolbar();
     this.renderSidebarContent();
-    this.showFindingInDrawer(finding);
+    if (this.options.showDrawer) {
+      this.showFindingInDrawer(finding);
+    }
 
-    // Scroll canvas to center finding
-    if (finding.bbox) {
-      setTimeout(() => {
-        const groupEl = this.container.querySelector(`[data-finding-id="${finding.finding_id}"]`);
-        if (groupEl) {
-          groupEl.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
-        }
-      }, 60);
+    // Smoothly scroll defect into view and pulse marker (Section 3 & 5)
+    setTimeout(() => {
+      const groupEl = this.container.querySelector(`[data-finding-id="${finding.finding_id}"]`);
+      if (groupEl) {
+        groupEl.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+        groupEl.classList.add("defect-pulsing");
+        setTimeout(() => groupEl.classList.remove("defect-pulsing"), 2400);
+      }
+    }, 100);
+  }
+
+  focusLocation(pageNum, bbox = null) {
+    const p = parseInt(pageNum, 10);
+    if (p >= 1 && p <= this.totalPages) {
+      this.currentPage = p;
+      this.renderPageCanvas();
+      this.updateToolbar();
+      this.renderSidebarContent();
+      if (bbox) {
+        setTimeout(() => {
+          const viewport = this.container.querySelector("#viewer-canvas-viewport");
+          if (viewport) {
+            const imgEl = this.container.querySelector("#viewer-page-img");
+            const rx = (imgEl?.naturalWidth || 612) / this.pageWidth;
+            const ry = (imgEl?.naturalHeight || 792) / this.pageHeight;
+            viewport.scrollTo({
+              top: Math.max(0, (bbox.y0 * ry) - 100),
+              left: Math.max(0, (bbox.x0 * rx) - 100),
+              behavior: "smooth"
+            });
+          }
+        }, 100);
+      }
     }
   }
 
@@ -135,7 +181,7 @@ class DocumentViewerComponent {
     this.container.innerHTML = `
       <div class="viewer-layout">
         <!-- LEFT: Page Navigation Sidebar with Multi-Page Tabs -->
-        <div class="viewer-pages-sidebar">
+        <div class="viewer-pages-sidebar" style="${this.options.showSidebar ? '' : 'display: none;'}">
           <div class="viewer-sidebar-tabs" style="display: flex; border-bottom: 1px solid var(--border-default); background: var(--bg-surface-sunken);">
             <button class="v-tab ${this.activeTab === 'pages' ? 'active' : ''}" data-tab="pages" style="flex: 1; padding: 7px 2px; font-size: 11px; font-weight: 700; border: none; background: transparent; cursor: pointer; color: ${this.activeTab === 'pages' ? 'var(--accent-primary)' : 'var(--text-muted)'}; border-bottom: 2px solid ${this.activeTab === 'pages' ? 'var(--accent-primary)' : 'transparent'};">Pages</button>
             <button class="v-tab ${this.activeTab === 'structure' ? 'active' : ''}" data-tab="structure" style="flex: 1; padding: 7px 2px; font-size: 11px; font-weight: 700; border: none; background: transparent; cursor: pointer; color: ${this.activeTab === 'structure' ? 'var(--accent-primary)' : 'var(--text-muted)'}; border-bottom: 2px solid ${this.activeTab === 'structure' ? 'var(--accent-primary)' : 'transparent'};">Tree</button>
@@ -249,7 +295,7 @@ class DocumentViewerComponent {
         </div>
 
         <!-- RIGHT: Finding Details Drawer -->
-        <div class="viewer-detail-drawer" id="viewer-detail-drawer">
+        <div class="viewer-detail-drawer" id="viewer-detail-drawer" style="${this.options.showDrawer ? '' : 'display: none;'}">
           <div class="drawer-header">
             <span style="font-size: 12px; font-weight: 800; color: var(--text-primary); letter-spacing: 0.5px;">FINDING DETAILS</span>
             <button class="btn btn-secondary btn-sm" id="viewer-drawer-close" style="padding: 2px 6px;">✕</button>
@@ -330,9 +376,12 @@ class DocumentViewerComponent {
       }
     };
 
-    this.container.querySelector("#viewer-drawer-close").onclick = () => {
-      this.closeDrawer();
-    };
+    const drawerClose = this.container.querySelector("#viewer-drawer-close");
+    if (drawerClose) {
+      drawerClose.onclick = () => {
+        this.closeDrawer();
+      };
+    }
 
     this.container.querySelectorAll(".v-tab").forEach((tabBtn) => {
       tabBtn.onclick = () => {
@@ -516,8 +565,19 @@ class DocumentViewerComponent {
     if (!svgEl) return;
     svgEl.innerHTML = "";
 
+    // SVG Defs for drop shadows and glow effects
+    const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+    defs.innerHTML = `
+      <filter id="defect-glow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-opacity="0.45" flood-color="#000000" />
+      </filter>
+    `;
+    svgEl.appendChild(defs);
+
     const filtered = this.getFilteredFindings();
     const findingsOnPage = filtered.filter((f) => (f.page_number || f.page) === this.currentPage && f.bbox);
+    const missingFindingsOnPage = filtered.filter((f) => (f.page_number || f.page) === this.currentPage && !f.bbox);
+
     const rx = renderedWidth / this.pageWidth;
     const ry = renderedHeight / this.pageHeight;
 
@@ -529,9 +589,14 @@ class DocumentViewerComponent {
       Informational: { stroke: "#64748b", fill: "rgba(100, 116, 139, 0.12)" }
     };
 
+    // 1. Render findings with bounding boxes (Text, Formatting, TOC, Figure, Table)
     findingsOnPage.forEach((f) => {
       const isFocused = this.focusedFinding && this.focusedFinding.finding_id === f.finding_id;
       const sevColor = severityColors[f.severity] || severityColors.Medium;
+
+      // Calculate finding index number [01], [02], [12]
+      const fIdx = this.findings.findIndex((x) => x.finding_id === f.finding_id);
+      const findingNum = fIdx >= 0 ? (fIdx + 1).toString().padStart(2, "0") : "01";
 
       // Classify marker visual style based on issue type and category
       const it = f.issue_type || "";
@@ -551,7 +616,7 @@ class DocumentViewerComponent {
 
       // Add tooltip
       const titleEl = document.createElementNS("http://www.w3.org/2000/svg", "title");
-      titleEl.textContent = `[${f.severity}] ${f.finding_id}: ${f.issue_type || f.category}\n` +
+      titleEl.textContent = `[${f.severity}] Finding #${findingNum} (${f.finding_id}): ${f.issue_type || f.category}\n` +
         `Detected: "${f.matched_text || f.detected_value || f.original_content}"\n` +
         `Expected: "${f.expected_text || f.expected_value || ''}"\n` +
         `Precision: ${f.location_precision || 'APPROXIMATE'}`;
@@ -567,7 +632,7 @@ class DocumentViewerComponent {
         const h = Math.max(8, y1 - y0);
         const lineY = y1 + 1.0;
 
-        // 1. Subtle interactive hit-box rectangle (provides smooth hover feedback without obscuring text)
+        // Subtle interactive hit-box rectangle
         const hitRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         hitRect.setAttribute("x", x0);
         hitRect.setAttribute("y", y0);
@@ -583,9 +648,8 @@ class DocumentViewerComponent {
         hitRect.setAttribute("stroke-width", isFocused ? "1.5" : "0.5");
         group.appendChild(hitRect);
 
-        // 2. Issue-Specific Visual Marker Line / Wave
+        // Issue-Specific Visual Marker Line / Wave
         if (isSpelling) {
-          // Red Squiggly Underline
           const wavePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
           wavePath.setAttribute("d", this.generateSquigglyPath(x0, x1, lineY, 5.5, 2.0));
           wavePath.setAttribute("class", "annotation-squiggly-path");
@@ -593,7 +657,6 @@ class DocumentViewerComponent {
           wavePath.setAttribute("stroke-width", isFocused ? "2.6" : "1.8");
           group.appendChild(wavePath);
         } else if (isGrammar) {
-          // Blue Squiggly Underline
           const wavePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
           wavePath.setAttribute("d", this.generateSquigglyPath(x0, x1, lineY, 5.5, 2.0));
           wavePath.setAttribute("class", "annotation-squiggly-path");
@@ -601,7 +664,6 @@ class DocumentViewerComponent {
           wavePath.setAttribute("stroke-width", isFocused ? "2.6" : "1.8");
           group.appendChild(wavePath);
         } else if (isDuplicate) {
-          // Orange / Amber Double Underline (two parallel lines)
           const l1 = document.createElementNS("http://www.w3.org/2000/svg", "line");
           l1.setAttribute("x1", x0);
           l1.setAttribute("y1", lineY - 1.5);
@@ -622,7 +684,6 @@ class DocumentViewerComponent {
           l2.setAttribute("stroke-width", isFocused ? "1.8" : "1.4");
           group.appendChild(l2);
         } else if (isTocDrift || isBrokenRef) {
-          // Orange Dotted Underline
           const dotLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
           dotLine.setAttribute("x1", x0);
           dotLine.setAttribute("y1", lineY);
@@ -634,7 +695,6 @@ class DocumentViewerComponent {
           dotLine.setAttribute("stroke-dasharray", "3.5, 2.5");
           group.appendChild(dotLine);
         } else {
-          // Standard Clean Boundary Line / Underline
           const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
           line.setAttribute("x1", x0);
           line.setAttribute("y1", lineY);
@@ -646,6 +706,76 @@ class DocumentViewerComponent {
         }
       });
 
+      // Render Clear Numbered Defect Pointer & Marker (Section 5 & 18)
+      if (boxes.length > 0 && boxes[0]) {
+        const pBox = boxes[0];
+        const bx0 = pBox.x0 * rx;
+        const by0 = pBox.y0 * ry;
+        const bx1 = pBox.x1 * rx;
+        const by1 = pBox.y1 * ry;
+        const cx = (bx0 + bx1) / 2;
+        const badgeW = isFocused ? 82 : 36;
+        const badgeH = isFocused ? 20 : 16;
+        const badgeX = Math.max(6, Math.min(renderedWidth - badgeW - 6, cx - badgeW / 2));
+        const placeAbove = by0 >= badgeH + 10;
+        const badgeY = placeAbove ? (by0 - badgeH - 7) : (by1 + 7);
+
+        // Pointer Arrow (downward if above, upward if below)
+        const ptr = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        if (placeAbove) {
+          ptr.setAttribute("d", `M ${cx} ${badgeY + badgeH} L ${cx} ${by0 - 1.5} M ${cx - 3.5} ${by0 - 5.5} L ${cx} ${by0 - 1.5} L ${cx + 3.5} ${by0 - 5.5}`);
+        } else {
+          ptr.setAttribute("d", `M ${cx} ${badgeY} L ${cx} ${by1 + 1.5} M ${cx - 3.5} ${by1 + 5.5} L ${cx} ${by1 + 1.5} L ${cx + 3.5} ${by1 + 5.5}`);
+        }
+        ptr.setAttribute("stroke", sevColor.stroke);
+        ptr.setAttribute("stroke-width", isFocused ? "2.2" : "1.4");
+        ptr.setAttribute("fill", "none");
+        group.appendChild(ptr);
+
+        // Marker Badge Background
+        const badgeRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        badgeRect.setAttribute("x", badgeX);
+        badgeRect.setAttribute("y", badgeY);
+        badgeRect.setAttribute("width", badgeW);
+        badgeRect.setAttribute("height", badgeH);
+        badgeRect.setAttribute("rx", "3");
+        badgeRect.setAttribute("fill", isFocused ? sevColor.stroke : "rgba(15, 23, 42, 0.88)");
+        badgeRect.setAttribute("stroke", isFocused ? "#ffffff" : sevColor.stroke);
+        badgeRect.setAttribute("stroke-width", isFocused ? "1.5" : "1");
+        if (isFocused) {
+          badgeRect.setAttribute("filter", "url(#defect-glow)");
+        }
+        group.appendChild(badgeRect);
+
+        // Marker Badge Label
+        const badgeText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        badgeText.setAttribute("x", badgeX + badgeW / 2);
+        badgeText.setAttribute("y", badgeY + (badgeH / 2) + 3.5);
+        badgeText.setAttribute("text-anchor", "middle");
+        badgeText.setAttribute("font-size", isFocused ? "10px" : "9px");
+        badgeText.setAttribute("font-weight", "800");
+        badgeText.setAttribute("font-family", "monospace, sans-serif");
+        badgeText.setAttribute("fill", "#ffffff");
+        badgeText.textContent = isFocused ? `[${findingNum}] ▼ DEFECT` : `[${findingNum}]`;
+        group.appendChild(badgeText);
+
+        // Active Defect Border Outline Highlight
+        if (isFocused) {
+          const glowOutline = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+          glowOutline.setAttribute("x", bx0 - 2);
+          glowOutline.setAttribute("y", by0 - 2);
+          glowOutline.setAttribute("width", Math.max(12, (bx1 - bx0) + 4));
+          glowOutline.setAttribute("height", Math.max(12, (by1 - by0) + 4));
+          glowOutline.setAttribute("rx", "3");
+          glowOutline.setAttribute("fill", "none");
+          glowOutline.setAttribute("stroke", sevColor.stroke);
+          glowOutline.setAttribute("stroke-width", "2");
+          glowOutline.setAttribute("stroke-dasharray", "4,2");
+          glowOutline.setAttribute("class", "active-defect-pulse");
+          group.appendChild(glowOutline);
+        }
+      }
+
       group.onclick = (e) => {
         e.stopPropagation();
         this.selectFinding(f);
@@ -653,12 +783,94 @@ class DocumentViewerComponent {
 
       svgEl.appendChild(group);
     });
+
+    // 2. Render Missing Content Defect Callouts (Section 14 & 23)
+    missingFindingsOnPage.forEach((mf, mIdx) => {
+      const isFocused = this.focusedFinding && this.focusedFinding.finding_id === mf.finding_id;
+      const fIdx = this.findings.findIndex((x) => x.finding_id === mf.finding_id);
+      const findingNum = fIdx >= 0 ? (fIdx + 1).toString().padStart(2, "0") : "01";
+      const bannerW = Math.min(500, renderedWidth - 36);
+      const bannerH = 44;
+      const bannerX = (renderedWidth - bannerW) / 2;
+      const bannerY = 20 + mIdx * (bannerH + 10);
+
+      const mg = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      mg.setAttribute("class", `missing-content-group ${isFocused ? "focused defect-pulsing" : ""}`);
+      mg.setAttribute("data-finding-id", mf.finding_id);
+      mg.style.cursor = "pointer";
+
+      // Dashed Callout Box
+      const mRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      mRect.setAttribute("x", bannerX);
+      mRect.setAttribute("y", bannerY);
+      mRect.setAttribute("width", bannerW);
+      mRect.setAttribute("height", bannerH);
+      mRect.setAttribute("rx", "5");
+      mRect.setAttribute("fill", isFocused ? "rgba(220, 38, 38, 0.12)" : "rgba(234, 88, 12, 0.07)");
+      mRect.setAttribute("stroke", isFocused ? "#dc2626" : "#ea580c");
+      mRect.setAttribute("stroke-width", isFocused ? "2" : "1.5");
+      mRect.setAttribute("stroke-dasharray", "6,3");
+      mg.appendChild(mRect);
+
+      // Marker Badge on Callout
+      const bRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      bRect.setAttribute("x", bannerX + 10);
+      bRect.setAttribute("y", bannerY + 11);
+      bRect.setAttribute("width", isFocused ? "78" : "36");
+      bRect.setAttribute("height", "22");
+      bRect.setAttribute("rx", "3");
+      bRect.setAttribute("fill", isFocused ? "#dc2626" : "rgba(15, 23, 42, 0.88)");
+      bRect.setAttribute("stroke", isFocused ? "#ffffff" : "#dc2626");
+      bRect.setAttribute("stroke-width", "1.2");
+      mg.appendChild(bRect);
+
+      const bText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      bText.setAttribute("x", bannerX + 10 + (isFocused ? 39 : 18));
+      bText.setAttribute("y", bannerY + 26);
+      bText.setAttribute("text-anchor", "middle");
+      bText.setAttribute("font-size", isFocused ? "10px" : "9px");
+      bText.setAttribute("font-weight", "800");
+      bText.setAttribute("font-family", "monospace, sans-serif");
+      bText.setAttribute("fill", "#ffffff");
+      bText.textContent = isFocused ? `[${findingNum}] MISSING` : `[${findingNum}]`;
+      mg.appendChild(bText);
+
+      // Warning Header
+      const t1 = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      t1.setAttribute("x", bannerX + (isFocused ? 98 : 56));
+      t1.setAttribute("y", bannerY + 18);
+      t1.setAttribute("font-size", "11px");
+      t1.setAttribute("font-weight", "800");
+      t1.setAttribute("fill", isFocused ? "#dc2626" : "#ea580c");
+      t1.textContent = "⚠ EXPECTED CONTENT NOT DETECTED HERE";
+      mg.appendChild(t1);
+
+      // Expected Object Target
+      const t2 = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      t2.setAttribute("x", bannerX + (isFocused ? 98 : 56));
+      t2.setAttribute("y", bannerY + 34);
+      t2.setAttribute("font-size", "11px");
+      t2.setAttribute("font-weight", "600");
+      t2.setAttribute("fill", "#0f172a");
+      const missingLabel = mf.expected_value || mf.expected_text || mf.explanation || mf.finding_id;
+      t2.textContent = missingLabel.length > 55 ? missingLabel.substring(0, 52) + "..." : missingLabel;
+      mg.appendChild(t2);
+
+      mg.onclick = (e) => {
+        e.stopPropagation();
+        this.selectFinding(mf);
+      };
+
+      svgEl.appendChild(mg);
+    });
   }
 
   selectFinding(finding) {
     this.focusedFinding = finding;
     this.renderPageCanvas();
-    this.showFindingInDrawer(finding);
+    if (this.options.showDrawer) {
+      this.showFindingInDrawer(finding);
+    }
     this.updateToolbar();
     if (this.onFindingSelected) {
       this.onFindingSelected(finding);

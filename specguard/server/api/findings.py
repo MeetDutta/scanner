@@ -5,7 +5,8 @@ strictly from the verified local SQLite findings repository.
 """
 
 from fastapi import APIRouter, HTTPException, Query
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, Optional, List
+import re
 import json
 import logging
 
@@ -15,6 +16,87 @@ from specguard.repository.manager import RepositoryManager
 
 logger = logging.getLogger("SpecGuard.API.Findings")
 router = APIRouter(prefix="/findings", tags=["findings"])
+
+
+def _enrich_finding_location_metadata(finding_dict: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Extracts structured location breakdown (section, paragraph, object_type, coordinates, multi-locations)
+    from location and bounding box metadata with zero fabricated coordinates.
+    """
+    loc_str = str(finding_dict.get("location") or "")
+    cat = str(finding_dict.get("category") or "")
+    bbox = finding_dict.get("bbox")
+
+    # Section extraction
+    section = None
+    sec_match = re.search(r"(?:Section|Sec\.?)\s*([0-9A-Z\.]+)", loc_str, re.IGNORECASE)
+    if sec_match:
+        section = sec_match.group(1).strip()
+    elif "TOC" in cat or "TOC" in loc_str:
+        section = "Table of Contents"
+    elif "Abstract" in loc_str:
+        section = "Abstract"
+    finding_dict["section"] = section
+
+    # Paragraph / Line / Block extraction
+    paragraph = None
+    para_match = re.search(r"(?:Paragraph|Para\.?|Block|Line)\s*([0-9]+)", loc_str, re.IGNORECASE)
+    if para_match:
+        paragraph = para_match.group(1).strip()
+    finding_dict["paragraph"] = paragraph
+
+    # Object Type extraction
+    obj_type = None
+    if "Table of Contents" in cat or "TOC" in cat or "TOC" in loc_str:
+        obj_type = "TOC Entry"
+    elif "Table" in cat or "Table" in loc_str:
+        obj_type = "Table"
+    elif "Figure" in cat or "Figure" in loc_str:
+        obj_type = "Figure"
+    elif "Equation" in cat or "Equation" in loc_str:
+        obj_type = "Equation"
+    elif "Heading" in loc_str or "Outline" in loc_str or "Structure" in cat:
+        obj_type = "Heading"
+    elif "Grammar" in cat or "Spelling" in cat or "Semantic" in cat:
+        obj_type = "Text Span"
+    elif "Cross-Reference" in cat:
+        obj_type = "Cross Reference"
+    elif "Formatting" in cat:
+        obj_type = "Formatted Text Block"
+    elif "Standards" in cat:
+        obj_type = "Specification Text"
+    elif "Logical" in cat:
+        obj_type = "Specification Value"
+    finding_dict["object_type"] = obj_type
+
+    # Format region coordinates
+    if bbox and isinstance(bbox, dict) and "x0" in bbox and "y0" in bbox and "x1" in bbox and "y1" in bbox:
+        w = max(0.0, float(bbox["x1"]) - float(bbox["x0"]))
+        h = max(0.0, float(bbox["y1"]) - float(bbox["y0"]))
+        finding_dict["region_formatted"] = f"x={float(bbox['x0']):.1f}, y={float(bbox['y0']):.1f}, width={w:.1f}, height={h:.1f}"
+    else:
+        finding_dict["region_formatted"] = None
+
+    # Multiple locations extraction (e.g. Page X vs Page Y, or cross-ref mentions)
+    locations = []
+    vs_pages = re.findall(r"Page\s*([0-9]+)", loc_str, re.IGNORECASE)
+    if len(vs_pages) > 1:
+        for idx, p in enumerate(vs_pages):
+            locations.append({
+                "label": f"Location {idx + 1} (Page {p})",
+                "page": int(p),
+                "type": "Occurrence"
+            })
+    elif finding_dict.get("page"):
+        primary_p = finding_dict["page"]
+        locations.append({
+            "label": f"Primary Location (Page {primary_p})",
+            "page": int(primary_p),
+            "type": obj_type or "Defect"
+        })
+
+    finding_dict["locations"] = locations
+    return finding_dict
 
 
 @router.get("")
@@ -177,7 +259,7 @@ def list_findings(
                     if k in disk_f and disk_f[k] is not None:
                         finding_dict[k] = disk_f[k]
 
-            findings.append(finding_dict)
+            findings.append(_enrich_finding_location_metadata(finding_dict))
 
         # Severity summary for current session
         cursor.execute(f"""
@@ -297,4 +379,4 @@ def get_finding_detail(finding_id: str, session_id: Optional[str] = None) -> Dic
         except Exception:
             pass
 
-        return res
+        return _enrich_finding_location_metadata(res)
