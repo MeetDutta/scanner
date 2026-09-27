@@ -130,26 +130,7 @@ async def upload_document(file: UploadFile = File(...)) -> Dict[str, Any]:
 @router.get("/samples")
 def list_demo_samples() -> List[Dict[str, Any]]:
     """Lists available local sample documents for immediate evaluation."""
-    samples = []
-    if DEMO_SAMPLES_DIR.exists():
-        for p in sorted(DEMO_SAMPLES_DIR.glob("*.*")):
-            if p.suffix.lower() in SUPPORTED_EXTENSIONS:
-                domain = "mechanical"
-                if "elect" in p.name.lower():
-                    domain = "electrical"
-                elif "chem" in p.name.lower():
-                    domain = "chemical"
-                elif "ieee" in p.name.lower() or "paper" in p.name.lower():
-                    domain = "academic"
-
-                samples.append({
-                    "filename": p.name,
-                    "file_path": str(p.resolve()),
-                    "domain": domain,
-                    "file_size": p.stat().st_size,
-                    "file_type": p.suffix.replace(".", "").upper()
-                })
-    return samples
+    return []
 
 
 def _run_pipeline_worker(

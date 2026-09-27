@@ -7,7 +7,6 @@ window.NewAnalysisView = {
   selectedFile: null,
   selectedDomain: "mechanical",
   selectedProfile: "mechanical",
-  demoSamples: [],
 
   async render(container) {
     this.selectedFile = null;
@@ -59,16 +58,6 @@ window.NewAnalysisView = {
                 </div>
               </div>
               <button class="btn btn-outline btn-sm" id="btn-remove-selected-file">✕ Remove</button>
-            </div>
-
-            <!-- Quick Demo Samples Selector -->
-            <div style="border-top: 1px solid var(--border-subtle); padding-top: 12px;">
-              <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
-                Or select a local verified demo sample:
-              </span>
-              <div id="demo-samples-container" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px;">
-                <span style="font-size: 12px; color: var(--text-muted);">Loading sample documents...</span>
-              </div>
             </div>
           </div>
         </div>
@@ -161,7 +150,6 @@ window.NewAnalysisView = {
     `;
 
     this._bindEvents();
-    await this.loadDemoSamples();
     await this.loadCustomProfiles();
   },
 
@@ -240,46 +228,6 @@ window.NewAnalysisView = {
     document.getElementById("btn-start-analysis").disabled = false;
   },
 
-  async loadDemoSamples() {
-    try {
-      const samples = await window.api.analysis.getSamples();
-      this.demoSamples = samples;
-      const container = document.getElementById("demo-samples-container");
-      if (!container) return;
-
-      if (samples.length === 0) {
-        container.innerHTML = `<span style="font-size: 12px; color: var(--text-muted);">No demo files in demo_samples/</span>`;
-        return;
-      }
-
-      container.innerHTML = samples.map((s, idx) => `
-        <button class="btn btn-secondary btn-sm" id="btn-sample-${idx}" style="font-size: 11.5px;">
-          ${s.domain === "mechanical" ? "⚙️" : s.domain === "electrical" ? "⚡" : s.domain === "academic" ? "📑" : "🧪"}
-          ${s.filename}
-        </button>
-      `).join("");
-
-      samples.forEach((s, idx) => {
-        document.getElementById(`btn-sample-${idx}`).onclick = () => {
-          this.setDocument({
-            filename: s.filename,
-            file_path: s.file_path,
-            file_size: s.file_size,
-            file_type: s.file_type,
-            page_count: 2
-          });
-
-          // Auto-select domain matching sample
-          if (s.domain) {
-            const card = document.querySelector(`.domain-card[data-domain="${s.domain}"]`);
-            if (card) card.click();
-          }
-        };
-      });
-    } catch (err) {
-      console.warn("Could not load demo samples:", err);
-    }
-  },
 
   async startAnalysis() {
     if (!this.selectedFile) return;

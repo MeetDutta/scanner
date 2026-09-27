@@ -67,6 +67,19 @@ def _find_document_path(doc_identifier: str) -> Optional[Path]:
     if archived_file.exists():
         return archived_file
 
+    # Fallback for SHA-256 hash lookup in demo_samples or uploads
+    if len(doc_identifier) == 64:
+        import hashlib
+        for candidate_dir in [DEMO_SAMPLES_DIR, DATA_DIR / "uploads"]:
+            if candidate_dir.exists():
+                for p in candidate_dir.glob("*.*"):
+                    if p.is_file():
+                        try:
+                            if hashlib.sha256(p.read_bytes()).hexdigest() == doc_identifier:
+                                return p
+                        except Exception:
+                            continue
+
     return None
 
 
