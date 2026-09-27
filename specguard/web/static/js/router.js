@@ -77,8 +77,14 @@ class Router {
       currentBreadcrumb.textContent = routeConfig.title;
     }
 
-    // Scroll container to top
+    // Scroll container to top and configure route attributes
     if (this.container) {
+      this.container.setAttribute("data-route", routeName);
+      if (routeName === "viewer" || routeName === "findings") {
+        this.container.classList.add("no-scroll-view");
+      } else {
+        this.container.classList.remove("no-scroll-view");
+      }
       this.container.scrollTop = 0;
       this.container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⏳</div><div>Loading view...</div></div>`;
       routeConfig.view.render(this.container);

@@ -1,9 +1,9 @@
 /**
- * Interactive Document Viewer Canvas Component for DocReady
- * Renders high-DPI document pages locally via PyMuPDF image endpoints,
- * overlays precise Word-like visual markers (wavy squigglies, double lines, dotted lines),
- * handles multi-line bounding boxes, issue navigation (prev/next), category & precision filters,
- * and bi-directional linked finding exploration.
+ * Interactive Document Viewer Component for SpecGuard
+ * Real Multi-Page Document Viewport with continuous vertical scrolling,
+ * responsive Fit-Page & Fit-Width calculation, aspect-ratio preservation,
+ * zero flexbox scroll-clipping traps, and precision defect location highlighting.
+ * Strictly 100% READ-ONLY.
  */
 
 class DocumentViewerComponent {
@@ -14,56 +14,156 @@ class DocumentViewerComponent {
       showSidebar: true,
       initialZoom: 1.25
     }, options);
+
     this.docId = null;
     this.currentPage = 1;
     this.totalPages = 1;
     this.zoomLevel = this.options.initialZoom || 1.25;
+    this.viewModeState = "custom"; // "custom" | "fit-width" | "fit-page"
+
     this.findings = [];
     this.focusedFinding = null;
+    this.docDetails = null;
+
+    // Page dimensions map: pageNum -> { width, height }
+    this.pagesInfo = {};
     this.pageWidth = 612;
     this.pageHeight = 792;
+
     this.onFindingSelected = null;
+    this._isProgrammaticScroll = false;
+    this._scrollUnlockTimer = null;
+    this._resizeObserver = null;
 
     // Filters and UI state
     this.activeCategoryFilter = "ALL";
     this.activeSeverityFilter = "ALL";
     this.exactOnlyFilter = false;
     this.legendVisible = false;
+    this.activeTab = "pages";
   }
 
   async loadDocument(docId, totalPages = 1, findings = []) {
     this.docId = docId;
     this.totalPages = totalPages;
     this.currentPage = 1;
-    this.findings = findings;
+    this.findings = findings || [];
     this.activeTab = "pages";
     this.docDetails = null;
     this.focusedFinding = null;
+    this.pagesInfo = {};
+
     this.render();
+
     try {
       this.docDetails = await window.api.documents.get(docId);
-      if (this.docDetails && this.docDetails.page_count) {
-        this.totalPages = this.docDetails.page_count;
+      if (this.docDetails) {
+        if (this.docDetails.page_count) {
+          this.totalPages = this.docDetails.page_count;
+        }
+        if (this.docDetails.pages && Array.isArray(this.docDetails.pages)) {
+          this.docDetails.pages.forEach((p) => {
+            this.pagesInfo[p.page_num] = {
+              width: p.width || 612,
+              height: p.height || 792
+            };
+          });
+          if (this.pagesInfo[1]) {
+            this.pageWidth = this.pagesInfo[1].width;
+            this.pageHeight = this.pagesInfo[1].height;
+          }
+        }
       }
-      this.renderSidebarContent();
-      this.updateToolbar();
     } catch (e) {
       console.warn("Could not fetch document AST:", e);
     }
+
+    // Populate fallback page info if empty
+    for (let i = 1; i <= this.totalPages; i++) {
+      if (!this.pagesInfo[i]) {
+        this.pagesInfo[i] = { width: this.pageWidth, height: this.pageHeight };
+      }
+    }
+
+    this.renderPages();
+    this.renderSidebarContent();
+    this.updateToolbar();
+    this._initScrollObserver();
+    this._initResizeObserver();
   }
 
   setPage(pageNum) {
     if (pageNum < 1 || pageNum > this.totalPages) return;
     this.currentPage = pageNum;
-    this.renderPageCanvas();
+    this.scrollToPage(pageNum, true);
     this.updateToolbar();
     this.renderSidebarContent();
   }
 
-  setZoom(zoom) {
-    this.zoomLevel = Math.max(0.5, Math.min(3.0, zoom));
-    this.renderPageCanvas();
+  scrollToPage(pageNum, smooth = true) {
+    if (pageNum < 1 || pageNum > this.totalPages) return;
+    const pageEl = this.container.querySelector(`#page-container-${pageNum}`);
+    const viewport = this.container.querySelector("#viewer-canvas-viewport");
+    if (!pageEl || !viewport) return;
+
+    this._isProgrammaticScroll = true;
+    clearTimeout(this._scrollUnlockTimer);
+
+    const targetTop = pageEl.offsetTop - 16;
+    viewport.scrollTo({
+      top: Math.max(0, targetTop),
+      behavior: smooth ? "smooth" : "auto"
+    });
+
+    this._scrollUnlockTimer = setTimeout(() => {
+      this._isProgrammaticScroll = false;
+    }, 600);
+  }
+
+  setZoom(zoom, modeState = null) {
+    if (modeState) {
+      this.viewModeState = modeState;
+    } else if (this.viewModeState !== "fit-page" && this.viewModeState !== "fit-width") {
+      this.viewModeState = "custom";
+    }
+    this.zoomLevel = Math.max(0.4, Math.min(3.0, zoom));
+    this.updatePageSizes();
     this.updateToolbar();
+  }
+
+  fitPage() {
+    const viewport = this.container.querySelector("#viewer-canvas-viewport");
+    if (!viewport) return;
+
+    // Available viewport space (accounting for padding & page label)
+    const availableW = Math.max(120, viewport.clientWidth - 48);
+    const availableH = Math.max(120, viewport.clientHeight - 64);
+
+    const curPageInfo = this.pagesInfo[this.currentPage] || { width: this.pageWidth, height: this.pageHeight };
+    const pW = curPageInfo.width || 612;
+    const pH = curPageInfo.height || 792;
+
+    const scaleW = availableW / pW;
+    const scaleH = availableH / pH;
+    const targetZoom = Math.max(0.4, Math.min(3.0, Math.min(scaleW, scaleH)));
+
+    this.viewModeState = "fit-page";
+    this.setZoom(targetZoom, "fit-page");
+    this.scrollToPage(this.currentPage, false);
+  }
+
+  fitWidth() {
+    const viewport = this.container.querySelector("#viewer-canvas-viewport");
+    if (!viewport) return;
+
+    const availableW = Math.max(120, viewport.clientWidth - 48);
+    const curPageInfo = this.pagesInfo[this.currentPage] || { width: this.pageWidth, height: this.pageHeight };
+    const pW = curPageInfo.width || 612;
+
+    const targetZoom = Math.max(0.4, Math.min(3.0, availableW / pW));
+
+    this.viewModeState = "fit-width";
+    this.setZoom(targetZoom, "fit-width");
   }
 
   getFilteredFindings() {
@@ -85,36 +185,53 @@ class DocumentViewerComponent {
     if (!finding) return;
     this.focusedFinding = finding;
     const targetPage = parseInt(finding.page_number || finding.page || 1, 10);
-    if (targetPage !== this.currentPage && targetPage >= 1 && targetPage <= this.totalPages) {
+    if (targetPage >= 1 && targetPage <= this.totalPages) {
       this.currentPage = targetPage;
     }
 
-    // Zoom behavior: calculate appropriate viewport without over-zooming (Section 19)
-    if (finding.bbox) {
-      const viewport = this.container.querySelector("#viewer-canvas-viewport");
-      if (viewport && this.pageWidth > 0) {
-        const availableW = viewport.clientWidth - 48;
-        const targetZoom = Math.min(1.45, Math.max(1.15, availableW / this.pageWidth));
-        if (this.zoomLevel < 1.15) {
-          this.zoomLevel = targetZoom;
-        }
-      }
+    // Auto-adjust zoom if currently too small to inspect
+    if (this.zoomLevel < 1.0) {
+      this.zoomLevel = 1.15;
+      this.viewModeState = "custom";
     }
 
-    this.renderPageCanvas();
+    this.updatePageSizes();
     this.updateToolbar();
     this.renderSidebarContent();
+
     if (this.options.showDrawer) {
       this.showFindingInDrawer(finding);
     }
 
-    // Smoothly scroll defect into view and pulse marker (Section 3 & 5)
+    // Smoothly scroll defect directly into view in the document viewport
     setTimeout(() => {
+      const viewportEl = this.container.querySelector("#viewer-canvas-viewport");
       const groupEl = this.container.querySelector(`[data-finding-id="${finding.finding_id}"]`);
-      if (groupEl) {
-        groupEl.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+      const pageEl = this.container.querySelector(`#page-container-${targetPage}`);
+
+      if (groupEl && viewportEl && pageEl) {
+        const viewportRect = viewportEl.getBoundingClientRect();
+        const groupRect = groupEl.getBoundingClientRect();
+
+        const relativeTop = groupRect.top - viewportRect.top + viewportEl.scrollTop;
+        const relativeLeft = groupRect.left - viewportRect.left + viewportEl.scrollLeft;
+
+        this._isProgrammaticScroll = true;
+        viewportEl.scrollTo({
+          top: Math.max(0, relativeTop - (viewportEl.clientHeight / 2) + 20),
+          left: Math.max(0, relativeLeft - (viewportEl.clientWidth / 2) + 20),
+          behavior: "smooth"
+        });
+
+        clearTimeout(this._scrollUnlockTimer);
+        this._scrollUnlockTimer = setTimeout(() => {
+          this._isProgrammaticScroll = false;
+        }, 500);
+
         groupEl.classList.add("defect-pulsing");
         setTimeout(() => groupEl.classList.remove("defect-pulsing"), 2400);
+      } else if (pageEl) {
+        this.scrollToPage(targetPage, true);
       }
     }, 100);
   }
@@ -123,21 +240,31 @@ class DocumentViewerComponent {
     const p = parseInt(pageNum, 10);
     if (p >= 1 && p <= this.totalPages) {
       this.currentPage = p;
-      this.renderPageCanvas();
+      this.scrollToPage(p, true);
       this.updateToolbar();
       this.renderSidebarContent();
+
       if (bbox) {
         setTimeout(() => {
           const viewport = this.container.querySelector("#viewer-canvas-viewport");
-          if (viewport) {
-            const imgEl = this.container.querySelector("#viewer-page-img");
-            const rx = (imgEl?.naturalWidth || 612) / this.pageWidth;
-            const ry = (imgEl?.naturalHeight || 792) / this.pageHeight;
+          const pageEl = this.container.querySelector(`#page-container-${p}`);
+          if (viewport && pageEl) {
+            const pageInfo = this.pagesInfo[p] || { width: this.pageWidth, height: this.pageHeight };
+            const ry = (pageInfo.height * this.zoomLevel) / pageInfo.height;
+            const rx = (pageInfo.width * this.zoomLevel) / pageInfo.width;
+
+            const targetTop = pageEl.offsetTop + (bbox.y0 * ry) - 100;
+            const targetLeft = (bbox.x0 * rx) - 100;
+
+            this._isProgrammaticScroll = true;
             viewport.scrollTo({
-              top: Math.max(0, (bbox.y0 * ry) - 100),
-              left: Math.max(0, (bbox.x0 * rx) - 100),
+              top: Math.max(0, targetTop),
+              left: Math.max(0, targetLeft),
               behavior: "smooth"
             });
+            setTimeout(() => {
+              this._isProgrammaticScroll = false;
+            }, 500);
           }
         }, 100);
       }
@@ -182,33 +309,33 @@ class DocumentViewerComponent {
       <div class="viewer-layout">
         <!-- LEFT: Page Navigation Sidebar with Multi-Page Tabs -->
         <div class="viewer-pages-sidebar" style="${this.options.showSidebar ? '' : 'display: none;'}">
-          <div class="viewer-sidebar-tabs" style="display: flex; border-bottom: 1px solid var(--border-default); background: var(--bg-surface-sunken);">
+          <div class="viewer-sidebar-tabs" style="display: flex; border-bottom: 1px solid var(--border-default); background: var(--bg-surface-sunken); flex-shrink: 0;">
             <button class="v-tab ${this.activeTab === 'pages' ? 'active' : ''}" data-tab="pages" style="flex: 1; padding: 7px 2px; font-size: 11px; font-weight: 700; border: none; background: transparent; cursor: pointer; color: ${this.activeTab === 'pages' ? 'var(--accent-primary)' : 'var(--text-muted)'}; border-bottom: 2px solid ${this.activeTab === 'pages' ? 'var(--accent-primary)' : 'transparent'};">Pages</button>
             <button class="v-tab ${this.activeTab === 'structure' ? 'active' : ''}" data-tab="structure" style="flex: 1; padding: 7px 2px; font-size: 11px; font-weight: 700; border: none; background: transparent; cursor: pointer; color: ${this.activeTab === 'structure' ? 'var(--accent-primary)' : 'var(--text-muted)'}; border-bottom: 2px solid ${this.activeTab === 'structure' ? 'var(--accent-primary)' : 'transparent'};">Tree</button>
             <button class="v-tab ${this.activeTab === 'toc' ? 'active' : ''}" data-tab="toc" style="flex: 1; padding: 7px 2px; font-size: 11px; font-weight: 700; border: none; background: transparent; cursor: pointer; color: ${this.activeTab === 'toc' ? 'var(--accent-primary)' : 'var(--text-muted)'}; border-bottom: 2px solid ${this.activeTab === 'toc' ? 'var(--accent-primary)' : 'transparent'};">TOC</button>
             <button class="v-tab ${this.activeTab === 'assets' ? 'active' : ''}" data-tab="assets" style="flex: 1; padding: 7px 2px; font-size: 11px; font-weight: 700; border: none; background: transparent; cursor: pointer; color: ${this.activeTab === 'assets' ? 'var(--accent-primary)' : 'var(--text-muted)'}; border-bottom: 2px solid ${this.activeTab === 'assets' ? 'var(--accent-primary)' : 'transparent'};">Assets</button>
             <button class="v-tab ${this.activeTab === 'xrefs' ? 'active' : ''}" data-tab="xrefs" style="flex: 1; padding: 7px 2px; font-size: 11px; font-weight: 700; border: none; background: transparent; cursor: pointer; color: ${this.activeTab === 'xrefs' ? 'var(--accent-primary)' : 'var(--text-muted)'}; border-bottom: 2px solid ${this.activeTab === 'xrefs' ? 'var(--accent-primary)' : 'transparent'};">Refs</button>
           </div>
-          <div class="pages-list" id="viewer-pages-list" style="overflow-y: auto; flex: 1; padding: 6px;"></div>
+          <div class="pages-list" id="viewer-pages-list" style="overflow-y: auto; flex: 1; padding: 6px; min-height: 0;"></div>
         </div>
 
         <!-- CENTER: Canvas Viewport -->
         <div class="viewer-center-pane">
           <!-- Main Toolbar -->
-          <div class="viewer-toolbar" style="flex-wrap: wrap; height: auto; padding: 6px 14px; gap: 8px;">
+          <div class="viewer-toolbar">
             <!-- Page Nav & Issue Nav -->
             <div style="display: flex; align-items: center; gap: 6px;">
               <button class="btn btn-secondary btn-sm" id="viewer-btn-prev" title="Previous Page">← Prev</button>
-              <span id="viewer-page-counter" style="font-size: 11.5px; font-weight: 700; color: var(--text-primary); min-width: 75px; text-align: center;">
-                Page 1 of 1
+              <span id="viewer-page-counter" style="font-size: 11.5px; font-weight: 700; color: var(--text-primary); min-width: 80px; text-align: center;">
+                Page 1 of ${this.totalPages}
               </span>
               <button class="btn btn-secondary btn-sm" id="viewer-btn-next" title="Next Page">Next →</button>
 
               <div style="height: 18px; width: 1px; background: var(--border-default); margin: 0 4px;"></div>
 
-              <button class="btn btn-secondary btn-sm" id="viewer-issue-prev" title="Previous Issue">⏮ Prev Issue</button>
+              <button class="btn btn-secondary btn-sm" id="viewer-issue-prev" title="Previous Issue">⏮ Prev</button>
               <span id="viewer-issue-counter" style="font-size: 11px; font-weight: 700; color: var(--accent-primary); min-width: 60px; text-align: center;">Issues</span>
-              <button class="btn btn-secondary btn-sm" id="viewer-issue-next" title="Next Issue">Next Issue ⏭</button>
+              <button class="btn btn-secondary btn-sm" id="viewer-issue-next" title="Next Issue">Next ⏭</button>
             </div>
 
             <!-- Filters -->
@@ -226,17 +353,17 @@ class DocumentViewerComponent {
 
               <label style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; cursor: pointer; color: var(--text-secondary);">
                 <input type="checkbox" id="viewer-exact-filter" style="cursor: pointer;" />
-                Exact Words Only
+                Exact Only
               </label>
             </div>
 
             <!-- Zoom & View Controls & Legend -->
             <div style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
               <button class="btn btn-secondary btn-sm" id="viewer-zoom-out" title="Zoom Out">−</button>
-              <span id="viewer-zoom-label" style="font-size: 11.5px; font-weight: 700; min-width: 38px; text-align: center;">125%</span>
+              <span id="viewer-zoom-label" style="font-size: 11.5px; font-weight: 700; min-width: 40px; text-align: center;">125%</span>
               <button class="btn btn-secondary btn-sm" id="viewer-zoom-in" title="Zoom In">+</button>
-              <button class="btn btn-secondary btn-sm" id="viewer-fit-width">Fit Width</button>
-              <button class="btn btn-secondary btn-sm" id="viewer-fit-page">Fit Page</button>
+              <button class="btn btn-secondary btn-sm" id="viewer-fit-width" title="Fit Document Width to Viewport">Fit Width</button>
+              <button class="btn btn-secondary btn-sm" id="viewer-fit-page" title="Fit Complete Page in Viewport">Fit Page</button>
               <button class="btn btn-secondary btn-sm" id="viewer-legend-toggle" title="Toggle Annotation Legend">🎨 Legend</button>
             </div>
           </div>
@@ -286,10 +413,10 @@ class DocumentViewerComponent {
             </div>
           </div>
 
-          <div class="canvas-viewport" id="viewer-canvas-viewport">
-            <div class="page-canvas-wrapper" id="viewer-page-wrapper">
-              <img class="page-canvas-image" id="viewer-page-img" alt="Document Page" />
-              <svg class="page-overlay-svg" id="viewer-overlay-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+          <!-- Document Viewport - Dedicated Scroll Container (Section 3) -->
+          <div class="document-viewport canvas-viewport" id="viewer-canvas-viewport">
+            <div class="document-pages-container" id="viewer-pages-container">
+              <!-- Dynamically populated continuous multi-page flow -->
             </div>
           </div>
         </div>
@@ -304,7 +431,7 @@ class DocumentViewerComponent {
             <div class="empty-state" style="padding: 24px;">
               <div class="empty-state-icon">🔍</div>
               <div class="empty-state-title">No Finding Selected</div>
-              <div class="empty-state-desc">Click any marked word or underline on the document canvas to inspect exact issue details.</div>
+              <div class="empty-state-desc">Click any marked defect or underline on the document canvas to inspect exact issue details.</div>
             </div>
           </div>
         </div>
@@ -313,15 +440,25 @@ class DocumentViewerComponent {
 
     this._bindEvents();
     this.renderPageList();
-    this.renderPageCanvas();
+    this.renderPages();
     this.updateToolbar();
   }
 
   _bindEvents() {
     this.container.querySelector("#viewer-btn-prev").onclick = () => this.setPage(this.currentPage - 1);
     this.container.querySelector("#viewer-btn-next").onclick = () => this.setPage(this.currentPage + 1);
-    this.container.querySelector("#viewer-zoom-out").onclick = () => this.setZoom(this.zoomLevel - 0.25);
-    this.container.querySelector("#viewer-zoom-in").onclick = () => this.setZoom(this.zoomLevel + 0.25);
+
+    this.container.querySelector("#viewer-zoom-out").onclick = () => {
+      this.viewModeState = "custom";
+      this.setZoom(this.zoomLevel - 0.25, "custom");
+    };
+    this.container.querySelector("#viewer-zoom-in").onclick = () => {
+      this.viewModeState = "custom";
+      this.setZoom(this.zoomLevel + 0.25, "custom");
+    };
+
+    this.container.querySelector("#viewer-fit-width").onclick = () => this.fitWidth();
+    this.container.querySelector("#viewer-fit-page").onclick = () => this.fitPage();
 
     this.container.querySelector("#viewer-issue-prev").onclick = () => this.prevFinding();
     this.container.querySelector("#viewer-issue-next").onclick = () => this.nextFinding();
@@ -330,7 +467,7 @@ class DocumentViewerComponent {
     if (catSelect) {
       catSelect.onchange = (e) => {
         this.activeCategoryFilter = e.target.value;
-        this.renderPageCanvas();
+        this.updatePageSizes();
         this.updateToolbar();
       };
     }
@@ -339,7 +476,7 @@ class DocumentViewerComponent {
     if (exactCheckbox) {
       exactCheckbox.onchange = (e) => {
         this.exactOnlyFilter = e.target.checked;
-        this.renderPageCanvas();
+        this.updatePageSizes();
         this.updateToolbar();
       };
     }
@@ -360,22 +497,6 @@ class DocumentViewerComponent {
       }
     }
 
-    this.container.querySelector("#viewer-fit-width").onclick = () => {
-      const viewport = this.container.querySelector("#viewer-canvas-viewport");
-      if (viewport && this.pageWidth > 0) {
-        const availableW = viewport.clientWidth - 48;
-        this.setZoom(availableW / this.pageWidth);
-      }
-    };
-
-    this.container.querySelector("#viewer-fit-page").onclick = () => {
-      const viewport = this.container.querySelector("#viewer-canvas-viewport");
-      if (viewport && this.pageHeight > 0) {
-        const availableH = viewport.clientHeight - 48;
-        this.setZoom(availableH / this.pageHeight);
-      }
-    };
-
     const drawerClose = this.container.querySelector("#viewer-drawer-close");
     if (drawerClose) {
       drawerClose.onclick = () => {
@@ -394,6 +515,154 @@ class DocumentViewerComponent {
         this.renderSidebarContent();
       };
     });
+  }
+
+  _initScrollObserver() {
+    const viewport = this.container.querySelector("#viewer-canvas-viewport");
+    if (!viewport) return;
+
+    const handleScroll = () => {
+      if (this._isProgrammaticScroll) return;
+
+      const viewRect = viewport.getBoundingClientRect();
+      const viewCenterY = viewRect.top + (viewRect.height / 3);
+
+      let activePage = this.currentPage;
+      let minDistance = Infinity;
+
+      for (let p = 1; p <= this.totalPages; p++) {
+        const pageEl = this.container.querySelector(`#page-container-${p}`);
+        if (pageEl) {
+          const r = pageEl.getBoundingClientRect();
+          if (r.top <= viewCenterY && r.bottom >= viewCenterY) {
+            activePage = p;
+            break;
+          }
+          const dist = Math.abs(r.top - viewCenterY);
+          if (dist < minDistance) {
+            minDistance = dist;
+            activePage = p;
+          }
+        }
+      }
+
+      if (activePage !== this.currentPage && activePage >= 1 && activePage <= this.totalPages) {
+        this.currentPage = activePage;
+        this.updateToolbar();
+        this.renderSidebarContent();
+      }
+    };
+
+    viewport.addEventListener("scroll", handleScroll, { passive: true });
+  }
+
+  _initResizeObserver() {
+    const viewport = this.container.querySelector("#viewer-canvas-viewport");
+    if (!viewport) return;
+
+    if (this._resizeObserver) {
+      this._resizeObserver.disconnect();
+    }
+
+    this._resizeObserver = new ResizeObserver(() => {
+      if (this.viewModeState === "fit-page") {
+        this.fitPage();
+      } else if (this.viewModeState === "fit-width") {
+        this.fitWidth();
+      }
+    });
+
+    this._resizeObserver.observe(viewport);
+  }
+
+  renderPages() {
+    const pagesContainer = this.container.querySelector("#viewer-pages-container");
+    if (!pagesContainer || !this.docId) return;
+    pagesContainer.innerHTML = "";
+
+    for (let p = 1; p <= this.totalPages; p++) {
+      const pageInfo = this.pagesInfo[p] || { width: this.pageWidth, height: this.pageHeight };
+      const naturalW = pageInfo.width || 612;
+      const naturalH = pageInfo.height || 792;
+      const displayW = Math.round(naturalW * this.zoomLevel);
+      const displayH = Math.round(naturalH * this.zoomLevel);
+
+      const pageContainer = document.createElement("div");
+      pageContainer.className = "document-page-container";
+      pageContainer.id = `page-container-${p}`;
+      pageContainer.setAttribute("data-page", p);
+
+      pageContainer.innerHTML = `
+        <div class="document-page-label">
+          <span>Page ${p}</span>
+          <span class="badge badge-outline" style="font-size: 9px; padding: 1px 5px;">P.${p} of ${this.totalPages}</span>
+        </div>
+        <div class="document-page-wrapper page-canvas-wrapper" id="viewer-page-wrapper-${p}" data-page="${p}" style="width: ${displayW}px; height: ${displayH}px;">
+          <img class="page-canvas-image" id="viewer-page-img-${p}" alt="Document Page ${p}" loading="lazy" style="width: ${displayW}px; height: ${displayH}px;" />
+          <svg class="page-overlay-svg" id="viewer-overlay-svg-${p}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${displayW} ${displayH}" width="${displayW}" height="${displayH}"></svg>
+        </div>
+      `;
+
+      pagesContainer.appendChild(pageContainer);
+
+      const imgEl = pageContainer.querySelector(`#viewer-page-img-${p}`);
+      const svgEl = pageContainer.querySelector(`#viewer-overlay-svg-${p}`);
+
+      const imgUrl = window.api.documents.getPageImageUrl(this.docId, p, Math.min(2.5, Math.max(0.75, this.zoomLevel)));
+      imgEl.onload = () => {
+        this.renderHighlightsForPage(p, displayW, displayH, naturalW, naturalH);
+      };
+      imgEl.src = imgUrl;
+
+      // Render overlay immediately
+      this.renderHighlightsForPage(p, displayW, displayH, naturalW, naturalH);
+    }
+  }
+
+  updatePageSizes() {
+    for (let p = 1; p <= this.totalPages; p++) {
+      const pageInfo = this.pagesInfo[p] || { width: this.pageWidth, height: this.pageHeight };
+      const naturalW = pageInfo.width || 612;
+      const naturalH = pageInfo.height || 792;
+      const displayW = Math.round(naturalW * this.zoomLevel);
+      const displayH = Math.round(naturalH * this.zoomLevel);
+
+      const wrapper = this.container.querySelector(`#viewer-page-wrapper-${p}`);
+      const imgEl = this.container.querySelector(`#viewer-page-img-${p}`);
+      const svgEl = this.container.querySelector(`#viewer-overlay-svg-${p}`);
+
+      if (wrapper) {
+        wrapper.style.width = `${displayW}px`;
+        wrapper.style.height = `${displayH}px`;
+      }
+
+      if (imgEl) {
+        imgEl.style.width = `${displayW}px`;
+        imgEl.style.height = `${displayH}px`;
+        const requestedZoom = Math.min(2.5, Math.max(0.75, this.zoomLevel));
+        const newUrl = window.api.documents.getPageImageUrl(this.docId, p, requestedZoom);
+        if (!imgEl.src.includes(`zoom=${requestedZoom}`)) {
+          imgEl.src = newUrl;
+        }
+      }
+
+      if (svgEl) {
+        svgEl.setAttribute("viewBox", `0 0 ${displayW} ${displayH}`);
+        svgEl.setAttribute("width", displayW);
+        svgEl.setAttribute("height", displayH);
+      }
+
+      this.renderHighlightsForPage(p, displayW, displayH, naturalW, naturalH);
+    }
+  }
+
+  // Backward compatibility alias
+  renderPageCanvas() {
+    this.updatePageSizes();
+  }
+
+  renderPageList() {
+    this.renderSidebarContent();
   }
 
   renderSidebarContent() {
@@ -519,32 +788,6 @@ class DocumentViewerComponent {
     }
   }
 
-  renderPageList() {
-    this.renderSidebarContent();
-  }
-
-  renderPageCanvas() {
-    const imgEl = this.container.querySelector("#viewer-page-img");
-    const svgEl = this.container.querySelector("#viewer-overlay-svg");
-    if (!imgEl || !this.docId) return;
-
-    const imgUrl = window.api.documents.getPageImageUrl(this.docId, this.currentPage, this.zoomLevel);
-
-    imgEl.onload = () => {
-      // Set SVG dimensions matching loaded image natural size
-      svgEl.setAttribute("viewBox", `0 0 ${imgEl.naturalWidth} ${imgEl.naturalHeight}`);
-      svgEl.setAttribute("width", imgEl.naturalWidth);
-      svgEl.setAttribute("height", imgEl.naturalHeight);
-      this.renderHighlights(imgEl.naturalWidth, imgEl.naturalHeight);
-    };
-
-    imgEl.src = imgUrl;
-    this.renderPageList();
-  }
-
-  /**
-   * Generates a sinusoidal SVG path for Microsoft Word-like wavy underlines.
-   */
   generateSquigglyPath(x0, x1, y, wavelength = 6.0, amplitude = 2.0) {
     let d = `M ${x0.toFixed(1)} ${y.toFixed(1)}`;
     let curX = x0;
@@ -560,26 +803,26 @@ class DocumentViewerComponent {
     return d;
   }
 
-  renderHighlights(renderedWidth, renderedHeight) {
-    const svgEl = this.container.querySelector("#viewer-overlay-svg");
+  renderHighlightsForPage(pageNum, renderedWidth, renderedHeight, naturalWidth, naturalHeight) {
+    const svgEl = this.container.querySelector(`#viewer-overlay-svg-${pageNum}`);
     if (!svgEl) return;
     svgEl.innerHTML = "";
 
-    // SVG Defs for drop shadows and glow effects
+    // SVG Defs for glow and filters
     const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
     defs.innerHTML = `
-      <filter id="defect-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <filter id="defect-glow-${pageNum}" x="-20%" y="-20%" width="140%" height="140%">
         <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-opacity="0.45" flood-color="#000000" />
       </filter>
     `;
     svgEl.appendChild(defs);
 
     const filtered = this.getFilteredFindings();
-    const findingsOnPage = filtered.filter((f) => (f.page_number || f.page) === this.currentPage && f.bbox);
-    const missingFindingsOnPage = filtered.filter((f) => (f.page_number || f.page) === this.currentPage && !f.bbox);
+    const findingsOnPage = filtered.filter((f) => (f.page_number || f.page) === pageNum && f.bbox);
+    const missingFindingsOnPage = filtered.filter((f) => (f.page_number || f.page) === pageNum && !f.bbox);
 
-    const rx = renderedWidth / this.pageWidth;
-    const ry = renderedHeight / this.pageHeight;
+    const rx = renderedWidth / (naturalWidth || 612);
+    const ry = renderedHeight / (naturalHeight || 792);
 
     const severityColors = {
       Critical: { stroke: "#dc2626", fill: "rgba(220, 38, 38, 0.18)" },
@@ -589,16 +832,14 @@ class DocumentViewerComponent {
       Informational: { stroke: "#64748b", fill: "rgba(100, 116, 139, 0.12)" }
     };
 
-    // 1. Render findings with bounding boxes (Text, Formatting, TOC, Figure, Table)
+    // 1. Render findings with bounding boxes
     findingsOnPage.forEach((f) => {
       const isFocused = this.focusedFinding && this.focusedFinding.finding_id === f.finding_id;
       const sevColor = severityColors[f.severity] || severityColors.Medium;
 
-      // Calculate finding index number [01], [02], [12]
       const fIdx = this.findings.findIndex((x) => x.finding_id === f.finding_id);
       const findingNum = fIdx >= 0 ? (fIdx + 1).toString().padStart(2, "0") : "01";
 
-      // Classify marker visual style based on issue type and category
       const it = f.issue_type || "";
       const isSpelling = it === "SPELLING_ERROR" || (f.category.includes("Grammar") && f.detected_value && !f.detected_value.includes("Repeated"));
       const isGrammar = it === "REPEATED_WORD" || it === "UNBALANCED_PUNCTUATION" || (f.category.includes("Grammar") && !isSpelling);
@@ -606,15 +847,12 @@ class DocumentViewerComponent {
       const isTocDrift = it === "TOC_PAGE_DRIFT" || f.finding_id.startsWith("TOC-PAG");
       const isBrokenRef = it.includes("UNRESOLVED");
 
-      // Extract list of bounding boxes (supports multi-line words/phrases)
       const boxes = (f.bounding_boxes && f.bounding_boxes.length > 0) ? f.bounding_boxes : [f.bbox];
 
-      // Create SVG group for this finding
       const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
       group.setAttribute("class", `finding-annotation-group ${isFocused ? "focused" : ""}`);
       group.setAttribute("data-finding-id", f.finding_id);
 
-      // Add tooltip
       const titleEl = document.createElementNS("http://www.w3.org/2000/svg", "title");
       titleEl.textContent = `[${f.severity}] Finding #${findingNum} (${f.finding_id}): ${f.issue_type || f.category}\n` +
         `Detected: "${f.matched_text || f.detected_value || f.original_content}"\n` +
@@ -632,7 +870,6 @@ class DocumentViewerComponent {
         const h = Math.max(8, y1 - y0);
         const lineY = y1 + 1.0;
 
-        // Subtle interactive hit-box rectangle
         const hitRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         hitRect.setAttribute("x", x0);
         hitRect.setAttribute("y", y0);
@@ -648,7 +885,6 @@ class DocumentViewerComponent {
         hitRect.setAttribute("stroke-width", isFocused ? "1.5" : "0.5");
         group.appendChild(hitRect);
 
-        // Issue-Specific Visual Marker Line / Wave
         if (isSpelling) {
           const wavePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
           wavePath.setAttribute("d", this.generateSquigglyPath(x0, x1, lineY, 5.5, 2.0));
@@ -706,7 +942,7 @@ class DocumentViewerComponent {
         }
       });
 
-      // Render Clear Numbered Defect Pointer & Marker (Section 5 & 18)
+      // Numbered Defect Pointer & Marker
       if (boxes.length > 0 && boxes[0]) {
         const pBox = boxes[0];
         const bx0 = pBox.x0 * rx;
@@ -720,7 +956,6 @@ class DocumentViewerComponent {
         const placeAbove = by0 >= badgeH + 10;
         const badgeY = placeAbove ? (by0 - badgeH - 7) : (by1 + 7);
 
-        // Pointer Arrow (downward if above, upward if below)
         const ptr = document.createElementNS("http://www.w3.org/2000/svg", "path");
         if (placeAbove) {
           ptr.setAttribute("d", `M ${cx} ${badgeY + badgeH} L ${cx} ${by0 - 1.5} M ${cx - 3.5} ${by0 - 5.5} L ${cx} ${by0 - 1.5} L ${cx + 3.5} ${by0 - 5.5}`);
@@ -732,7 +967,6 @@ class DocumentViewerComponent {
         ptr.setAttribute("fill", "none");
         group.appendChild(ptr);
 
-        // Marker Badge Background
         const badgeRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         badgeRect.setAttribute("x", badgeX);
         badgeRect.setAttribute("y", badgeY);
@@ -743,11 +977,10 @@ class DocumentViewerComponent {
         badgeRect.setAttribute("stroke", isFocused ? "#ffffff" : sevColor.stroke);
         badgeRect.setAttribute("stroke-width", isFocused ? "1.5" : "1");
         if (isFocused) {
-          badgeRect.setAttribute("filter", "url(#defect-glow)");
+          badgeRect.setAttribute("filter", `url(#defect-glow-${pageNum})`);
         }
         group.appendChild(badgeRect);
 
-        // Marker Badge Label
         const badgeText = document.createElementNS("http://www.w3.org/2000/svg", "text");
         badgeText.setAttribute("x", badgeX + badgeW / 2);
         badgeText.setAttribute("y", badgeY + (badgeH / 2) + 3.5);
@@ -759,7 +992,6 @@ class DocumentViewerComponent {
         badgeText.textContent = isFocused ? `[${findingNum}] ▼ DEFECT` : `[${findingNum}]`;
         group.appendChild(badgeText);
 
-        // Active Defect Border Outline Highlight
         if (isFocused) {
           const glowOutline = document.createElementNS("http://www.w3.org/2000/svg", "rect");
           glowOutline.setAttribute("x", bx0 - 2);
@@ -784,7 +1016,7 @@ class DocumentViewerComponent {
       svgEl.appendChild(group);
     });
 
-    // 2. Render Missing Content Defect Callouts (Section 14 & 23)
+    // 2. Render Missing Content Defect Callouts
     missingFindingsOnPage.forEach((mf, mIdx) => {
       const isFocused = this.focusedFinding && this.focusedFinding.finding_id === mf.finding_id;
       const fIdx = this.findings.findIndex((x) => x.finding_id === mf.finding_id);
@@ -799,7 +1031,6 @@ class DocumentViewerComponent {
       mg.setAttribute("data-finding-id", mf.finding_id);
       mg.style.cursor = "pointer";
 
-      // Dashed Callout Box
       const mRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
       mRect.setAttribute("x", bannerX);
       mRect.setAttribute("y", bannerY);
@@ -812,7 +1043,6 @@ class DocumentViewerComponent {
       mRect.setAttribute("stroke-dasharray", "6,3");
       mg.appendChild(mRect);
 
-      // Marker Badge on Callout
       const bRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
       bRect.setAttribute("x", bannerX + 10);
       bRect.setAttribute("y", bannerY + 11);
@@ -835,7 +1065,6 @@ class DocumentViewerComponent {
       bText.textContent = isFocused ? `[${findingNum}] MISSING` : `[${findingNum}]`;
       mg.appendChild(bText);
 
-      // Warning Header
       const t1 = document.createElementNS("http://www.w3.org/2000/svg", "text");
       t1.setAttribute("x", bannerX + (isFocused ? 98 : 56));
       t1.setAttribute("y", bannerY + 18);
@@ -845,7 +1074,6 @@ class DocumentViewerComponent {
       t1.textContent = "⚠ EXPECTED CONTENT NOT DETECTED HERE";
       mg.appendChild(t1);
 
-      // Expected Object Target
       const t2 = document.createElementNS("http://www.w3.org/2000/svg", "text");
       t2.setAttribute("x", bannerX + (isFocused ? 98 : 56));
       t2.setAttribute("y", bannerY + 34);
@@ -867,11 +1095,13 @@ class DocumentViewerComponent {
 
   selectFinding(finding) {
     this.focusedFinding = finding;
-    this.renderPageCanvas();
+    this.updatePageSizes();
+
     if (this.options.showDrawer) {
       this.showFindingInDrawer(finding);
     }
     this.updateToolbar();
+
     if (this.onFindingSelected) {
       this.onFindingSelected(finding);
     }
@@ -881,11 +1111,10 @@ class DocumentViewerComponent {
     const drawerContent = this.container.querySelector("#viewer-drawer-content");
     if (!drawerContent) return;
 
-    const sevClass = `badge-${f.severity.toLowerCase()}`;
+    const sevClass = `badge-${(f.severity || "medium").toLowerCase()}`;
     const precision = f.location_precision || "APPROXIMATE";
     const isExact = precision.startsWith("EXACT");
 
-    // Format related finding links if any exist
     let relatedHtml = "";
     if (f.related_finding_ids && f.related_finding_ids.length > 0) {
       const linkBtns = f.related_finding_ids.map((relId) => {
@@ -987,7 +1216,7 @@ class DocumentViewerComponent {
     const drawer = this.container.querySelector("#viewer-detail-drawer");
     if (drawer) drawer.classList.add("hidden");
     this.focusedFinding = null;
-    this.renderPageCanvas();
+    this.updatePageSizes();
     this.updateToolbar();
   }
 
@@ -1004,7 +1233,6 @@ class DocumentViewerComponent {
     const btnNext = this.container.querySelector("#viewer-btn-next");
     if (btnNext) btnNext.disabled = this.currentPage >= this.totalPages;
 
-    // Issue counter update
     const issueCounter = this.container.querySelector("#viewer-issue-counter");
     const filteredList = this.getFilteredFindings();
     if (issueCounter) {

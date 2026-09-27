@@ -55,9 +55,9 @@ window.ViewerView = {
     }
 
     container.innerHTML = `
-      <div style="display: flex; flex-direction: column; height: 100%; gap: 10px;">
+      <div class="viewer-shell" style="display: flex; flex-direction: column; height: 100%; gap: 10px; min-height: 0; flex: 1 1 auto;">
         <!-- Top Viewer Control Bar -->
-        <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-surface); padding: 8px 16px; border: 1px solid var(--border-default); border-radius: var(--radius-md);">
+        <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-surface); padding: 8px 16px; border: 1px solid var(--border-default); border-radius: var(--radius-md); flex-shrink: 0;">
           <div style="display: flex; align-items: center; gap: 12px;">
             <button class="btn btn-secondary btn-sm" onclick="window.router.navigate('results')">
               ← Results
@@ -83,7 +83,7 @@ window.ViewerView = {
         </div>
 
         <!-- Document Viewer Mount Point -->
-        <div id="viewer-mount-point" style="flex: 1; min-height: 0;"></div>
+        <div id="viewer-mount-point" style="flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column;"></div>
       </div>
     `;
 

@@ -265,6 +265,9 @@
   border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   background-color: var(--bg-surface);
+  min-height: 0;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .viewer-pages-sidebar {
@@ -274,6 +277,7 @@
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  min-height: 0;
 }
 
 .pages-sidebar-header {
@@ -320,52 +324,98 @@
 }
 
 .viewer-center-pane {
-  flex: 1;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
+  min-height: 0;
+  min-width: 0;
 }
 
 .viewer-toolbar {
-  height: 44px;
+  min-height: 44px;
+  height: auto;
   background-color: var(--bg-surface);
   border-bottom: 1px solid var(--border-default);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
+  padding: 6px 14px;
   flex-shrink: 0;
   gap: 8px;
+  z-index: 10;
 }
 
+/* Document Viewport - The Dedicated Scroll Container (Sections 3, 4, 18) */
+.document-viewport,
 .canvas-viewport {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
   overflow: auto;
   background-color: #cbd5e1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
   position: relative;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  display: block; /* Avoids flexbox center scroll clipping traps (Section 4 & 5) */
 }
 
+[data-theme="dark"] .document-viewport,
 [data-theme="dark"] .canvas-viewport {
   background-color: #090e1a;
 }
 
+/* Continuous Multi-Page Container (Section 13) */
+.document-pages-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  margin: 0 auto;
+  width: fit-content;
+  min-width: min-content;
+  padding-bottom: 48px;
+}
+
+/* Individual Page Container (Section 11) */
+.document-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.document-page-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Page Canvas Wrapper (Section 6, 12, 15) */
+.document-page-wrapper,
 .page-canvas-wrapper {
   position: relative;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   background-color: #ffffff;
-  display: inline-block;
+  display: block;
   line-height: 0;
+  user-select: none;
+  flex-shrink: 0;
+  border-radius: 2px;
 }
 
 .page-canvas-image {
   display: block;
   user-select: none;
   max-width: none;
+  height: auto;
 }
 
 .page-overlay-svg {

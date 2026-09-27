@@ -461,9 +461,12 @@
 .findings-coordinated-layout {
   display: flex;
   gap: 16px;
-  height: calc(100vh - 185px);
-  min-height: 600px;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
   width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 .finding-info-column {
@@ -479,11 +482,13 @@
   overflow-y: auto;
   padding: 18px;
   box-shadow: var(--shadow-sm);
+  min-height: 0;
 }
 
 .document-inspection-column {
-  flex: 1;
-  min-width: 500px;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   border: 1px solid var(--border-default);
