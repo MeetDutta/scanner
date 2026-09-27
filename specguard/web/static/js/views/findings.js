@@ -59,6 +59,18 @@ window.FindingsView = {
         }
       }
     }
+    if (!sessionId && !activeDoc) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">🔍</div>
+          <div class="empty-state-title">No Analysis Available</div>
+          <div class="empty-state-desc">Upload an engineering document and run an inspection to detect and locate defect details.</div>
+          <button class="btn btn-primary" onclick="window.router.navigate('new_analysis')">Start New Analysis</button>
+        </div>
+      `;
+      return;
+    }
+
     this.activeDoc = activeDoc;
 
     container.innerHTML = `

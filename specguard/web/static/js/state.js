@@ -9,12 +9,12 @@ class AppState {
       theme: localStorage.getItem("specguard-theme") || "dark",
       currentView: "dashboard",
       activeDocument: null,
-      activeDomain: "mechanical",
+      activeDomain: null,
       activeSessionId: null,
-      activeFindings: [],
+      activeFindings: null,
       activeJobId: null,
       activePage: 1,
-      totalPages: 1,
+      totalPages: null,
       focusedFinding: null,
       stats: null
     };

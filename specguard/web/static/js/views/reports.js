@@ -27,13 +27,13 @@ window.ReportsView = {
       }
     }
 
-    if (!sessionId) {
+    if (!sessionId && !activeDoc) {
       container.innerHTML = `
         <div class="empty-state">
           <div class="empty-state-icon">📄</div>
-          <div class="empty-state-title">No Active Verification Session Selected</div>
-          <div class="empty-state-desc">Select a completed analysis from Document History to export inspection audit reports.</div>
-          <button class="btn btn-primary" onclick="window.router.navigate('history')">Select from History</button>
+          <div class="empty-state-title">No Analysis Available</div>
+          <div class="empty-state-desc">Upload an engineering document and run an inspection to generate compliance and audit reports.</div>
+          <button class="btn btn-primary" onclick="window.router.navigate('new_analysis')">Start New Analysis</button>
         </div>
       `;
       return;

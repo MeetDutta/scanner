@@ -9,13 +9,15 @@ window.StructuralIssuesView = {
     const sessionId = window.appState.get("activeSessionId");
     let findings = window.appState.get("activeFindings") || [];
 
-    if (!sessionId && findings.length === 0) {
+    const activeDoc = window.appState.get("activeDocument");
+
+    if (!sessionId && !activeDoc) {
       container.innerHTML = `
         <div class="empty-state">
           <div class="empty-state-icon">🏗️</div>
-          <div class="empty-state-title">No Structural Analysis Data</div>
-          <div class="empty-state-desc">Run a document verification to inspect section hierarchy, TOC synchronicity, and heading sequences.</div>
-          <button class="btn btn-primary" onclick="window.router.navigate('new_analysis')">Start Analysis</button>
+          <div class="empty-state-title">No Analysis Available</div>
+          <div class="empty-state-desc">Upload an engineering document and run an inspection to inspect section hierarchy and TOC.</div>
+          <button class="btn btn-primary" onclick="window.router.navigate('new_analysis')">Start New Analysis</button>
         </div>
       `;
       return;

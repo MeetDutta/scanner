@@ -156,7 +156,7 @@ window.HistoryView = {
         tbody.innerHTML = `
           <tr>
             <td colspan="9" style="text-align: center; color: var(--text-muted); padding: 36px;">
-              No comparison records found.
+              No previous analyses.
             </td>
           </tr>
         `;
@@ -212,7 +212,7 @@ window.HistoryView = {
         page_count: detail.document.page_count
       });
 
-      window.router.navigate("results");
+      window.router.navigate("dashboard");
     } catch (err) {
       window.toast.error(`Error opening record: ${err.message}`);
     }

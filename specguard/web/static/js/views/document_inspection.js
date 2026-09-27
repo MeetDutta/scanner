@@ -15,9 +15,9 @@ window.DocumentInspectionView = {
       container.innerHTML = `
         <div class="empty-state">
           <div class="empty-state-icon">📑</div>
-          <div class="empty-state-title">No Document Loaded for Inspection</div>
-          <div class="empty-state-desc">Select an analyzed document from History or start a new verification pipeline.</div>
-          <button class="btn btn-primary" onclick="window.router.navigate('history')">Select from History</button>
+          <div class="empty-state-title">No Analysis Available</div>
+          <div class="empty-state-desc">Upload an engineering document and run an inspection to inspect document structure and outline.</div>
+          <button class="btn btn-primary" onclick="window.router.navigate('new_analysis')">Start New Analysis</button>
         </div>
       `;
       return;

@@ -91,14 +91,16 @@ def get_recent_activity(limit: int = 8) -> Dict[str, Any]:
     with db.get_connection() as conn:
         cursor = conn.cursor()
 
-        # Recent comparisons
+        # Recent comparisons with real page_count
         cursor.execute("""
             SELECT 
-                comparison_id, document_id, document_filename, document_sha256,
-                domain, status, analysis_completed_at, duration_ms,
-                total_findings, critical_count, high_count, medium_count, low_count, info_count
-            FROM repo_comparisons
-            ORDER BY rowid DESC
+                c.comparison_id, c.document_id, c.document_filename, c.document_sha256,
+                c.domain, c.status, c.analysis_completed_at, c.duration_ms,
+                c.total_findings, c.critical_count, c.high_count, c.medium_count, c.low_count, c.info_count,
+                d.page_count
+            FROM repo_comparisons c
+            LEFT JOIN repo_documents d ON c.document_id = d.document_id
+            ORDER BY c.rowid DESC
             LIMIT ?
         """, (limit,))
         recent_comparisons = [dict(r) for r in cursor.fetchall()]

@@ -11,12 +11,12 @@ window.ResultsView = {
     const activeDomain = window.appState.get("activeDomain") || "Mechanical";
     let findings = window.appState.get("activeFindings") || [];
 
-    if (!sessionId && findings.length === 0) {
+    if (!sessionId && !activeDoc) {
       container.innerHTML = `
         <div class="empty-state">
           <div class="empty-state-icon">📊</div>
-          <div class="empty-state-title">No Analysis Results Available</div>
-          <div class="empty-state-desc">Run a document verification or select an analyzed document from History.</div>
+          <div class="empty-state-title">No Analysis Available</div>
+          <div class="empty-state-desc">Upload an engineering document and run an inspection to view verification results.</div>
           <button class="btn btn-primary" onclick="window.router.navigate('new_analysis')">Start New Analysis</button>
         </div>
       `;
