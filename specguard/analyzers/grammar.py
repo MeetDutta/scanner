@@ -140,7 +140,7 @@ class GrammarAnalyzer(BaseAnalyzer):
                         w_bbox = LocationMapper.find_word_bbox(page, w, block_id=block.block_id)
                         f_bbox = w_bbox if w_bbox else block.bbox
                         precision = "EXACT_WORD" if w_bbox else "APPROXIMATE"
-                        severity = SeverityLevel.CRITICAL.value if w_lower == "maintenence" else SeverityLevel.LOW.value
+                        severity = SeverityLevel.LOW.value
                         findings.append(Finding(
                             finding_id=f"GRM-SPL-{finding_counter:03d}",
                             category="SPELLING",

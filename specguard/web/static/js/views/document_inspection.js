@@ -2,15 +2,42 @@
  * SpecGuard Document Inspection Overview View
  * High-level quality overview, document AST outline, asset counts,
  * and interactive document-wide page error heatmap.
+ * Persistent session rehydration from backend database.
  */
 
 window.DocumentInspectionView = {
   async render(container) {
+    // 1. Initial loading UI while rehydrating session from persistent store
+    container.innerHTML = `
+      <div class="empty-state" style="padding: 60px 20px;">
+        <div class="spinner" style="margin: 0 auto 16px;"></div>
+        <div style="font-size: 15px; font-weight: 700; color: var(--text-primary);">Loading Document Overview...</div>
+        <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Retrieving persistent analysis session from backend</div>
+      </div>
+    `;
+
+    // 2. Rehydrate session state deterministically
+    try {
+      await window.appState.rehydrateSession();
+    } catch (err) {
+      console.error("Failed to rehydrate session for Document Overview:", err);
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">⚠️</div>
+          <div class="empty-state-title">Analysis Session Not Found</div>
+          <div class="empty-state-desc">The requested analysis session could not be retrieved from the persistent database.</div>
+          <button class="btn btn-primary" onclick="window.router.navigate('new_analysis')">Start New Analysis</button>
+        </div>
+      `;
+      return;
+    }
+
     const activeDoc = window.appState.get("activeDocument");
     const sessionId = window.appState.get("activeSessionId");
     let findings = window.appState.get("activeFindings") || [];
     const activeDomain = window.appState.get("activeDomain") || "Mechanical";
 
+    // 3. Display "No Analysis Available" ONLY when no session exists anywhere
     if (!activeDoc && !sessionId) {
       container.innerHTML = `
         <div class="empty-state">
@@ -25,7 +52,7 @@ window.DocumentInspectionView = {
 
     if (findings.length === 0 && sessionId) {
       try {
-        const res = await window.api.findings.list({ session_id: sessionId, limit: 300 });
+        const res = await window.api.findings.list({ session_id: sessionId, limit: 500 });
         findings = res.findings || [];
         window.appState.set("activeFindings", findings);
       } catch (e) {
@@ -56,10 +83,10 @@ window.DocumentInspectionView = {
 
     const maxCount = Math.max(1, ...Object.values(pageCounts));
 
-    // Category summary counts
+    // Category summary counts (normalized)
     const catCounts = {};
     findings.forEach((f) => {
-      const cat = f.category || "General";
+      const cat = f.category || "FORMATTING";
       catCounts[cat] = (catCounts[cat] || 0) + 1;
     });
 
@@ -94,7 +121,7 @@ window.DocumentInspectionView = {
               </div>
               <div class="meta-item">
                 <span class="meta-item-label">Inspection Session</span>
-                <span class="meta-item-val">${escapeHtml(sessionId || "SES-LOCAL")}</span>
+                <span class="meta-item-val" style="font-family: monospace; font-weight: 700;">${escapeHtml(sessionId || "SES-LOCAL")}</span>
               </div>
               <div class="meta-item">
                 <span class="meta-item-label">Detected Headings / Sections</span>
@@ -193,24 +220,10 @@ window.DocumentInspectionView = {
 
   jumpToPage(pageNum) {
     window.appState.set("activePage", pageNum);
-    window.router.navigate("viewer");
-    setTimeout(() => {
-      if (window.currentViewer) {
-        window.currentViewer.setPage(pageNum);
-      }
-    }, 150);
+    window.router.navigate("viewer", { page: pageNum });
   },
 
   filterCategory(category) {
-    window.appState.set("selectedCategoryFilter", category);
-    if (category.toLowerCase().includes("format")) {
-      window.router.navigate("formatting");
-    } else if (category.toLowerCase().includes("struct") || category.toLowerCase().includes("toc")) {
-      window.router.navigate("structural");
-    } else if (category.toLowerCase().includes("gramm") || category.toLowerCase().includes("engin") || category.toLowerCase().includes("logic")) {
-      window.router.navigate("content");
-    } else {
-      window.router.navigate("findings");
-    }
+    window.router.navigate("findings", { category });
   }
 };

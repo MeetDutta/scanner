@@ -6,6 +6,29 @@
 
 window.ResultsView = {
   async render(container) {
+    container.innerHTML = `
+      <div class="empty-state" style="padding: 60px 20px;">
+        <div class="spinner" style="margin: 0 auto 16px;"></div>
+        <div style="font-size: 15px; font-weight: 700; color: var(--text-primary);">Loading Analysis Results...</div>
+        <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Retrieving persistent analysis session from backend</div>
+      </div>
+    `;
+
+    try {
+      await window.appState.rehydrateSession();
+    } catch (err) {
+      console.error("Failed to rehydrate session for ResultsView:", err);
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">⚠️</div>
+          <div class="empty-state-title">Analysis Session Not Found</div>
+          <div class="empty-state-desc">The requested analysis session could not be retrieved from the persistent database.</div>
+          <button class="btn btn-primary" onclick="window.router.navigate('new_analysis')">Start New Analysis</button>
+        </div>
+      `;
+      return;
+    }
+
     const sessionId = window.appState.get("activeSessionId");
     let activeDoc = window.appState.get("activeDocument");
     const activeDomain = window.appState.get("activeDomain") || "Mechanical";
@@ -25,7 +48,7 @@ window.ResultsView = {
 
     if (findings.length === 0 && sessionId) {
       try {
-        const res = await window.api.findings.list({ session_id: sessionId, limit: 300 });
+        const res = await window.api.findings.list({ session_id: sessionId, limit: 500 });
         findings = res.findings || [];
         window.appState.set("activeFindings", findings);
       } catch (err) {
@@ -36,41 +59,49 @@ window.ResultsView = {
     const docName = activeDoc ? activeDoc.filename : "Engineering Document";
     const totalPages = (activeDoc && activeDoc.page_count) || 1;
 
-    const crit = findings.filter((f) => f.severity === "Critical").length;
-    const high = findings.filter((f) => f.severity === "High").length;
-    const med = findings.filter((f) => f.severity === "Medium").length;
-    const low = findings.filter((f) => f.severity === "Low").length;
-    const info = findings.filter((f) => f.severity === "Informational").length;
+    const crit = findings.filter((f) => (f.severity || "").toUpperCase() === "CRITICAL").length;
+    const high = findings.filter((f) => (f.severity || "").toUpperCase() === "HIGH").length;
+    const med = findings.filter((f) => (f.severity || "").toUpperCase() === "MEDIUM").length;
+    const low = findings.filter((f) => (f.severity || "").toUpperCase() === "LOW").length;
+    const info = findings.filter((f) => {
+      const s = (f.severity || "").toUpperCase();
+      return s === "INFORMATIONAL" || s === "INFO";
+    }).length;
 
-    // Issue Categories breakdown
+    // Issue Categories breakdown (canonical)
+    function normalizeCategory(cat) {
+      if (!cat) return "FORMATTING";
+      const c = String(cat).trim().toUpperCase();
+      if (c === "SPELLING" || c.includes("SPELL")) return "SPELLING";
+      if (c === "GRAMMAR" || c === "GRAMMAR & SPELLING") return "GRAMMAR";
+      if (c === "TOC" || c.includes("TABLE OF CONTENTS")) return "TOC";
+      if (c === "FIGURE_REFERENCE" || c === "FIGURE" || c.includes("FIGURE")) return "FIGURE_REFERENCE";
+      if (c === "TABLE_VALUE" || c === "TABLE" || c.includes("TABLE")) return "TABLE_VALUE";
+      if (c === "DOCUMENT_CONTROL" || c.includes("CONTROL") || c.includes("VERSION")) return "DOCUMENT_CONTROL";
+      if (c === "NUMBERING" || c.includes("NUMBER")) return "NUMBERING";
+      if (c === "MISSING_CONTENT" || c.includes("MISSING")) return "MISSING_CONTENT";
+      if (c === "CONTRADICTION" || c.includes("CONTRADICT") || c.includes("LOGICAL")) return "CONTRADICTION";
+      if (c === "FORMATTING" || c.includes("FORMAT") || c.includes("LAYOUT") || c.includes("TYPO")) return "FORMATTING";
+      if (c === "MIXED") return "MIXED";
+      return c;
+    }
+
     const catMap = {
-      "Formatting": 0,
-      "Structure": 0,
+      "SPELLING": 0,
+      "GRAMMAR": 0,
+      "FORMATTING": 0,
       "TOC": 0,
-      "Figures": 0,
-      "Tables": 0,
-      "Grammar": 0,
-      "References": 0,
-      "Engineering": 0,
-      "Standards": 0,
-      "Logical": 0,
-      "Semantic": 0
+      "FIGURE_REFERENCE": 0,
+      "TABLE_VALUE": 0,
+      "DOCUMENT_CONTROL": 0,
+      "NUMBERING": 0,
+      "MISSING_CONTENT": 0,
+      "CONTRADICTION": 0
     };
 
     findings.forEach((f) => {
-      const c = (f.category || "").toLowerCase();
-      if (c.includes("format") || c.includes("typography") || c.includes("layout")) catMap["Formatting"]++;
-      else if (c.includes("structure") || c.includes("outline")) catMap["Structure"]++;
-      else if (c.includes("table of contents") || c.includes("toc")) catMap["TOC"]++;
-      else if (c.includes("figure") || c.includes("drawing")) catMap["Figures"]++;
-      else if (c.includes("table")) catMap["Tables"]++;
-      else if (c.includes("grammar") || c.includes("spelling")) catMap["Grammar"]++;
-      else if (c.includes("reference") || c.includes("citation") || c.includes("cross")) catMap["References"]++;
-      else if (c.includes("parameter") || c.includes("engineering")) catMap["Engineering"]++;
-      else if (c.includes("standard") || c.includes("ieee")) catMap["Standards"]++;
-      else if (c.includes("logical") || c.includes("contradiction")) catMap["Logical"]++;
-      else if (c.includes("semantic")) catMap["Semantic"]++;
-      else catMap["Formatting"]++;
+      const cat = normalizeCategory(f.category);
+      catMap[cat] = (catMap[cat] || 0) + 1;
     });
 
     // Page Issue Density

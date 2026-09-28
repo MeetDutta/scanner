@@ -16,6 +16,26 @@ class SeverityLevel(str, Enum):
     LOW = "Low"
     INFORMATIONAL = "Informational"
 
+    @classmethod
+    def normalize(cls, val: Any) -> str:
+        """Normalizes any string or Enum value to canonical SeverityLevel (Critical, High, Medium, Low, Informational). Never defaults to Critical."""
+        if not val:
+            return cls.LOW.value
+        s = str(val).strip()
+        s_upper = s.upper()
+        if s_upper == "CRITICAL":
+            return cls.CRITICAL.value
+        if s_upper == "HIGH":
+            return cls.HIGH.value
+        if s_upper == "MEDIUM":
+            return cls.MEDIUM.value
+        if s_upper == "LOW":
+            return cls.LOW.value
+        if s_upper in ("INFORMATIONAL", "INFO"):
+            return cls.INFORMATIONAL.value
+        # Safe fallback: never default to Critical
+        return cls.LOW.value
+
 
 class FindingCategory(str, Enum):
     FORMATTING = "Formatting"
@@ -313,6 +333,7 @@ class Finding:
     location_precision: str = "BLOCK"  # EXACT_WORD, EXACT_PHRASE, EXACT_NUMBER, EXACT_LABEL, CHARACTER_RANGE, WORD_BOUNDING_BOX, MULTI_REGION, LINE, BLOCK, PAGE, DOCUMENT, UNKNOWN
 
     def __post_init__(self):
+        self.severity = SeverityLevel.normalize(self.severity)
         if not self.message and self.explanation:
             self.message = self.explanation
         if not self.suggested_fix and self.suggested_correction:
@@ -365,7 +386,7 @@ class Finding:
             detected_value=data.get("detected_value", ""),
             expected_value=data.get("expected_value", ""),
             deviation=data.get("deviation"),
-            severity=data.get("severity", "Medium"),
+            severity=SeverityLevel.normalize(data.get("severity", "Low")),
             confidence=float(data.get("confidence", 1.0)),
             explanation=data.get("explanation", ""),
             suggested_correction=data.get("suggested_correction", ""),

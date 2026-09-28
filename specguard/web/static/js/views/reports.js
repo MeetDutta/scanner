@@ -10,27 +10,33 @@ window.ReportsView = {
   currentSessionId: null,
 
   async render(container) {
+    container.innerHTML = `
+      <div style="max-width: 980px; margin: 0 auto; padding: 20px 0;">
+        <div class="card" style="text-align: center; padding: 40px;">
+          <div class="spinner" style="margin: 0 auto 16px;"></div>
+          <div style="font-size: 15px; font-weight: 600; color: var(--text-primary);">Loading Document Tolerance Assessment...</div>
+          <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Evaluating findings against publication tolerance profile</div>
+        </div>
+      </div>
+    `;
+
+    try {
+      await window.appState.rehydrateSession();
+    } catch (err) {
+      console.error("Failed to rehydrate session for ReportsView:", err);
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">⚠️</div>
+          <div class="empty-state-title">Analysis Session Not Found</div>
+          <div class="empty-state-desc">The requested analysis session could not be retrieved from the persistent database.</div>
+          <button class="btn btn-primary" onclick="window.router.navigate('new_analysis')">Start New Analysis</button>
+        </div>
+      `;
+      return;
+    }
+
     let sessionId = window.appState.get("activeSessionId");
     let activeDoc = window.appState.get("activeDocument");
-
-    if (!sessionId) {
-      try {
-        const recent = await window.api.dashboard.getRecent(1);
-        if (recent.recent_comparisons && recent.recent_comparisons.length > 0) {
-          const latest = recent.recent_comparisons[0];
-          sessionId = latest.comparison_id;
-          activeDoc = {
-            filename: latest.document_filename,
-            file_hash: latest.document_sha256,
-            page_count: latest.page_count || 1
-          };
-          window.appState.set("activeSessionId", sessionId);
-          window.appState.set("activeDocument", activeDoc);
-        }
-      } catch (e) {
-        console.warn("Could not fetch recent session for reports:", e);
-      }
-    }
 
     if (!sessionId && !activeDoc) {
       container.innerHTML = `
@@ -45,17 +51,6 @@ window.ReportsView = {
     }
 
     this.currentSessionId = sessionId;
-
-    // Show loading state while fetching tolerance report
-    container.innerHTML = `
-      <div style="max-width: 980px; margin: 0 auto; padding: 20px 0;">
-        <div class="card" style="text-align: center; padding: 40px;">
-          <div class="spinner" style="margin: 0 auto 16px;"></div>
-          <div style="font-size: 15px; font-weight: 600; color: var(--text-primary);">Loading Document Tolerance Assessment...</div>
-          <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Evaluating findings against publication tolerance profile</div>
-        </div>
-      </div>
-    `;
 
     try {
       // Fetch available profiles and initial tolerance result in parallel

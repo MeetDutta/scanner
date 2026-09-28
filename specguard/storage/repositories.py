@@ -47,11 +47,11 @@ class SessionRepository:
         self.db = db
 
     def save_session(self, session_id: str, doc_hash: str, domain: str, standards: List[str], findings: List[Finding], duration_ms: int):
-        crit = sum(1 for f in findings if f.severity == "Critical")
-        high = sum(1 for f in findings if f.severity == "High")
-        med = sum(1 for f in findings if f.severity == "Medium")
-        low = sum(1 for f in findings if f.severity == "Low")
-        info = sum(1 for f in findings if f.severity == "Informational")
+        crit = sum(1 for f in findings if (f.severity or "").upper() == "CRITICAL")
+        high = sum(1 for f in findings if (f.severity or "").upper() == "HIGH")
+        med = sum(1 for f in findings if (f.severity or "").upper() == "MEDIUM")
+        low = sum(1 for f in findings if (f.severity or "").upper() == "LOW")
+        info = sum(1 for f in findings if (f.severity or "").upper() in ("INFORMATIONAL", "INFO"))
 
         with self.db.get_connection() as conn:
             cursor = conn.cursor()

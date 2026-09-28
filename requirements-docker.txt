@@ -1,0 +1,31 @@
+# ==============================================================================
+# SpecGuard — Production Offline Container Dependencies
+# Linux x86_64 / aarch64 Slim Environment
+# Pinned for maximum reproducibility and offline reliability
+# ==============================================================================
+
+# Core Web Framework & ASGI Server
+fastapi>=0.110.0,<1.0.0
+uvicorn[standard]>=0.30.0,<1.0.0
+python-multipart>=0.0.9
+
+# Document Parsing & Office Format Engines (100% Offline)
+pymupdf>=1.24.0
+python-docx>=1.1.0
+openpyxl>=3.1.0
+
+# Data Processing, Structure & System Diagnostics
+numpy>=1.26.0,<3.0.0
+pandas>=2.2.0
+pydantic>=2.8.0
+pyyaml>=6.0.1
+jinja2>=3.1.4
+psutil>=6.0.0
+
+# Computer Vision & Layout Analysis (Headless - No X11/GUI bloat)
+opencv-python-headless>=4.10.0
+
+# Offline ML Inference & ONNX Runtime (CPU-optimized)
+torch>=2.2.0
+onnx>=1.16.0
+onnxruntime>=1.19.0

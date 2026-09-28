@@ -13,26 +13,20 @@
 
 window.DashboardView = {
   async render(container) {
-    let activeDoc = window.appState.get("activeDocument");
-    let sessionId = window.appState.get("activeSessionId");
-    let findings = window.appState.get("activeFindings"); // null = not loaded/no analysis, [] = 0 findings
-    let domain = window.appState.get("activeDomain");
-    const activeJobId = window.appState.get("activeJobId");
-
     // 1. STATE 2 / STATE 4: Check if an active analysis job is tracking
+    const activeJobId = window.appState.get("activeJobId");
     if (activeJobId) {
       try {
         const job = await window.api.analysis.getJob(activeJobId);
         if (job) {
           if (job.status === "processing" || job.status === "running") {
-            this.renderAnalyzing(container, job, activeDoc, domain);
+            this.renderAnalyzing(container, job, window.appState.get("activeDocument"), window.appState.get("activeDomain"));
             return;
           } else if (job.status === "failed") {
-            this.renderFailed(container, job, activeDoc);
+            this.renderFailed(container, job, window.appState.get("activeDocument"));
             return;
           } else if (job.status === "completed") {
-            sessionId = job.session_id;
-            window.appState.set("activeSessionId", sessionId);
+            window.appState.set("activeSessionId", job.session_id);
             window.appState.set("activeJobId", null);
           }
         }
@@ -41,7 +35,42 @@ window.DashboardView = {
       }
     }
 
-    // 2. Fetch recent comparisons from database to check for session restoration & history table
+    // 2. Deterministic session rehydration from persistent backend
+    let sessionData = null;
+    let rehydrateError = null;
+    try {
+      sessionData = await window.appState.rehydrateSession();
+    } catch (e) {
+      rehydrateError = e;
+      console.warn("Could not rehydrate session for dashboard:", e);
+    }
+
+    const currentStatus = window.appState.get("analysisStatus");
+
+    // Check if session retrieval failed
+    if (currentStatus === "DATA_LOAD_FAILED" || rehydrateError) {
+      const errMsg = rehydrateError ? rehydrateError.message : "The requested analysis session could not be retrieved from the persistent database.";
+      this.renderLoadFailed(container, errMsg);
+      return;
+    }
+
+    // Check if no analysis exists
+    if (currentStatus === "NO_ANALYSIS") {
+      let recentComparisons = [];
+      try {
+        const recentRes = await window.api.dashboard.getRecent(6);
+        recentComparisons = (recentRes && recentRes.recent_comparisons) || [];
+      } catch (e) {}
+      this.renderEmpty(container, recentComparisons);
+      return;
+    }
+
+    let activeDoc = window.appState.get("activeDocument");
+    let sessionId = window.appState.get("activeSessionId");
+    let findings = window.appState.get("activeFindings");
+    let domain = window.appState.get("activeDomain");
+
+    // 3. Fetch recent comparisons from database to check for session restoration & history table
     let recentComparisons = [];
     try {
       const recentRes = await window.api.dashboard.getRecent(6);
@@ -50,39 +79,29 @@ window.DashboardView = {
       console.warn("Could not fetch recent comparisons for dashboard:", e);
     }
 
-    // 3. Session restoration: If no active session in appState, load the latest real completed analysis if one exists
-    if (!sessionId && !activeDoc && recentComparisons.length > 0) {
-      const latest = recentComparisons[0];
-      sessionId = latest.comparison_id;
-      domain = latest.domain || null;
-      activeDoc = {
-        filename: latest.document_filename,
-        file_hash: latest.document_sha256,
-        page_count: latest.page_count || null
-      };
-      window.appState.set("activeSessionId", sessionId);
-      window.appState.set("activeDocument", activeDoc);
-      if (domain) window.appState.set("activeDomain", domain);
-    }
-
     // 4. STATE 1 - EMPTY: If there is still no session or document, render clean empty dashboard
     if (!sessionId && !activeDoc) {
       this.renderEmpty(container, recentComparisons);
       return;
     }
 
-    // 5. Fetch findings for active session if not already loaded into state
+    // 5. Fetch findings for active session if not already loaded into state - NEVER SILENTLY FALL BACK TO []
     if (sessionId && findings === null) {
       try {
         const res = await window.api.findings.list({ session_id: sessionId, limit: 500 });
-        findings = res.findings || [];
+        if (!res || !Array.isArray(res.findings)) {
+          throw new Error("Invalid findings response from API.");
+        }
+        findings = res.findings;
         window.appState.set("activeFindings", findings);
       } catch (e) {
-        console.warn("Could not load findings for dashboard:", e);
-        findings = [];
+        console.error("Could not load findings for dashboard:", e);
+        this.renderFindingsLoadFailed(container, sessionId, e.message);
+        return;
       }
     } else if (findings === null) {
-      findings = [];
+      this.renderFindingsLoadFailed(container, sessionId || "Unknown", "No findings data loaded in application state.");
+      return;
     }
 
     // If page_count is not yet known on activeDoc, resolve from document info API
@@ -99,6 +118,21 @@ window.DashboardView = {
       }
     }
 
+    // Check if explicit verified zero findings:
+    // Backend must explicitly confirm COMPLETED and total_findings === 0
+    const isExplicitZero = (currentStatus === "ANALYSIS_COMPLETE_ZERO_FINDINGS") ||
+      (findings.length === 0 && sessionData && (sessionData.status || "").toUpperCase() === "COMPLETED" && (sessionData.total_findings === 0 || sessionData.findings_count === 0));
+
+    if (isExplicitZero) {
+      this.renderZeroFindingsCompleted(container, {
+        activeDoc,
+        sessionId,
+        domain: domain || (activeDoc && activeDoc.domain) || "Engineering",
+        recentComparisons
+      });
+      return;
+    }
+
     // 6. STATE 3 - COMPLETED: Render full analysis dashboard with REAL data
     this.renderCompleted(container, {
       activeDoc,
@@ -107,6 +141,139 @@ window.DashboardView = {
       domain: domain || (activeDoc && activeDoc.domain) || "Engineering",
       recentComparisons
     });
+  },
+
+  /**
+   * Renders explicit error state when session retrieval fails.
+   * Guarantees that API failures never degrade into "Total Findings: 0".
+   */
+  renderLoadFailed(container, message) {
+    container.innerHTML = `
+      <div style="max-width: 760px; margin: 48px auto; padding: 36px; background: var(--bg-surface); border: 1px solid var(--accent-critical); border-radius: var(--radius-lg); text-align: center; box-shadow: var(--shadow-md);">
+        <div style="font-size: 44px; margin-bottom: 16px;">⚠️</div>
+        <h2 style="font-size: 22px; font-weight: 700; color: var(--accent-critical); margin-bottom: 10px;">
+          Unable to load analysis results.
+        </h2>
+        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; line-height: 1.6; max-width: 600px; margin-left: auto; margin-right: auto;">
+          ${escapeHtml(message || "The requested analysis session could not be retrieved from the persistent database.")}
+        </p>
+        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+          <button class="btn btn-primary" onclick="window.router.navigate('new_analysis')">
+            + Start New Analysis
+          </button>
+          <button class="btn btn-secondary" onclick="window.location.hash = '#dashboard'; window.location.reload();">
+            View Recent Analyses
+          </button>
+        </div>
+      </div>
+    `;
+  },
+
+  /**
+   * Renders explicit error state when session exists but findings retrieval fails.
+   */
+  renderFindingsLoadFailed(container, sessionId, message) {
+    container.innerHTML = `
+      <div style="max-width: 760px; margin: 48px auto; padding: 36px; background: var(--bg-surface); border: 1px solid var(--accent-critical); border-radius: var(--radius-lg); text-align: center; box-shadow: var(--shadow-md);">
+        <div style="font-size: 44px; margin-bottom: 16px;">⚠️</div>
+        <h2 style="font-size: 22px; font-weight: 700; color: var(--accent-critical); margin-bottom: 10px;">
+          Unable to load findings.
+        </h2>
+        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; line-height: 1.6; max-width: 600px; margin-left: auto; margin-right: auto;">
+          The session <strong style="font-family: var(--font-mono);">${escapeHtml(sessionId)}</strong> exists in the database, but finding records could not be loaded: ${escapeHtml(message || "API query failed")}
+        </p>
+        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+          <button class="btn btn-primary" onclick="window.location.reload()">
+            🔄 Retry Loading Findings
+          </button>
+          <button class="btn btn-secondary" onclick="window.router.navigate('new_analysis')">
+            Start New Analysis
+          </button>
+        </div>
+      </div>
+    `;
+  },
+
+  /**
+   * STATE: Explicit verified completed analysis with 0 findings (Clean Document).
+   * Backend explicitly confirms status = COMPLETED and total_findings = 0.
+   */
+  renderZeroFindingsCompleted(container, { activeDoc, sessionId, domain, recentComparisons }) {
+    const docName = activeDoc ? activeDoc.filename : "Verified Engineering Document";
+    const pageCount = (activeDoc && activeDoc.page_count) || 1;
+
+    container.innerHTML = `
+      <div class="dashboard-container" style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; border-bottom: 1px solid var(--border-default); padding-bottom: 16px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+              <h1 style="font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 0;">
+                ${escapeHtml(docName)}
+              </h1>
+              ${domain ? `<span class="badge badge-domain" style="text-transform: capitalize;">${escapeHtml(domain)}</span>` : ""}
+              <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); font-weight: 700;">
+                ✓ COMPLIANCE PASSED
+              </span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px; font-size: 13px; color: var(--text-muted); margin-top: 6px;">
+              <span>Session: <strong style="font-family: var(--font-mono);">${escapeHtml(sessionId || "")}</strong></span>
+              <span>•</span>
+              <span>Pages: <strong>${pageCount}</strong></span>
+              <span>•</span>
+              <span>Status: <strong style="color: #10b981;">100% SPECIFICATION COMPLIANT</strong></span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <button class="btn btn-primary" onclick="window.router.navigate('viewer')">
+              👁️ View Document
+            </button>
+            <button class="btn btn-secondary" onclick="window.router.navigate('new_analysis')">
+              + New Analysis
+            </button>
+          </div>
+        </div>
+
+        <!-- Verified Clean Banner -->
+        <div class="card" style="border: 1px solid rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.05); border-radius: var(--radius-lg); padding: 24px;">
+          <div style="display: flex; align-items: center; gap: 18px;">
+            <div style="font-size: 36px;">🛡️</div>
+            <div>
+              <div style="font-size: 16px; font-weight: 700; color: #10b981; margin-bottom: 4px;">
+                Verified Specification Compliance — Zero Defects Detected
+              </div>
+              <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+                The document was completely inspected across typography, section hierarchy, table and figure citations, grammar, and engineering parameters. The backend confirms zero non-conforming items.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Counters -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;">
+          <div class="stat-card" style="padding: 16px; background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-md); text-align: center;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Total Findings</div>
+            <div style="font-size: 28px; font-weight: 800; color: #10b981; margin-top: 4px;">0</div>
+          </div>
+          <div class="stat-card" style="padding: 16px; background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-md); text-align: center;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Critical</div>
+            <div style="font-size: 28px; font-weight: 800; color: var(--text-muted); margin-top: 4px;">0</div>
+          </div>
+          <div class="stat-card" style="padding: 16px; background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-md); text-align: center;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">High</div>
+            <div style="font-size: 28px; font-weight: 800; color: var(--text-muted); margin-top: 4px;">0</div>
+          </div>
+          <div class="stat-card" style="padding: 16px; background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-md); text-align: center;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Medium</div>
+            <div style="font-size: 28px; font-weight: 800; color: var(--text-muted); margin-top: 4px;">0</div>
+          </div>
+          <div class="stat-card" style="padding: 16px; background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-md); text-align: center;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Low</div>
+            <div style="font-size: 28px; font-weight: 800; color: var(--text-muted); margin-top: 4px;">0</div>
+          </div>
+        </div>
+      </div>
+    `;
   },
 
   /**
@@ -285,41 +452,49 @@ window.DashboardView = {
    * STATE 3 - COMPLETED: Full inspection dashboard populated strictly with REAL analysis data.
    */
   renderCompleted(container, { activeDoc, sessionId, findings, domain, recentComparisons }) {
-    const crit = findings.filter((f) => f.severity === "Critical").length;
-    const high = findings.filter((f) => f.severity === "High").length;
-    const med = findings.filter((f) => f.severity === "Medium").length;
-    const low = findings.filter((f) => f.severity === "Low").length;
-    const info = findings.filter((f) => f.severity === "Informational").length;
+    const crit = findings.filter((f) => (f.severity || "").toUpperCase() === "CRITICAL").length;
+    const high = findings.filter((f) => (f.severity || "").toUpperCase() === "HIGH").length;
+    const med = findings.filter((f) => (f.severity || "").toUpperCase() === "MEDIUM").length;
+    const low = findings.filter((f) => (f.severity || "").toUpperCase() === "LOW").length;
+    const info = findings.filter((f) => {
+      const s = (f.severity || "").toUpperCase();
+      return s === "INFORMATIONAL" || s === "INFO";
+    }).length;
 
-    // Standardized category counts from real findings
+    // Standardized canonical category mapping preserving exact detector categories
+    function normalizeCategory(cat) {
+      if (!cat) return "FORMATTING";
+      const c = String(cat).trim().toUpperCase();
+      if (c === "SPELLING" || c.includes("SPELL")) return "SPELLING";
+      if (c === "GRAMMAR" || c === "GRAMMAR & SPELLING") return "GRAMMAR";
+      if (c === "TOC" || c.includes("TABLE OF CONTENTS")) return "TOC";
+      if (c === "FIGURE_REFERENCE" || c === "FIGURE" || c.includes("FIGURE")) return "FIGURE_REFERENCE";
+      if (c === "TABLE_VALUE" || c === "TABLE" || c.includes("TABLE")) return "TABLE_VALUE";
+      if (c === "DOCUMENT_CONTROL" || c.includes("CONTROL") || c.includes("VERSION")) return "DOCUMENT_CONTROL";
+      if (c === "NUMBERING" || c.includes("NUMBER")) return "NUMBERING";
+      if (c === "MISSING_CONTENT" || c.includes("MISSING")) return "MISSING_CONTENT";
+      if (c === "CONTRADICTION" || c.includes("CONTRADICT") || c.includes("LOGICAL")) return "CONTRADICTION";
+      if (c === "FORMATTING" || c.includes("FORMAT") || c.includes("LAYOUT") || c.includes("TYPO")) return "FORMATTING";
+      if (c === "MIXED") return "MIXED";
+      return c;
+    }
+
     const catMap = {
-      "Formatting": 0,
-      "Structure": 0,
-      "Grammar": 0,
-      "Tables": 0,
-      "Figures": 0,
+      "SPELLING": 0,
+      "GRAMMAR": 0,
+      "FORMATTING": 0,
       "TOC": 0,
-      "References": 0,
-      "Engineering": 0,
-      "Standards": 0,
-      "Logical": 0,
-      "Semantic": 0
+      "FIGURE_REFERENCE": 0,
+      "TABLE_VALUE": 0,
+      "DOCUMENT_CONTROL": 0,
+      "NUMBERING": 0,
+      "MISSING_CONTENT": 0,
+      "CONTRADICTION": 0
     };
 
     findings.forEach((f) => {
-      const c = (f.category || "").toLowerCase();
-      if (c.includes("format") || c.includes("typography") || c.includes("layout")) catMap["Formatting"]++;
-      else if (c.includes("structure") || c.includes("outline")) catMap["Structure"]++;
-      else if (c.includes("grammar") || c.includes("spelling")) catMap["Grammar"]++;
-      else if (c.includes("table of contents") || c.includes("toc")) catMap["TOC"]++;
-      else if (c.includes("table")) catMap["Tables"]++;
-      else if (c.includes("figure")) catMap["Figures"]++;
-      else if (c.includes("reference") || c.includes("citation") || c.includes("cross")) catMap["References"]++;
-      else if (c.includes("parameter") || c.includes("engineering")) catMap["Engineering"]++;
-      else if (c.includes("standard") || c.includes("ieee")) catMap["Standards"]++;
-      else if (c.includes("logical") || c.includes("contradiction")) catMap["Logical"]++;
-      else if (c.includes("semantic")) catMap["Semantic"]++;
-      else catMap["Formatting"]++;
+      const cat = normalizeCategory(f.category);
+      catMap[cat] = (catMap[cat] || 0) + 1;
     });
 
     // Real page count from parsed document
@@ -543,18 +718,10 @@ window.DashboardView = {
 
   jumpToPage(pageNum) {
     window.appState.set("activePage", pageNum);
-    window.router.navigate("viewer");
-    setTimeout(() => {
-      if (window.currentViewer) {
-        window.currentViewer.setPage(pageNum);
-      }
-    }, 150);
+    window.router.navigate("viewer", { page: pageNum });
   },
 
   jumpToCategory(category) {
-    if (category.toLowerCase() === "formatting") window.router.navigate("formatting");
-    else if (category.toLowerCase() === "structure" || category.toLowerCase() === "toc") window.router.navigate("structural");
-    else if (["grammar", "engineering", "standards", "logical", "semantic"].includes(category.toLowerCase())) window.router.navigate("content");
-    else window.router.navigate("findings");
+    window.router.navigate("findings", { category });
   }
 };

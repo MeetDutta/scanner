@@ -416,8 +416,9 @@ class BenchmarkEngine:
             try:
                 import fitz
                 pdoc = fitz.open(fpath)
-                tp = pdoc[0].get_textpage_ocr(language="eng", dpi=150)
-                ocr_text = pdoc[0].get_text(textpage=tp).strip()
+                page = pdoc[0]
+                tp = page.get_textpage_ocr(language="eng", dpi=150)
+                ocr_text = page.get_text(textpage=tp).strip()
                 if ocr_text:
                     status = "PASS"
                     err_msg = ""
@@ -1069,9 +1070,12 @@ PDF coordinates transform dynamically into rendered page coordinates and browser
         with open(self.output_dir / "model_inventory.json", "w", encoding="utf-8") as f:
             json.dump(model_inv, f, indent=2)
 
-        # Also write root MODEL_INVENTORY.json
-        with open(self.dataset_dir.parent / "MODEL_INVENTORY.json", "w", encoding="utf-8") as f:
-            json.dump(model_inv, f, indent=2)
+        # Also write root MODEL_INVENTORY.json if writable
+        try:
+            with open(self.dataset_dir.parent / "MODEL_INVENTORY.json", "w", encoding="utf-8") as f:
+                json.dump(model_inv, f, indent=2)
+        except OSError:
+            pass
 
         # 7. Summary
         total_docs_tested = clean_res["total_documents"] + len([m for m in manifest if m.get("variant") != "clean"])
@@ -1110,9 +1114,12 @@ PDF coordinates transform dynamically into rendered page coordinates and browser
         with open(self.output_dir / "SpecGuard-Benchmark-Report.md", "w", encoding="utf-8") as f:
             f.write(report_md)
 
-        # Also write root SpecGuard-Benchmark-Report.md
-        with open(self.dataset_dir.parent / "SpecGuard-Benchmark-Report.md", "w", encoding="utf-8") as f:
-            f.write(report_md)
+        # Also write root SpecGuard-Benchmark-Report.md if writable
+        try:
+            with open(self.dataset_dir.parent / "SpecGuard-Benchmark-Report.md", "w", encoding="utf-8") as f:
+                f.write(report_md)
+        except OSError:
+            pass
 
         return {
             "summary": summary_data,

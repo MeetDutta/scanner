@@ -26,39 +26,32 @@ window.FindingsView = {
   _keyHandler: null,
 
   async render(container) {
+    container.innerHTML = `
+      <div class="empty-state" style="padding: 60px 20px;">
+        <div class="spinner" style="margin: 0 auto 16px;"></div>
+        <div style="font-size: 15px; font-weight: 700; color: var(--text-primary);">Loading Document Findings...</div>
+        <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Loading persisted finding metadata and defect coordinates</div>
+      </div>
+    `;
+
+    try {
+      await window.appState.rehydrateSession();
+    } catch (err) {
+      console.error("Failed to rehydrate session for FindingsView:", err);
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">⚠️</div>
+          <div class="empty-state-title">Analysis Session Not Found</div>
+          <div class="empty-state-desc">The requested analysis session could not be retrieved from the persistent database.</div>
+          <button class="btn btn-primary" onclick="window.router.navigate('new_analysis')">Start New Analysis</button>
+        </div>
+      `;
+      return;
+    }
+
     let sessionId = window.appState.get("activeSessionId");
     let activeDoc = window.appState.get("activeDocument");
 
-    if (!activeDoc) {
-      if (!sessionId) {
-        try {
-          const recent = await window.api.dashboard.getRecent(1);
-          if (recent && recent.recent_comparisons && recent.recent_comparisons.length > 0) {
-            sessionId = recent.recent_comparisons[0].comparison_id;
-            window.appState.set("activeSessionId", sessionId);
-          }
-        } catch (e) {
-          console.warn("Could not get recent session:", e);
-        }
-      }
-
-      if (sessionId) {
-        try {
-          const hist = await window.api.history.get(sessionId);
-          if (hist) {
-            activeDoc = {
-              filename: hist.document_filename,
-              file_hash: hist.document_sha256,
-              page_count: hist.page_count || 1
-            };
-            window.appState.set("activeDocument", activeDoc);
-            if (hist.domain) window.appState.set("activeDomain", hist.domain);
-          }
-        } catch (e) {
-          console.warn("Could not resolve document info from session:", e);
-        }
-      }
-    }
     if (!sessionId && !activeDoc) {
       container.innerHTML = `
         <div class="empty-state">
@@ -72,6 +65,12 @@ window.FindingsView = {
     }
 
     this.activeDoc = activeDoc;
+
+    // Check for URL filter parameters
+    const params = window.router ? window.router.getParams() : {};
+    if (params.category) this.currentFilters.category = params.category;
+    if (params.severity) this.currentFilters.severity = params.severity;
+    if (params.page_num) this.currentFilters.page_num = params.page_num;
 
     container.innerHTML = `
       <div class="findings-container">
@@ -395,7 +394,26 @@ window.FindingsView = {
       }
     } catch (err) {
       console.error("Error loading findings:", err);
-      window.toast.error("Failed loading document findings.");
+      const listMount = document.getElementById("findings-list-mount");
+      if (listMount) {
+        listMount.innerHTML = `
+          <div class="empty-state" style="padding: 48px 24px; text-align: center;">
+            <div style="font-size: 36px; margin-bottom: 12px;">⚠️</div>
+            <div class="empty-state-title" style="color: var(--accent-critical); font-size: 16px; font-weight: 700;">
+              Unable to load findings.
+            </div>
+            <div class="empty-state-desc" style="margin-bottom: 16px; font-size: 13px; color: var(--text-muted);">
+              ${escapeHtml(err.message || "Failed to load findings from persistent storage.")}
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="window.location.reload()">
+              Retry
+            </button>
+          </div>
+        `;
+      }
+      const countEl = document.getElementById("findings-count-badge");
+      if (countEl) countEl.innerText = "Error";
+      if (window.toast) window.toast.error("Failed loading document findings.");
     }
   },
 
@@ -403,8 +421,8 @@ window.FindingsView = {
     const { severity, category, search, page_num } = this.currentFilters;
 
     this.filteredFindings = this.allFindings.filter((f) => {
-      if (severity && f.severity !== severity) return false;
-      if (category && f.category !== category) return false;
+      if (severity && (f.severity || "").toUpperCase() !== severity.toUpperCase()) return false;
+      if (category && (f.category || "").toUpperCase() !== category.toUpperCase()) return false;
       if (page_num && String(f.page_number || f.page) !== String(page_num)) return false;
       if (search) {
         const q = search.toLowerCase();
@@ -587,7 +605,8 @@ window.FindingsView = {
     const col = document.getElementById("findings-info-column");
     if (!col) return;
 
-    const sevClass = `badge-${(f.severity || "medium").toLowerCase()}`;
+    const normSev = (f.severity || "LOW").toUpperCase();
+    const sevClass = (normSev === "INFORMATIONAL" || normSev === "INFO") ? "badge-info" : `badge-${normSev.toLowerCase()}`;
     const precision = f.location_precision || "APPROXIMATE";
 
     // Finding Index Number
@@ -773,7 +792,8 @@ window.FindingsView = {
     }
 
     tbody.innerHTML = this.filteredFindings.map((f, idx) => {
-      const sevClass = `badge-${(f.severity || "medium").toLowerCase()}`;
+      const normSev = (f.severity || "LOW").toUpperCase();
+      const sevClass = (normSev === "INFORMATIONAL" || normSev === "INFO") ? "badge-info" : `badge-${normSev.toLowerCase()}`;
       const num = (idx + 1).toString().padStart(2, "0");
       const isSelected = this.selectedFinding && this.selectedFinding.finding_id === f.finding_id;
       const issueSummary = f.explanation || f.original_content || f.detected_value || "Issue detected";

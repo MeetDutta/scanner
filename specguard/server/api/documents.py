@@ -43,7 +43,35 @@ def _find_document_path(doc_identifier: str) -> Optional[Path]:
     db = DatabaseManager()
     with db.get_connection() as conn:
         cursor = conn.cursor()
-        # Try repo_documents first
+        # Try repo_comparisons if identifier is a comparison_id
+        cursor.execute(
+            """
+            SELECT d.original_path, d.filename 
+            FROM repo_documents d 
+            JOIN repo_comparisons c ON d.document_id = c.document_id 
+            WHERE c.comparison_id = ?
+            """,
+            (doc_identifier,)
+        )
+        row = cursor.fetchone()
+        if row and Path(row["original_path"]).exists():
+            return Path(row["original_path"])
+
+        # Try analysis_sessions if identifier is a session_id
+        cursor.execute(
+            """
+            SELECT doc.file_path, doc.filename 
+            FROM documents doc 
+            JOIN analysis_sessions s ON doc.file_hash = s.document_hash 
+            WHERE s.session_id = ?
+            """,
+            (doc_identifier,)
+        )
+        row = cursor.fetchone()
+        if row and Path(row["file_path"]).exists():
+            return Path(row["file_path"])
+
+        # Try repo_documents
         cursor.execute(
             "SELECT original_path, filename FROM repo_documents WHERE document_id = ? OR sha256 = ? OR filename = ?",
             (doc_identifier, doc_identifier, doc_identifier)

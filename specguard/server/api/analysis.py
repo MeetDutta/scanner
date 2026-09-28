@@ -337,3 +337,104 @@ def stream_job_progress(job_id: str):
             time.sleep(0.15)
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
+
+
+@router.get("/session/{session_id}")
+def get_analysis_session(session_id: str) -> Dict[str, Any]:
+    """
+    Retrieves the canonical persisted analysis session record, document metadata,
+    and summary counts. Supports 'latest' to fetch the most recent completed analysis.
+    """
+    db = DatabaseManager()
+    repo = RepositoryManager(db=db)
+
+    target_id = session_id.strip()
+    if target_id.lower() == "latest":
+        with db.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT comparison_id FROM repo_comparisons ORDER BY rowid DESC LIMIT 1")
+            row = cursor.fetchone()
+            if not row:
+                raise HTTPException(status_code=404, detail="No analysis session found.")
+            target_id = row["comparison_id"]
+
+    rec = repo.get_comparison_record(target_id)
+    if not rec:
+        # Check analysis_sessions fallback
+        with db.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM analysis_sessions WHERE session_id = ?", (target_id,))
+            s_row = cursor.fetchone()
+            if not s_row:
+                raise HTTPException(status_code=404, detail=f"Analysis session '{session_id}' not found.")
+            findings = repo.get_comparison_findings(target_id)
+            return {
+                "session_id": s_row["session_id"],
+                "comparison_id": s_row["session_id"],
+                "status": "COMPLETED",
+                "domain": s_row["domain"],
+                "total_findings": s_row["findings_count"],
+                "critical_count": s_row["critical_count"],
+                "high_count": s_row["high_count"],
+                "medium_count": s_row["medium_count"],
+                "low_count": s_row["low_count"],
+                "info_count": s_row["info_count"],
+                "findings_count": len(findings),
+                "document": {
+                    "filename": "Engineering Document",
+                    "file_hash": s_row["document_hash"],
+                    "page_count": 1
+                },
+                "findings": [f.to_dict() for f in findings]
+            }
+
+    doc_info = repo.get_document(rec.document_id)
+    findings = repo.get_comparison_findings(target_id)
+
+    # Check for tolerance report
+    tol_record = None
+    with db.get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM document_tolerance_reports WHERE session_id = ?", (target_id,))
+        t_row = cursor.fetchone()
+        if t_row:
+            tol_record = dict(t_row)
+
+    crit_count = sum(1 for f in findings if (f.severity or "").upper() == "CRITICAL")
+    high_count = sum(1 for f in findings if (f.severity or "").upper() == "HIGH")
+    med_count = sum(1 for f in findings if (f.severity or "").upper() == "MEDIUM")
+    low_count = sum(1 for f in findings if (f.severity or "").upper() == "LOW")
+    info_count = sum(1 for f in findings if (f.severity or "").upper() in ("INFORMATIONAL", "INFO"))
+
+    return {
+        "session_id": rec.comparison_id,
+        "comparison_id": rec.comparison_id,
+        "document_id": rec.document_id,
+        "document_filename": rec.document_filename,
+        "document_sha256": rec.document_sha256,
+        "domain": rec.domain,
+        "status": rec.status or "COMPLETED",
+        "analysis_started_at": rec.analysis_started_at,
+        "analysis_completed_at": rec.analysis_completed_at,
+        "duration_ms": rec.duration_ms,
+        "model_version": rec.model_version,
+        "total_findings": len(findings),
+        "critical_count": crit_count,
+        "high_count": high_count,
+        "medium_count": med_count,
+        "low_count": low_count,
+        "info_count": info_count,
+        "findings_count": len(findings),
+        "document": {
+            "filename": doc_info.filename if doc_info else rec.document_filename,
+            "file_type": doc_info.file_type if doc_info else "PDF",
+            "file_size": doc_info.file_size if doc_info else 0,
+            "page_count": doc_info.page_count if doc_info else 1,
+            "original_path": doc_info.original_path if doc_info else "",
+            "file_hash": rec.document_sha256
+        },
+        "tolerance": tol_record,
+        "findings": [f.to_dict() for f in findings]
+    }
+
+

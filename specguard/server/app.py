@@ -104,16 +104,37 @@ def create_app() -> FastAPI:
     app.include_router(router_templates, prefix=api_prefix)
     app.include_router(router_settings, prefix=api_prefix)
 
-    # Health check endpoints (Section 39 - 100% Offline Subsystem Reporting):
+    # Health check endpoints (100% Offline Subsystem Reporting):
     @app.get("/health")
     def health_check():
         return {
             "status": "ok",
-            "service": "docready",
+            "service": "specguard",
             "name": "SpecGuard",
             "environment": env_mode,
             "offline": True,
             "lan_ready": True
+        }
+
+    @app.get("/health/ready")
+    def health_ready():
+        from specguard.core.config import MODELS_DIR, RULES_DIR, STANDARDS_DIR, TEMPLATES_DIR, DATA_DIR
+        models_ok = MODELS_DIR.exists() and any(MODELS_DIR.iterdir())
+        rules_ok = RULES_DIR.exists() and any(RULES_DIR.iterdir())
+        standards_ok = STANDARDS_DIR.exists() and any(STANDARDS_DIR.iterdir())
+        templates_ok = TEMPLATES_DIR.exists() and any(TEMPLATES_DIR.iterdir())
+        storage_ok = DATA_DIR.exists()
+
+        is_ready = all([models_ok, rules_ok, standards_ok, templates_ok, storage_ok])
+        return {
+            "status": "ready" if is_ready else "not_ready",
+            "service": "specguard",
+            "models": "OK" if models_ok else "MISSING",
+            "rules": "OK" if rules_ok else "MISSING",
+            "standards": "OK" if standards_ok else "MISSING",
+            "templates": "OK" if templates_ok else "MISSING",
+            "storage": "OK" if storage_ok else "ERROR",
+            "offline": True
         }
 
     @app.get("/api/health")

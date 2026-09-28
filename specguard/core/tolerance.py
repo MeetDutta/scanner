@@ -262,11 +262,11 @@ class ToleranceCalculator:
         pages_count = max(1, doc.page_count)
         metadata = cls.extract_document_metadata(doc, custom_meta)
 
-        crit_count = sum(1 for f in findings if f.severity == "Critical")
-        high_count = sum(1 for f in findings if f.severity == "High")
-        med_count = sum(1 for f in findings if f.severity == "Medium")
-        low_count = sum(1 for f in findings if f.severity == "Low")
-        info_count = sum(1 for f in findings if f.severity == "Informational")
+        crit_count = sum(1 for f in findings if (f.severity or "").upper() == "CRITICAL")
+        high_count = sum(1 for f in findings if (f.severity or "").upper() == "HIGH")
+        med_count = sum(1 for f in findings if (f.severity or "").upper() == "MEDIUM")
+        low_count = sum(1 for f in findings if (f.severity or "").upper() == "LOW")
+        info_count = sum(1 for f in findings if (f.severity or "").upper() in ("INFORMATIONAL", "INFO"))
 
         # Standardized Category Counts
         category_summary = {
@@ -283,7 +283,8 @@ class ToleranceCalculator:
 
         raw_tolerance = 0.0
         for f in findings:
-            sev_w = profile.severity_weights.get(f.severity, 1.0)
+            sev_norm = (f.severity or "Low").capitalize()
+            sev_w = profile.severity_weights.get(sev_norm, profile.severity_weights.get(f.severity, 0.5))
             cat_w = profile.get_category_weight(f.category)
             raw_tolerance += (sev_w * cat_w)
 

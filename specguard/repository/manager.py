@@ -251,11 +251,11 @@ class RepositoryManager:
         started_at = analysis_started_at or now_utc
         completed_at = analysis_completed_at or now_utc
 
-        crit = sum(1 for f in findings if f.severity == "Critical")
-        high = sum(1 for f in findings if f.severity == "High")
-        med = sum(1 for f in findings if f.severity == "Medium")
-        low = sum(1 for f in findings if f.severity == "Low")
-        info = sum(1 for f in findings if f.severity == "Informational")
+        crit = sum(1 for f in findings if (f.severity or "").upper() == "CRITICAL")
+        high = sum(1 for f in findings if (f.severity or "").upper() == "HIGH")
+        med = sum(1 for f in findings if (f.severity or "").upper() == "MEDIUM")
+        low = sum(1 for f in findings if (f.severity or "").upper() == "LOW")
+        info = sum(1 for f in findings if (f.severity or "").upper() in ("INFORMATIONAL", "INFO"))
 
         # Save findings JSON
         findings_json_file = cmp_folder / "findings.json"
@@ -401,7 +401,35 @@ class RepositoryManager:
             return findings
 
     def get_comparison_record(self, comparison_id: str) -> Optional[ComparisonRecord]:
-        """Loads comparison metadata record with stored artifact hash references."""
+        """Loads comparison metadata record with stored artifact hash references from persistent database."""
+        with self.db.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM repo_comparisons WHERE comparison_id = ?", (comparison_id,))
+            r = cursor.fetchone()
+            if r:
+                return ComparisonRecord(
+                    comparison_id=r["comparison_id"],
+                    document_id=r["document_id"],
+                    document_filename=r["document_filename"],
+                    document_sha256=r["document_sha256"],
+                    domain=r["domain"],
+                    status=r["status"],
+                    analysis_started_at=str(r["analysis_started_at"]),
+                    analysis_completed_at=str(r["analysis_completed_at"]),
+                    duration_ms=r["duration_ms"],
+                    model_version=r["model_version"],
+                    standards_used=json.loads(r["standards_used"]) if r["standards_used"] else [],
+                    total_findings=r["total_findings"],
+                    critical_count=r["critical_count"],
+                    high_count=r["high_count"],
+                    medium_count=r["medium_count"],
+                    low_count=r["low_count"],
+                    info_count=r["info_count"],
+                    annotated_pdf_path=r["annotated_pdf_path"],
+                    report_html_path=r["report_html_path"],
+                    findings_json_path=r["findings_json_path"]
+                )
+
         cmp_file = self.comps_dir / comparison_id / "comparison.json"
         if cmp_file.exists():
             try:
@@ -411,34 +439,7 @@ class RepositoryManager:
             except Exception as e:
                 logger.warning("Could not read comparison.json for %s: %s", comparison_id, e)
 
-        with self.db.get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM repo_comparisons WHERE comparison_id = ?", (comparison_id,))
-            r = cursor.fetchone()
-            if not r:
-                return None
-            return ComparisonRecord(
-                comparison_id=r["comparison_id"],
-                document_id=r["document_id"],
-                document_filename=r["document_filename"],
-                document_sha256=r["document_sha256"],
-                domain=r["domain"],
-                status=r["status"],
-                analysis_started_at=str(r["analysis_started_at"]),
-                analysis_completed_at=str(r["analysis_completed_at"]),
-                duration_ms=r["duration_ms"],
-                model_version=r["model_version"],
-                standards_used=json.loads(r["standards_used"]) if r["standards_used"] else [],
-                total_findings=r["total_findings"],
-                critical_count=r["critical_count"],
-                high_count=r["high_count"],
-                medium_count=r["medium_count"],
-                low_count=r["low_count"],
-                info_count=r["info_count"],
-                annotated_pdf_path=r["annotated_pdf_path"],
-                report_html_path=r["report_html_path"],
-                findings_json_path=r["findings_json_path"]
-            )
+        return None
 
     def verify_comparison_artifacts(self, comparison_id: str) -> Dict[str, Any]:
         """

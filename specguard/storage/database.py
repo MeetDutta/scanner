@@ -232,7 +232,179 @@ class DatabaseManager:
             CREATE INDEX IF NOT EXISTS idx_tolerance_session ON document_tolerance_reports(session_id);
             """)
             conn.commit()
+            self._apply_migrations(conn)
             logger.info("SQLite database schema initialized at %s", self.db_path)
+
+    def _apply_migrations(self, conn: sqlite3.Connection):
+        """Applies safe, idempotent migrations preserving all existing data and sessions."""
+        cursor = conn.cursor()
+        try:
+            # 1. Migrate misclassified spelling severities (CRITICAL -> Low)
+            cursor.execute("""
+                UPDATE findings 
+                SET severity = 'Low' 
+                WHERE (category = 'SPELLING' OR finding_id LIKE 'GRM-SPL-%') 
+                  AND UPPER(severity) = 'CRITICAL'
+            """)
+            cursor.execute("""
+                UPDATE repo_findings 
+                SET severity = 'Low' 
+                WHERE (category = 'SPELLING' OR finding_id LIKE 'GRM-SPL-%') 
+                  AND UPPER(severity) = 'CRITICAL'
+            """)
+
+            # 2. Recalculate severity counts for repo_comparisons
+            cursor.execute("SELECT DISTINCT comparison_id FROM repo_findings")
+            comp_ids = [r[0] for r in cursor.fetchall()]
+            for cid in comp_ids:
+                cursor.execute("""
+                    SELECT 
+                        COUNT(*) as total,
+                        SUM(CASE WHEN UPPER(severity) = 'CRITICAL' THEN 1 ELSE 0 END) as crit,
+                        SUM(CASE WHEN UPPER(severity) = 'HIGH' THEN 1 ELSE 0 END) as high,
+                        SUM(CASE WHEN UPPER(severity) = 'MEDIUM' THEN 1 ELSE 0 END) as med,
+                        SUM(CASE WHEN UPPER(severity) = 'LOW' THEN 1 ELSE 0 END) as low,
+                        SUM(CASE WHEN UPPER(severity) IN ('INFORMATIONAL', 'INFO') THEN 1 ELSE 0 END) as info
+                    FROM repo_findings
+                    WHERE comparison_id = ?
+                """, (cid,))
+                row = cursor.fetchone()
+                if row:
+                    cursor.execute("""
+                        UPDATE repo_comparisons
+                        SET total_findings = ?, critical_count = ?, high_count = ?, medium_count = ?, low_count = ?, info_count = ?
+                        WHERE comparison_id = ?
+                    """, (
+                        row[0],
+                        row[1] or 0,
+                        row[2] or 0,
+                        row[3] or 0,
+                        row[4] or 0,
+                        row[5] or 0,
+                        cid
+                    ))
+
+            # 3. Recalculate severity counts for analysis_sessions
+            cursor.execute("SELECT DISTINCT session_id FROM findings")
+            sess_ids = [r[0] for r in cursor.fetchall()]
+            for sid in sess_ids:
+                cursor.execute("""
+                    SELECT 
+                        COUNT(*) as total,
+                        SUM(CASE WHEN UPPER(severity) = 'CRITICAL' THEN 1 ELSE 0 END) as crit,
+                        SUM(CASE WHEN UPPER(severity) = 'HIGH' THEN 1 ELSE 0 END) as high,
+                        SUM(CASE WHEN UPPER(severity) = 'MEDIUM' THEN 1 ELSE 0 END) as med,
+                        SUM(CASE WHEN UPPER(severity) = 'LOW' THEN 1 ELSE 0 END) as low,
+                        SUM(CASE WHEN UPPER(severity) IN ('INFORMATIONAL', 'INFO') THEN 1 ELSE 0 END) as info
+                    FROM findings
+                    WHERE session_id = ?
+                """, (sid,))
+                row = cursor.fetchone()
+                if row:
+                    cursor.execute("""
+                        UPDATE analysis_sessions
+                        SET findings_count = ?, critical_count = ?, high_count = ?, medium_count = ?, low_count = ?, info_count = ?
+                        WHERE session_id = ?
+                    """, (
+                        row[0],
+                        row[1] or 0,
+                        row[2] or 0,
+                        row[3] or 0,
+                        row[4] or 0,
+                        row[5] or 0,
+                        sid
+                    ))
+
+            # 4. Synchronize tolerance reports with updated severity counts
+            cursor.execute("""
+                SELECT session_id, maximum_acceptable_tolerance, normalization_factor
+                FROM document_tolerance_reports
+            """)
+            tol_rows = cursor.fetchall()
+            for t_row in tol_rows:
+                tsid = t_row[0]
+                max_tol = float(t_row[1] or 10.0)
+                norm_f = float(t_row[2] or 1.0)
+                
+                # Check repo_comparisons first
+                cursor.execute("""
+                    SELECT total_findings, critical_count, high_count, medium_count, low_count, info_count
+                    FROM repo_comparisons WHERE comparison_id = ?
+                """, (tsid,))
+                c_data = cursor.fetchone()
+                if not c_data:
+                    cursor.execute("""
+                        SELECT findings_count, critical_count, high_count, medium_count, low_count, info_count
+                        FROM analysis_sessions WHERE session_id = ?
+                    """, (tsid,))
+                    c_data = cursor.fetchone()
+                
+                if c_data:
+                    tot, c_crit, c_high, c_med, c_low, c_info = c_data
+                    raw = (c_crit or 0) * 8.0 + (c_high or 0) * 4.0 + (c_med or 0) * 2.0 + (c_low or 0) * 0.5 + (c_info or 0) * 0.0
+                    idx = round(raw / (norm_f or 1.0), 2)
+                    util = round((idx / max_tol) * 100, 1) if max_tol > 0 else 0.0
+                    status = "ELIGIBLE" if (idx <= max_tol and (c_crit or 0) == 0) else "NOT ELIGIBLE"
+                    reason = f"Document quality tolerance index ({idx}) is within maximum allowed ({max_tol})." if status == "ELIGIBLE" else (
+                        f"Document contains {c_crit} critical finding(s). Configured profile requires at most 0 critical findings." if (c_crit or 0) > 0 else
+                        f"Tolerance index ({idx}) exceeds maximum allowable tolerance ({max_tol})."
+                    )
+                    cursor.execute("""
+                        UPDATE document_tolerance_reports
+                        SET total_findings = ?, critical_count = ?, high_count = ?, medium_count = ?, low_count = ?, info_count = ?,
+                            raw_tolerance = ?, tolerance_index = ?, tolerance_utilization = ?, acceptance_status = ?, status_reason = ?
+                        WHERE session_id = ?
+                    """, (tot, c_crit or 0, c_high or 0, c_med or 0, c_low or 0, c_info or 0, raw, idx, util, status, reason, tsid))
+
+            # 5. Synchronize on-disk JSON files for migrated comparisons
+            comps_dir = self.db_path.parent / "repository" / "comparisons"
+            if comps_dir.exists():
+                for cid_dir in comps_dir.iterdir():
+                    if not cid_dir.is_dir():
+                        continue
+                    cid = cid_dir.name
+                    f_json = cid_dir / "findings.json"
+                    if f_json.exists():
+                        try:
+                            with open(f_json, "r", encoding="utf-8") as f:
+                                f_list = json.load(f)
+                            changed = False
+                            for finding_dict in f_list:
+                                cat = (finding_dict.get("category") or "").upper()
+                                fid = (finding_dict.get("finding_id") or "").upper()
+                                sev = (finding_dict.get("severity") or "").upper()
+                                if (cat == "SPELLING" or fid.startswith("GRM-SPL")) and sev == "CRITICAL":
+                                    finding_dict["severity"] = "Low"
+                                    changed = True
+                            if changed:
+                                with open(f_json, "w", encoding="utf-8") as f:
+                                    json.dump(f_list, f, indent=2)
+                        except Exception as f_err:
+                            logger.debug("Could not update disk findings.json for %s: %s", cid, f_err)
+
+                    c_json = cid_dir / "comparison.json"
+                    if c_json.exists():
+                        try:
+                            cursor.execute("SELECT total_findings, critical_count, high_count, medium_count, low_count, info_count FROM repo_comparisons WHERE comparison_id = ?", (cid,))
+                            rc = cursor.fetchone()
+                            if rc:
+                                with open(c_json, "r", encoding="utf-8") as f:
+                                    c_dict = json.load(f)
+                                c_dict["total_findings"] = rc[0]
+                                c_dict["critical_count"] = rc[1]
+                                c_dict["high_count"] = rc[2]
+                                c_dict["medium_count"] = rc[3]
+                                c_dict["low_count"] = rc[4]
+                                c_dict["info_count"] = rc[5]
+                                with open(c_json, "w", encoding="utf-8") as f:
+                                    json.dump(c_dict, f, indent=2)
+                        except Exception as c_err:
+                            logger.debug("Could not update disk comparison.json for %s: %s", cid, c_err)
+
+            conn.commit()
+            logger.info("Database migration check completed successfully.")
+        except Exception as e:
+            logger.warning("Migration failed or already applied: %s", e)
 
     def save_tolerance_report(self, tol_data: Dict[str, Any]):
         """Persists a calculated tolerance result to prevent re-calculation drift."""

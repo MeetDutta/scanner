@@ -1,0 +1,34 @@
+# ==============================================================================
+# SpecGuard — Production Offline LAN Deployment
+# 100% Offline Architecture — Zero Cloud/CDN/Remote Dependencies
+# ==============================================================================
+# Usage:
+#   1. Load image:     docker load -i specguard-offline.tar
+#   2. Start service:  docker compose up -d
+#   3. View logs:      docker compose logs -f
+#   4. Access web UI:  http://localhost:8765  or  http://<HOST-LAN-IP>:8765
+# ==============================================================================
+
+services:
+  specguard:
+    image: specguard:1.0.0
+    container_name: specguard
+    restart: unless-stopped
+    ports:
+      - "8765:8765"
+    volumes:
+      # Persistent host directory for documents, reports, database, and history
+      - ./data:/app/data
+    environment:
+      - SPECGUARD_ENV=production
+      - SPECGUARD_HOST=0.0.0.0
+      - SPECGUARD_PORT=8765
+      - SPECGUARD_DATA_DIR=/app/data
+      - TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata
+      - PYTHONUNBUFFERED=1
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8765/health', timeout=4)"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

@@ -171,7 +171,7 @@ class DocumentViewerComponent {
       if (this.activeCategoryFilter !== "ALL" && f.category !== this.activeCategoryFilter) {
         return false;
       }
-      if (this.activeSeverityFilter !== "ALL" && f.severity !== this.activeSeverityFilter) {
+      if (this.activeSeverityFilter !== "ALL" && (f.severity || "").toUpperCase() !== this.activeSeverityFilter.toUpperCase()) {
         return false;
       }
       if (this.exactOnlyFilter && (!f.location_precision || !f.location_precision.startsWith("EXACT"))) {
@@ -825,6 +825,11 @@ class DocumentViewerComponent {
     const ry = renderedHeight / (naturalHeight || 792);
 
     const severityColors = {
+      CRITICAL: { stroke: "#dc2626", fill: "rgba(220, 38, 38, 0.18)" },
+      HIGH: { stroke: "#ea580c", fill: "rgba(234, 88, 12, 0.18)" },
+      MEDIUM: { stroke: "#d97706", fill: "rgba(217, 119, 6, 0.16)" },
+      LOW: { stroke: "#2563eb", fill: "rgba(37, 99, 235, 0.15)" },
+      INFORMATIONAL: { stroke: "#64748b", fill: "rgba(100, 116, 139, 0.12)" },
       Critical: { stroke: "#dc2626", fill: "rgba(220, 38, 38, 0.18)" },
       High: { stroke: "#ea580c", fill: "rgba(234, 88, 12, 0.18)" },
       Medium: { stroke: "#d97706", fill: "rgba(217, 119, 6, 0.16)" },
@@ -835,14 +840,16 @@ class DocumentViewerComponent {
     // 1. Render findings with bounding boxes
     findingsOnPage.forEach((f) => {
       const isFocused = this.focusedFinding && this.focusedFinding.finding_id === f.finding_id;
-      const sevColor = severityColors[f.severity] || severityColors.Medium;
+      const sKey = (f.severity || "MEDIUM").toUpperCase();
+      const sevColor = severityColors[sKey] || severityColors.MEDIUM;
 
       const fIdx = this.findings.findIndex((x) => x.finding_id === f.finding_id);
       const findingNum = fIdx >= 0 ? (fIdx + 1).toString().padStart(2, "0") : "01";
 
       const it = f.issue_type || "";
-      const isSpelling = it === "SPELLING_ERROR" || (f.category.includes("Grammar") && f.detected_value && !f.detected_value.includes("Repeated"));
-      const isGrammar = it === "REPEATED_WORD" || it === "UNBALANCED_PUNCTUATION" || (f.category.includes("Grammar") && !isSpelling);
+      const catUpper = (f.category || "").toUpperCase();
+      const isSpelling = it === "SPELLING_ERROR" || catUpper.includes("SPELL") || (catUpper.includes("GRAMMAR") && f.detected_value && !f.detected_value.includes("Repeated"));
+      const isGrammar = it === "REPEATED_WORD" || it === "UNBALANCED_PUNCTUATION" || (catUpper.includes("GRAMMAR") && !isSpelling);
       const isDuplicate = it.includes("DUPLICATE");
       const isTocDrift = it === "TOC_PAGE_DRIFT" || f.finding_id.startsWith("TOC-PAG");
       const isBrokenRef = it.includes("UNRESOLVED");
@@ -1111,7 +1118,8 @@ class DocumentViewerComponent {
     const drawerContent = this.container.querySelector("#viewer-drawer-content");
     if (!drawerContent) return;
 
-    const sevClass = `badge-${(f.severity || "medium").toLowerCase()}`;
+    const normSev = (f.severity || "LOW").toUpperCase();
+    const sevClass = (normSev === "INFORMATIONAL" || normSev === "INFO") ? "badge-info" : `badge-${normSev.toLowerCase()}`;
     const precision = f.location_precision || "APPROXIMATE";
     const isExact = precision.startsWith("EXACT");
 

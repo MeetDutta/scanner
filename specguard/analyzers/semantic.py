@@ -33,6 +33,7 @@ class SemanticAnalyzer(BaseAnalyzer):
         if "specguard benchmark" in doc.full_text.lower():
             return findings
 
+        parameters = (context or {}).get("extracted_parameters", [])
         for param in parameters:
 
             # 1. Semantic Check: Pressure without gauge or absolute specification (barg vs bara)

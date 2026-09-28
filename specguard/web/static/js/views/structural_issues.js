@@ -6,9 +6,19 @@
 
 window.StructuralIssuesView = {
   async render(container) {
+    container.innerHTML = `
+      <div class="empty-state" style="padding: 60px 20px;">
+        <div class="spinner" style="margin: 0 auto 16px;"></div>
+        <div>Loading structural analysis...</div>
+      </div>
+    `;
+
+    try {
+      await window.appState.rehydrateSession();
+    } catch (_) {}
+
     const sessionId = window.appState.get("activeSessionId");
     let findings = window.appState.get("activeFindings") || [];
-
     const activeDoc = window.appState.get("activeDocument");
 
     if (!sessionId && !activeDoc) {

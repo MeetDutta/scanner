@@ -212,7 +212,7 @@ window.HistoryView = {
         page_count: detail.document.page_count
       });
 
-      window.router.navigate("dashboard");
+      window.router.navigate("dashboard", { session_id: detail.comparison_id });
     } catch (err) {
       window.toast.error(`Error opening record: ${err.message}`);
     }

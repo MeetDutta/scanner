@@ -50,7 +50,8 @@ class ApiClient {
     getSamples: () => this.request("/analysis/samples"),
     start: (data) => this.request("/analysis/start", { method: "POST", body: JSON.stringify(data) }),
     getJob: (jobId) => this.request(`/analysis/jobs/${jobId}`),
-    cancel: (jobId) => this.request(`/analysis/jobs/${jobId}/cancel`, { method: "POST" })
+    cancel: (jobId) => this.request(`/analysis/jobs/${jobId}/cancel`, { method: "POST" }),
+    getSession: (sessionId = "latest") => this.request(`/analysis/session/${encodeURIComponent(sessionId)}`)
   };
 
   // Documents & Pages

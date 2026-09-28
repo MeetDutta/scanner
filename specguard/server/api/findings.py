@@ -117,6 +117,8 @@ def list_findings(
     db = DatabaseManager()
     target_id = comparison_id or session_id
 
+    explicit_target = bool(comparison_id or session_id)
+
     # If no session or comparison ID provided, get the latest comparison ID
     if not target_id:
         with db.get_connection() as conn:
@@ -131,18 +133,24 @@ def list_findings(
             "findings": [],
             "total_count": 0,
             "session_id": None,
-            "severity_summary": {}
+            "severity_summary": {},
+            "category_summary": {}
         }
 
     with db.get_connection() as conn:
         cursor = conn.cursor()
 
-        # Check whether target_id is in repo_findings or findings
-        cursor.execute("SELECT COUNT(*) FROM repo_findings WHERE comparison_id = ?", (target_id,))
-        is_repo = (cursor.fetchone()[0] > 0)
+        # Check whether target_id exists in repo_comparisons or analysis_sessions
+        cursor.execute("SELECT COUNT(*) FROM repo_comparisons WHERE comparison_id = ?", (target_id,))
+        has_repo = (cursor.fetchone()[0] > 0)
+        cursor.execute("SELECT COUNT(*) FROM analysis_sessions WHERE session_id = ?", (target_id,))
+        has_session = (cursor.fetchone()[0] > 0)
 
-        table_name = "repo_findings" if is_repo else "findings"
-        id_col = "comparison_id" if is_repo else "session_id"
+        if explicit_target and not has_repo and not has_session:
+            raise HTTPException(status_code=404, detail=f"Analysis session '{target_id}' not found.")
+
+        table_name = "repo_findings" if has_repo else "findings"
+        id_col = "comparison_id" if has_repo else "session_id"
 
         where_clauses = [f"{id_col} = ?"]
         params: List[Any] = [target_id]

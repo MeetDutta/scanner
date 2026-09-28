@@ -22,6 +22,9 @@ models/
 *.sqlite3
 reports/
 *.log
+*.tar
+*.tar.gz
+SpecGuard-Docker-Offline/
 
 # Operating System
 .DS_Store

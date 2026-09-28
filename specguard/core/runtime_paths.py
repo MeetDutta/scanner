@@ -177,3 +177,27 @@ def detect_tesseract() -> Optional[Path]:
         return Path(system_tess)
 
     return None
+
+
+def get_static_dir() -> Path:
+    """Locates the static frontend assets directory."""
+    app_dir = get_app_dir()
+    candidates = [
+        app_dir / "static",
+        app_dir / "specguard" / "web" / "static",
+        app_dir / "web" / "static",
+    ]
+    for cand in candidates:
+        if cand.exists() and cand.is_dir():
+            return cand
+    return get_web_dir() / "static"
+
+
+# Standardized runtime path constants (Section 9)
+APPLICATION_ROOT = get_app_dir()
+MODELS_DIR = get_resource_dir("models")
+RULES_DIR = get_resource_dir("rules")
+STANDARDS_DIR = get_resource_dir("standards")
+TEMPLATES_DIR = get_resource_dir("templates")
+DATA_DIR = get_data_dir()
+STATIC_DIR = get_static_dir()
